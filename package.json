@@ -1,0 +1,30 @@
+{
+  "name": "foundry-year-zero-roller",
+  "version": "0.0.1",
+  "description": "",
+  "main": "foundry-year-zero-roller.js",
+  "scripts": {
+    "build": "gulp",
+    "watch": "gulp",
+    "gulp": "gulp",
+    "compile": "gulp css"
+  },
+  "keywords": [
+    "Foundry",
+    "VTT"
+  ],
+  "author": "Stefouch",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^7.18.0"
+  },
+  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Stefouch/foundry-year-zero-roller.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Stefouch/foundry-year-zero-roller/issues"
+  },
+  "homepage": "https://github.com/Stefouch/foundry-year-zero-roller#readme"
+}

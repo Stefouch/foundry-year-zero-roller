@@ -1,0 +1,24 @@
+{
+	"name": "foundry-year-zero-roller",
+	"title": "Year Zerol Roller",
+	"description": "Year Zero Roller for The Foundry VTT",
+	"private": true,
+	"author": "Stefouch",
+	"authors": ["Stefouch"],
+	"version": "0.0.1",
+	"minimumCoreVersion": "0.7.8",
+	"compatibleCoreVersion": "0.7.8",
+	"esmodules": [
+		"foundry-year-zero-roller.js"
+	],
+	"styles": [],
+	"packs": [],
+	"languages": [],
+	"gridDistance": 10,
+	"gridUnits": "m",
+	"initiative": "1d100",
+	"url": "https://github.com/Stefouch/foundry-year-zero-roller",
+	"manifest": "https://github.com/stefouch/foundry-year-zero-roller/releases/latest/download/system.json",
+	"download": "https://github.com/stefouch/foundry-year-zero-roller/releases/latest/download/master.zip",
+	"license": "LICENSE"
+}
