@@ -48,6 +48,7 @@ export function registerDice(game) {
 			const diceTypes = YZRoller.DIE_TYPES_MAP[g];
 			for (const type of diceTypes) _registerDie(type);
 		}
+		return;
 	}
 
 	// Checks the game validity.
@@ -68,7 +69,7 @@ export function registerDice(game) {
  */
 function _registerDie(type) {
 	const cls = YZRoller.DIE_TYPES[type];
-	if (!(cls instanceof YearZeroDie)) throw new DieTypeError(type);
+	if (!cls) throw new DieTypeError(type);
 
 	const deno = cls.DENOMINATION;
 	if (!deno) {
@@ -76,6 +77,10 @@ function _registerDie(type) {
 	}
 
 	// Registers the die in the Foundry CONFIG.
+	const reg = CONFIG.Dice.terms[deno];
+	if (reg) {
+		console.warn(`YZRoll | Dice Registration | Overwritting "${deno}" (${reg.name}) with ${cls.name}.`);
+	}
 	CONFIG.Dice.terms[deno] = cls;
 }
 
@@ -221,9 +226,9 @@ export class YZRoller {
 	 */
 	static DIE_TYPES_MAP = {
 		// Mutant Year Zero
-		'myz': ['base', 'skill', 'gear'],
+		'myz': ['base', 'skill', 'gear', 'neg'],
 		// Forbidden Lands
-		'fbl': ['base', 'skill', 'gear', 'artoD8', 'artoD10', 'artoD12'],
+		'fbl': ['base', 'skill', 'gear', 'neg', 'artoD8', 'artoD10', 'artoD12'],
 		// Alien RPG
 		'alien': ['skill', 'stress'],
 		// Tales From the Loop
@@ -233,7 +238,7 @@ export class YZRoller {
 		// Vaesen
 		'vae': ['skill'],
 		// Twilight 2000 //TODO
-		't2k': [null, 'ammo'],
+		// 't2k': [null, 'ammo'],
 	};
 
 	/**
