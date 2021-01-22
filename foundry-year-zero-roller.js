@@ -1,5 +1,5 @@
 // Imports Modules.
-import * as Dice from './dice.js';
+import * as YZDice from './dice.js';
 
 // Imports Entities.
 
@@ -16,8 +16,7 @@ Hooks.once('init', function() {
 	// Records configuration values.
 	CONFIG.debug.hooks = true;
 
-	Dice.registerDice();
-
+	YZDice.registerDice();
 });
 
 Hooks.once('ready', function() {

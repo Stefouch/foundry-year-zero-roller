@@ -1,24 +1,248 @@
 /* -------------------------------------------- */
+/*  Definitions                                 */
+/* -------------------------------------------- */
+
+/**
+ * Defines a Year Zero game.
+ * - `myz`: Mutant Year Zero
+ * - `fbl`: Forbidden Lands
+ * - `alien`: Alien RPG
+ * - `cor`: Coriolis The Third Horizon
+ * - `tales`: Tales From the Loop & Things From the Flood
+ * - `vae`: Vaesen
+ * - `t2k`: Twilight 2000
+ * @typedef {string} GameTypeString
+ */
+
+/**
+ * Defines a type of a YZ die.
+ * 
+ * `base`, `skill`, `gear`, `neg`, `stress`, `artoD8`, `artoD10`, `artoD12`, `ammo`
+ * @typedef {string} DieTypeString
+ */
+
+/* -------------------------------------------- */
 /*  Custom Dice Registration                    */
 /* -------------------------------------------- */
 
 /**
  * Registers all the Year Zero Dice.
- *
- * You must call this method in `Hooks.once('init');`
- *
- * *Note: Comment out those you don't need.*
+ * 
+ * You must call this method in `Hooks.once('init')`.
+ * 
+ * @param {?DieTypeString} game The game used (for the choice of die types to register). If omitted, registers all the dice.
  */
-export function registerDice() {
+export function registerDice(game) {
+	// Registers all the dice if `game` is omitted.
+	if (!game) {
+		// CONFIG.Dice.terms.b = BaseDie;
+		// CONFIG.Dice.terms.s = SkillDie;
+		// CONFIG.Dice.terms.g = GearDie;
+		// CONFIG.Dice.terms.n = NegativeDie;
+		// CONFIG.Dice.terms.x = StressDie;
+		// CONFIG.Dice.terms['8'] = D8ArtifactDie;
+		// CONFIG.Dice.terms['10'] = D10ArtifactDie;
+		// CONFIG.Dice.terms['12'] = D12ArtifactDie;
+
+		for (const g of YZRoller.GAMES) {
+			const diceTypes = YZRoller.DIE_TYPES_MAP[g];
+			for (const type of diceTypes) _registerDie(type);
+		}
+	}
+
+	// Checks the game validity.
+	if (!YZRoller.GAMES.includes(game)) throw new GameTypeError(game);
+
+	// Registers the game's dice.
+	const diceTypes = YZRoller.DIE_TYPES_MAP[game];
+	for (const type of diceTypes) _registerDie(type);
+
+	// Finally, registers our custom Roll class for Year Zero games.
 	CONFIG.Dice.rolls[0] = YearZeroRoll;
-	CONFIG.Dice.terms.b = BaseDie;
-	CONFIG.Dice.terms.s = SkillDie;
-	CONFIG.Dice.terms.g = GearDie;
-	CONFIG.Dice.terms.n = NegativeDie;
-	CONFIG.Dice.terms.x = StressDie;
-	CONFIG.Dice.terms['8'] = D8ArtifactDie;
-	CONFIG.Dice.terms['10'] = D10ArtifactDie;
-	CONFIG.Dice.terms['12'] = D12ArtifactDie;
+}
+
+/**
+ * Registers a die in Foundry.
+ * @param {DieTypeString} type Type of dice to register
+ * @private
+ */
+function _registerDie(type) {
+	const cls = YZRoller.DIE_TYPES[type];
+	if (!(cls instanceof YearZeroDie)) throw new DieTypeError(type);
+
+	const deno = cls.DENOMINATION;
+	if (!deno) {
+		throw new SyntaxError(`Undefined DENOMINATION for "${cls.name}".`);
+	}
+
+	// Registers the die in the Foundry CONFIG.
+	CONFIG.Dice.terms[deno] = cls;
+}
+
+
+/* -------------------------------------------- */
+/*  Custom YZ Roller class                      */
+/* -------------------------------------------- */
+
+/**
+ * Helper class for creating a Year Zero Roll.
+ */
+export class YZRoller {
+	/**
+	 * @param {GameTypeString} game      The game used
+	 * @param {?Object} opts             The options for the roll
+	 * @param {?number} opts.base        The quantity of base dice
+	 * @param {?number} opts.skill       The quantity of skill dice
+	 * @param {?number} opts.gear        The quantity of gear dice
+	 * @param {?number} opts.neg         The quantity of negative dice
+	 * @param {?number} opts.stress      The quantity of stress dice
+	 * @param {?number} opts.ammo        The quantity of ammo dice
+	 * @param {?number} opts.artoD8      The quantity of artoD8 dice
+	 * @param {?number} opts.artoD10     The quantity of artoD10 dice
+	 * @param {?number} opts.artoD12     The quantity of artoD12 dice
+	 * @param {number} [opts.maxPush=1]  The maximum number of pushes
+	 */
+	constructor(game = 'myz', {
+		base = 0,
+		skill = 0,
+		gear = 0,
+		neg = 0,
+		stress = 0,
+		ammo = 0,
+		artoD8 = 0,
+		artoD10 = 0,
+		artoD12 = 0,
+		maxPush = 1,
+	} = {}) {
+		const games = this.constructor.GAMES;
+		if (!games.includes(game)) {
+			throw new GameTypeError(game);
+		}
+
+		/**
+		 * The game used.
+		 * @type {GameTypeString}
+		 */
+		this.game = game;
+
+		/**
+		 * Quantities of dice.
+		 * @type {Object<DieTypeString, number>}
+		 */
+		this.diceQuantities = {
+			base, skill, gear, neg,
+			stress, ammo,
+			artoD8, artoD10, artoD12,
+		};
+
+		/**
+		 * The maximum number of pushes.
+		 * @type {number}
+		 */
+		this.maxPush = +maxPush;
+
+		/**
+		 * The roll in this roller.
+		 * @type {YearZeroRoll}
+		 * @private
+		 */
+		this._roll = undefined;
+
+		// Creates the roll inside the roller.
+		this._create();
+	}
+
+	/**
+	 * The formula of this roll, to pass into a Roll class.
+	 * @type {string}
+	 * @readonly
+	 */
+	get formula() {
+		const out = [];
+		for (const [type, n] of Object.entries(this.diceQuantities)) {
+			const cls = YZRoller.DIE_TYPES[type];
+			const deno = cls.DENOMINATION;
+			const str = `${n}d${deno}`;
+			out.push(str);
+		}
+		return out.join(' + ');
+	}
+
+	/**
+	 * The roll in this roller.
+	 * @returns {YearZeroRoll}
+	 * @readonly
+	 */
+	get roll() {
+		return this._roll;
+	}
+
+	/**
+	 * Creates a YearYearRoll object.
+	 * @returns {YearZeroRoll}
+	 * @private
+	 */
+	_create() {
+		this._roll = new YearZeroRoll(this.formula, {
+			game: this.game,
+			maxPush: this.maxPush,
+		});
+		return this._roll;
+	}
+
+	/**
+	 * Die Types and their classes.
+	 * @type {Object<DieTypeString, YearZeroDie>}
+	 * @constant
+	 * @readonly
+	 * @static
+	 */
+	static get DIE_TYPES() {
+		// Wrapped like this because of class declarations issues.
+		return {
+			'base': BaseDie,
+			'skill': SkillDie,
+			'gear': GearDie,
+			'neg': NegativeDie,
+			'stress': StressDie,
+			'arto': ArtifactDie,
+			'artoD8': D8ArtifactDie,
+			'artoD10': D10ArtifactDie,
+			'artoD12': D12ArtifactDie,
+		};
+	}
+
+	/**
+	 * Die Types mapped with Games.
+	 * @type {Object<GameTypeString, DieTypeString[]>}
+	 * @constant
+	 * @readonly
+	 * @static
+	 */
+	static DIE_TYPES_MAP = {
+		// Mutant Year Zero
+		'myz': ['base', 'skill', 'gear'],
+		// Forbidden Lands
+		'fbl': ['base', 'skill', 'gear', 'artoD8', 'artoD10', 'artoD12'],
+		// Alien RPG
+		'alien': ['skill', 'stress'],
+		// Tales From the Loop
+		'tales': ['skill'],
+		// Coriolis
+		'cor': ['skill'],
+		// Vaesen
+		'vae': ['skill'],
+		// Twilight 2000 //TODO
+		't2k': [null, 'ammo'],
+	};
+
+	/**
+	 * @type {GameTypeString[]}
+	 * @constant
+	 * @readonly
+	 * @static
+	 */
+	static GAMES = Object.keys(YZRoller.DIE_TYPES_MAP);
 }
 
 /* -------------------------------------------- */
@@ -68,7 +292,7 @@ export class YearZeroRoll extends Roll {
 	 * @readonly
 	 */
 	get game() {
-		if (!this.data.game) return YearZeroRoll.GAMES[0];
+		if (!this.data.game) return YZRoller.GAMES[0];
 		return this.data.game;
 	}
 
@@ -174,17 +398,6 @@ export class YearZeroRoll extends Roll {
 		return this.baneCount >= 2 || this.baneCount >= this.size;
 	}
 
-	// static DIE_TYPES = {
-	// 	'base': BaseDie,
-	// 	'skill': SkillDie,
-	// 	'gear': GearDie,
-	// 	'neg': NegativeDie,
-	// 	'stress': StressDie,
-	// 	'arto': ArtifactDie,
-	// };
-
-	static GAMES = ['myz', 'fbl', 't2k'];
-
 	/**
 	 * Pushes the roll, following the YZ rules.
 	 * @returns {YearZeroRoll} This roll, pushed
@@ -196,13 +409,6 @@ export class YearZeroRoll extends Roll {
 		// this.terms.forEach(t => t.push());
 		// this.evaluate();
 	}
-
-	/**
-	 * A string to define the type of a YZ die.
-	 * 
-	 * `base`, `skill`, `gear`, `neg`, `stress`, `arto`, `ammo`
-	 * @typedef {string} DieTypeString
-	 */
 
 	/**
 	 * Gets all the dice terms of a certain type.
@@ -479,6 +685,24 @@ export class D12ArtifactDie extends ArtifactDie {
 		super(termData);
 	}
 	static DENOMINATION = '12';
+}
+
+/* -------------------------------------------- */
+/*  Custom Errors                               */
+/* -------------------------------------------- */
+
+class GameTypeError extends TypeError {
+	constructor(msg) {
+		super(`Unknown game: "${msg}". Allowed games are: ${YZRoller.GAMES.join(', ')}.`);
+		this.name = 'YZ GameType Error';
+	}
+}
+
+class DieTypeError extends TypeError {
+	constructor(msg) {
+		super(`Unknown die type: "${msg}". Allowed types are: ${Object.keys(YZRoller.DIE_TYPES).join(', ')}.`);
+		this.name = 'YZ DieType Error';
+	}
 }
 
 /* -------------------------------------------- */
