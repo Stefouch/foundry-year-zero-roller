@@ -3,6 +3,7 @@
 /* -------------------------------------------- */
 
 /**
+ * @typedef {string} GameTypeString
  * Defines a Year Zero game.
  * - `myz`: Mutant Year Zero
  * - `fbl`: Forbidden Lands
@@ -11,14 +12,13 @@
  * - `tales`: Tales From the Loop & Things From the Flood
  * - `vae`: Vaesen
  * - `t2k`: Twilight 2000
- * @typedef {string} GameTypeString
  */
 
 /**
+ * @typedef {string} DieTypeString
  * Defines a type of a YZ die.
  * 
  * `base`, `skill`, `gear`, `neg`, `stress`, `artoD8`, `artoD10`, `artoD12`, `ammo`
- * @typedef {string} DieTypeString
  */
 
 /* -------------------------------------------- */
@@ -26,64 +26,182 @@
 /* -------------------------------------------- */
 
 /**
- * Registers all the Year Zero Dice.
+ * Interface for registering Year Zero dice
+ * and creating a cache for the pushable rolls.
  * 
- * You must call this method in `Hooks.once('init')`.
+ * Call the static `YearZeroRollManager.register()` method
+ * at the end of the `init` Hook.
  * 
- * @param {?DieTypeString} game The game used (for the choice of die types to register). If omitted, registers all the dice.
+ * @example
+ * import { YearZeroRollManager } from 'xxxx.js';
+ * Hooks.once('init', function() {
+ *   ...
+ *   YearZeroRollManager.register();
+ * });
  */
-export function registerDice(game) {
-	// Registers all the dice if `game` is omitted.
-	if (!game) {
-		// CONFIG.Dice.terms.b = BaseDie;
-		// CONFIG.Dice.terms.s = SkillDie;
-		// CONFIG.Dice.terms.g = GearDie;
-		// CONFIG.Dice.terms.n = NegativeDie;
-		// CONFIG.Dice.terms.x = StressDie;
-		// CONFIG.Dice.terms['8'] = D8ArtifactDie;
-		// CONFIG.Dice.terms['10'] = D10ArtifactDie;
-		// CONFIG.Dice.terms['12'] = D12ArtifactDie;
+export class YearZeroRollManager {
+	constructor() {
+		throw new SyntaxError(`${this.constructor.name} cannot be instancied. Use static methods instead.`);
+	}
 
-		for (const g of YZRoller.GAMES) {
-			const diceTypes = YZRoller.DIE_TYPES_MAP[g];
-			for (const type of diceTypes) _registerDie(type);
+	/**
+	 * Adds a roll to the cache.
+	 * @param {YearZeroRoll} roll Year Zero Roll to cache
+	 * @returns {Collection} The cached Collection (Map)
+	 * @static
+	 */
+	static cache(roll) {
+		return YearZeroRollManager._set(roll._id, roll);
+	}
+
+	/**
+	 * Sets a roll in the cache.
+	 * @param {string} id          ID (reference)
+	 * @param {YearZeroRoll} roll  Year Zero Roll to cache
+	 * @returns {Collection} The cached Collection (Map)
+	 * @private
+	 * @static
+	 */
+	static _set(id, roll) {
+		// 1 — Checks if the cache exists.
+		if (!game.yzrolls || !(game.yzrolls instanceof Collection)) {
+			YearZeroRollManager._createCache();
 		}
-		return;
+		// 2 — Validates the roll to cache.
+		if (!(roll instanceof YearZeroRoll)) {
+			throw new TypeError(`${YearZeroRollManager.name} | Can only cache YearZeroRoll objects.`);
+		}
+		// 3 — Caches only pushable rolls.
+		if (!roll.pushable) return this;
+		// 4 — Caches the roll.
+		return game.yzrolls.set(id, roll);
 	}
 
-	// Checks the game validity.
-	if (!YZRoller.GAMES.includes(game)) throw new GameTypeError(game);
+	/**
+	 * Retrieves a roll from the cache with its ID.
+	 * @param {string} id        Reference (ID) of the roll to retrieve
+	 * @param {?boolean} strict  Throw an Error if the requested id does not exist, otherwise return null. Default `false`
+	 * @returns {YearZeroRoll}
+	 * @static
+	 */
+	static get(id, strict) {
+		/** @type {YearZeroRoll} */
+		const roll = game.yzrolls.get(id, { strict });
+		if (!roll) return undefined;
+		if (!roll.pushable) {
+			YearZeroRollManager.delete(roll._id);
+			return undefined;
+		}
+		return roll;
+	}
 
-	// Registers the game's dice.
-	const diceTypes = YZRoller.DIE_TYPES_MAP[game];
-	for (const type of diceTypes) _registerDie(type);
+	static delete(id) {
+		if (!game.yzrolls) YearZeroRollManager._createCache();
+		return game.yzrolls.delete(id);
+	}
 
-	// Finally, registers our custom Roll class for Year Zero games.
-	CONFIG.Dice.rolls[0] = YearZeroRoll;
+	/**
+	 * Cleanse the cache.
+	 * @returns {boolean} `true` if the cache was cleansed
+	 * @static
+	 */
+	static clean() {
+		if (!game.yzrolls) return false;
+		game.yzrolls = new Collection();
+		console.warn(`${YearZeroRollManager.name} | Cache cleansed.`);
+		return true;
+	}
+
+	/**
+	 * Registers the Year Zero dice for the specified game
+	 * and the cache for the pushable Roll objects.
+	 * 
+	 * You must call this method in `Hooks.once('init')`.
+	 * 
+	 * @param {GameTypeString} yzGame The game used (for the choice of die types to register). If omitted, registers all the dice.
+	 * @static
+	 */
+	static register(yzGame) {
+		// Registers the dice.
+		YearZeroRollManager.registerDice(yzGame);
+
+		// Creates the dice cache.
+		if (game.yzrolls) {
+			console.warn(`${YearZeroRollManager.name} | Overwritting "game.yzrolls"`);
+		}
+		YearZeroRollManager._createCache();
+		console.log(`${YearZeroRollManager.name} | Registration complete!`);
+	}
+
+	/**
+	 * Registers all the Year Zero Dice.
+	 * @param {?GameTypeString} game The game used (for the choice of die types to register). If omitted, registers all the dice.
+	 * @static
+	 */
+	static registerDice(game) {
+		// Registers all the dice if `game` is omitted.
+		if (!game) {
+			// CONFIG.Dice.terms.b = BaseDie;
+			// CONFIG.Dice.terms.s = SkillDie;
+			// CONFIG.Dice.terms.g = GearDie;
+			// CONFIG.Dice.terms.n = NegativeDie;
+			// CONFIG.Dice.terms.x = StressDie;
+			// CONFIG.Dice.terms['8'] = D8ArtifactDie;
+			// CONFIG.Dice.terms['10'] = D10ArtifactDie;
+			// CONFIG.Dice.terms['12'] = D12ArtifactDie;
+
+			for (const g of YZRoller.GAMES) {
+				const diceTypes = YZRoller.DIE_TYPES_MAP[g];
+				for (const type of diceTypes) YearZeroRollManager.registerDie(type);
+			}
+			return;
+		}
+
+		// Checks the game validity.
+		if (!YZRoller.GAMES.includes(game)) throw new GameTypeError(game);
+
+		// Registers the game's dice.
+		const diceTypes = YZRoller.DIE_TYPES_MAP[game];
+		for (const type of diceTypes) YearZeroRollManager.registerDie(type);
+
+		// Finally, registers our custom Roll class for Year Zero games.
+		CONFIG.Dice.rolls[0] = YearZeroRoll;
+	}
+
+	/**
+	 * Registers a die in Foundry.
+	 * @param {DieTypeString} type Type of die to register
+	 * @static
+	 */
+	static registerDie(type) {
+		const cls = YZRoller.DIE_TYPES[type];
+		if (!cls) throw new DieTypeError(type);
+
+		const deno = cls.DENOMINATION;
+		if (!deno) {
+			throw new SyntaxError(`Undefined DENOMINATION for "${cls.name}".`);
+		}
+
+		// Registers the die in the Foundry CONFIG.
+		const reg = CONFIG.Dice.terms[deno];
+		if (reg) {
+			console.warn(`${YearZeroRollManager.name} | Die Registration: "${deno}" | Overwritting ${reg.name} with "${cls.name}".`);
+		}
+		else {
+			console.log(`${YearZeroRollManager.name} | Die Registration: "${deno}" with ${cls.name}.`);
+		}
+		CONFIG.Dice.terms[deno] = cls;
+	}
+
+	/**
+	 * @private
+	 * @static
+	 */
+	static _createCache() {
+		game.yzrolls = new Collection();
+		console.log(`${YearZeroRollManager.name} | Cache created.`);
+	}
 }
-
-/**
- * Registers a die in Foundry.
- * @param {DieTypeString} type Type of dice to register
- * @private
- */
-function _registerDie(type) {
-	const cls = YZRoller.DIE_TYPES[type];
-	if (!cls) throw new DieTypeError(type);
-
-	const deno = cls.DENOMINATION;
-	if (!deno) {
-		throw new SyntaxError(`Undefined DENOMINATION for "${cls.name}".`);
-	}
-
-	// Registers the die in the Foundry CONFIG.
-	const reg = CONFIG.Dice.terms[deno];
-	if (reg) {
-		console.warn(`YZRoll | Dice Registration | Overwritting "${deno}" (${reg.name}) with ${cls.name}.`);
-	}
-	CONFIG.Dice.terms[deno] = cls;
-}
-
 
 /* -------------------------------------------- */
 /*  Custom YZ Roller class                      */
@@ -221,7 +339,6 @@ export class YZRoller {
 	 * Die Types mapped with Games.
 	 * @type {Object<GameTypeString, DieTypeString[]>}
 	 * @constant
-	 * @readonly
 	 * @static
 	 */
 	static DIE_TYPES_MAP = {
@@ -244,7 +361,6 @@ export class YZRoller {
 	/**
 	 * @type {GameTypeString[]}
 	 * @constant
-	 * @readonly
 	 * @static
 	 */
 	static GAMES = Object.keys(YZRoller.DIE_TYPES_MAP);
@@ -467,8 +583,8 @@ export class YearZeroRoll extends Roll {
 				const hasSuccess = r.success !== undefined;
 				const hasFailure = r.failure !== undefined;
 				// START MODIFIED PART ==>
-				// const isMax = r.result === d.faces;
-				// const isMin = r.result === 1;
+				// // const isMax = r.result === d.faces;
+				// // const isMin = r.result === 1;
 				let isMax = false, isMin = false;
 				if (d instanceof NegativeDie) {
 					isMax = false;
@@ -501,7 +617,7 @@ export class YearZeroRoll extends Roll {
 }
 
 /* -------------------------------------------- */
-/*  Custom Dice Classes                         */
+/*  Custom Dice classes                         */
 /* -------------------------------------------- */
 
 export class YearZeroDie extends Die {
@@ -510,8 +626,8 @@ export class YearZeroDie extends Die {
 		super(termData);
 
 		if (!this.options.flavor) {
-			const cls = this.constructor.name;
-			this.options.flavor = game.i18n.localize(`YZDIE.${cls}`);
+			const clsName = this.constructor.name;
+			this.options.flavor = game.i18n.localize(`YZDIE.${clsName}`);
 		}
 	}
 
@@ -598,12 +714,20 @@ export class YearZeroDie extends Die {
 	);
 }
 
+/**
+ * Base Die: 1 & 6 can't be re-rolled.
+ * @extends {YearZeroDie}
+ */
 export class BaseDie extends YearZeroDie {
 	get type() { return 'base'; }
 	static DENOMINATION = 'b';
 	static LOCKED_VALUES = [1, 6];
 }
 
+/**
+ * Skill Die: 6 can't be re-rolled.
+ * @extends {YearZeroDie}
+ */
 export class SkillDie extends YearZeroDie {
 	get type() { return 'skill'; }
 	static DENOMINATION = 's';
@@ -613,12 +737,20 @@ export class SkillDie extends YearZeroDie {
 	}
 }
 
+/**
+ * Gear Die: 1 & 6 can't be re-rolled.
+ * @extends {YearZeroDie}
+ */
 export class GearDie extends YearZeroDie {
 	get type() { return 'gear'; }
 	static DENOMINATION = 'g';
 	static LOCKED_VALUES = [1, 6];
 }
 
+/**
+ * Negative Die: 6 can't be re-rolled.
+ * @extends {SkillDie}
+ */
 export class NegativeDie extends SkillDie {
 	get type() { return 'neg'; }
 	/** @override */
@@ -631,6 +763,10 @@ export class NegativeDie extends SkillDie {
 	static DENOMINATION = 'n';
 }
 
+/**
+ * Stress Die: 1 & 6 can't be re-rolled.
+ * @extends {YearZeroDie}
+ */
 export class StressDie extends YearZeroDie {
 	get type() { return 'stress'; }
 	static DENOMINATION = 'x';
@@ -645,6 +781,10 @@ export class StressDie extends YearZeroDie {
 
 /* -------------------------------------------- */
 
+/**
+ * Artifact Die: 6+ can't be re-rolled.
+ * @extends {SkillDie}
+ */
 export class ArtifactDie extends SkillDie {
 	get type() { return 'arto'; }
 	/** @override */

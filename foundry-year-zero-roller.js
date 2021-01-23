@@ -16,7 +16,7 @@ Hooks.once('init', function() {
 	// Records configuration values.
 	CONFIG.debug.hooks = true;
 
-	YZDice.registerDice();
+	YZDice.YearZeroRollManager.register();
 });
 
 Hooks.once('ready', function() {
