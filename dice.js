@@ -1,3 +1,35 @@
+/*
+ * ===========================================
+ *  UNIVERSAL YEAR ZERO DICE ROLLER
+ *   FOR THE FOUNDRY VTT
+ * ===========================================
+ * Author: @Stefouch
+ * Licence: MIT
+ * ===========================================
+ * Content:
+ * 
+ * - YearZeroRollManager: Interface for
+ *     registering dice & managing the cache
+ *     of pushable rolls.
+ * 
+ * - YZRoller: Helper class for YZ dice rolls
+ *     building.
+ * 
+ * - YearZeroRoll: Custom implementation of
+ *     the default Foundry Roll class.
+ * 
+ * - YearZeroDie: Custom implementation of
+ *     the default Foundry DieTerm class.
+ * 
+ * - (Base/Skill/Gear/etc..)Die: Extends of
+ *     the YearZeroDie class with specific
+ *     DENOMINATION and LOCKED_VALUE
+ *     constants.
+ * 
+ * ===========================================
+ */
+
+
 /* -------------------------------------------- */
 /*  Definitions                                 */
 /* -------------------------------------------- */
@@ -29,8 +61,16 @@
  * Interface for registering Year Zero dice
  * and creating a cache for the pushable rolls.
  * 
- * Call the static `YearZeroRollManager.register()` method
- * at the end of the `init` Hook.
+ * To register the game and its dice,
+ * call the static `YearZeroRollManager.register()` method
+ * at the end of the `init` or `setup` Hooks.
+ * 
+ * To save and retrieve dice for pushes, use the
+ * static methods `.cache(roll)` and `.grab(id)`.
+ * 
+ * @extends {Collection} The Foundry extends of Map
+ * @abstract
+ * @interface
  * 
  * @example
  * import { YearZeroRollManager } from 'xxxx.js';
@@ -38,12 +78,9 @@
  *   ...
  *   YearZeroRollManager.register();
  * });
+ * 
  */
-export class YearZeroRollManager {
-	constructor() {
-		throw new SyntaxError(`${this.constructor.name} cannot be instancied. Use static methods instead.`);
-	}
-
+export class YearZeroRollManager extends Collection {
 	/**
 	 * Adds a roll to the cache.
 	 * @param {YearZeroRoll} roll Year Zero Roll to cache
@@ -51,53 +88,18 @@ export class YearZeroRollManager {
 	 * @static
 	 */
 	static cache(roll) {
-		return YearZeroRollManager._set(roll._id, roll);
-	}
-
-	/**
-	 * Sets a roll in the cache.
-	 * @param {string} id          ID (reference)
-	 * @param {YearZeroRoll} roll  Year Zero Roll to cache
-	 * @returns {Collection} The cached Collection (Map)
-	 * @private
-	 * @static
-	 */
-	static _set(id, roll) {
-		// 1 — Checks if the cache exists.
-		if (!game.yzrolls || !(game.yzrolls instanceof Collection)) {
-			YearZeroRollManager._createCache();
-		}
-		// 2 — Validates the roll to cache.
-		if (!(roll instanceof YearZeroRoll)) {
-			throw new TypeError(`${YearZeroRollManager.name} | Can only cache YearZeroRoll objects.`);
-		}
-		// 3 — Caches only pushable rolls.
-		if (!roll.pushable) return this;
-		// 4 — Caches the roll.
-		return game.yzrolls.set(id, roll);
+		return game.yzrolls.set(roll._id, roll);
 	}
 
 	/**
 	 * Retrieves a roll from the cache with its ID.
-	 * @param {string} id        Reference (ID) of the roll to retrieve
-	 * @param {?boolean} strict  Throw an Error if the requested id does not exist, otherwise return null. Default `false`
-	 * @returns {YearZeroRoll}
+	 * @param {string} id               Reference (ID) of the roll to retrieve
+	 * @param {boolean} [strict=false]  Throws an Error if the requested id does not exist, otherwise return null. Default is `false`
+	 * @returns {YearZeroRoll|undefined} Returns `undefined` if nothing was found or if the cached roll wasn't pushable
 	 * @static
 	 */
-	static get(id, strict) {
-		/** @type {YearZeroRoll} */
-		const roll = game.yzrolls.get(id, { strict });
-		if (!roll) return undefined;
-		if (!roll.pushable) {
-			YearZeroRollManager.delete(roll._id);
-			return undefined;
-		}
-		return roll;
-	}
-
-	static delete(id) {
-		if (!game.yzrolls) YearZeroRollManager._createCache();
-		return game.yzrolls.delete(id);
+	static grab(id, strict = false) {
+		return game.yzrolls.get(id, strict);
 	}
 
 	/**
@@ -107,9 +109,37 @@ export class YearZeroRollManager {
 	 */
 	static clean() {
 		if (!game.yzrolls) return false;
-		game.yzrolls = new Collection();
+		game.yzrolls.clear();
 		console.warn(`${YearZeroRollManager.name} | Cache cleansed.`);
 		return true;
+	}
+
+	/** @override */
+	set(id, roll) {
+		// 1 — Checks if the cache exists.
+		if (!game.yzrolls || !(game.yzrolls instanceof this)) {
+			YearZeroRollManager._initialize();
+		}
+		// 2 — Validates the roll to cache.
+		if (!(roll instanceof YearZeroRoll)) {
+			throw new TypeError(`${YearZeroRollManager.name} | Can only cache YearZeroRoll objects.`);
+		}
+		// 3 — Caches only pushable rolls.
+		if (!roll.pushable) return this;
+		// 4 — Caches the roll.
+		return super.set(id, roll);
+	}
+
+	/** @override */
+	get(id, strict) {
+		/** @type {YearZeroRoll} */
+		const roll = super.get(id, { strict });
+		if (!roll) return undefined;
+		if (!roll.pushable) {
+			super.delete(roll._id);
+			return undefined;
+		}
+		return roll;
 	}
 
 	/**
@@ -129,7 +159,7 @@ export class YearZeroRollManager {
 		if (game.yzrolls) {
 			console.warn(`${YearZeroRollManager.name} | Overwritting "game.yzrolls"`);
 		}
-		YearZeroRollManager._createCache();
+		YearZeroRollManager._initialize();
 		console.log(`${YearZeroRollManager.name} | Registration complete!`);
 	}
 
@@ -197,8 +227,8 @@ export class YearZeroRollManager {
 	 * @private
 	 * @static
 	 */
-	static _createCache() {
-		game.yzrolls = new Collection();
+	static _initialize() {
+		game.yzrolls = new this();
 		console.log(`${YearZeroRollManager.name} | Cache created.`);
 	}
 }
