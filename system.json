@@ -7,7 +7,7 @@
 	"authors": ["Stefouch"],
 	"version": "0.0.1",
 	"minimumCoreVersion": "0.7.8",
-	"compatibleCoreVersion": "0.7.8",
+	"compatibleCoreVersion": "0.7.9",
 	"esmodules": [
 		"foundry-year-zero-roller.js"
 	],
