@@ -48,7 +48,7 @@
  */
 
  /**
-  * An object with quantities of dice
+  * An object with quantities of dice.
   * @typedef {Object<DieTypeString, number>} DiceQuantities
   */
 
@@ -76,7 +76,7 @@
  * import { YearZeroRollManager } from 'xxxx.js';
  * Hooks.once('init', function() {
  *   ...
- *   YearZeroRollManager.register();
+ *   YearZeroRollManager.register('yourgame');
  * });
  * 
  */
@@ -93,7 +93,7 @@ export class YearZeroRollManager extends Collection {
 
   /**
    * Retrieves a roll from the cache with its ID.
-   * @param {string} id               Reference (ID) of the roll to retrieve
+   * @param {string}   id             Reference (ID) of the roll to retrieve
    * @param {boolean} [strict=false]  Throws an Error if the requested id does not exist, otherwise return null. Default is `false`
    * @returns {YearZeroRoll|undefined} Returns `undefined` if nothing was found or if the cached roll wasn't pushable
    * @static
@@ -413,10 +413,10 @@ export class YZRoller {
       'artoD8': D8ArtifactDie,
       'artoD10': D10ArtifactDie,
       'artoD12': D12ArtifactDie,
-      'a': D6TwilightDie,
-      'b': D8TwilightDie,
-      'c': D10TwilightDie,
-      'd': D12TwilightDie,
+      'a': D12TwilightDie,
+      'b': D10TwilightDie,
+      'c': D8TwilightDie,
+      'd': D6TwilightDie,
       'ammo': AmmoDie,
       'loc': LocationDie,
     };
@@ -732,6 +732,7 @@ export class YearZeroDie extends Die {
     termData.faces = termData.faces || 6;
     super(termData);
 
+    // TODO
     // if (!this.options.flavor) {
     //   const clsName = this.constructor.name;
     //   this.options.flavor = game.i18n.localize(`YZDIE.${clsName}`);
