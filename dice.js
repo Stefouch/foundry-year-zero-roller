@@ -8,8 +8,7 @@
  * ===============================================================================
  * Content:
  * 
- * - YearZeroRollManager: Interface for registering dice & managing the cache
- *     of pushable rolls.
+ * - YearZeroRollManager: Interface for registering dice.
  * 
  * - YZRoller: Helper class for YZ dice rolls building.
  * 
@@ -47,10 +46,10 @@
  * @typedef {string} DieTypeString
  */
 
- /**
-  * An object with quantities of dice.
-  * @typedef {Object<DieTypeString, number>} DiceQuantities
-  */
+/**
+* An object with quantities of dice.
+* @typedef {Object<DieTypeString, number>} DiceQuantities
+*/
 
 
 /* -------------------------------------------- */
@@ -80,68 +79,7 @@
  * });
  * 
  */
-export class YearZeroRollManager extends Collection {
-  /**
-   * Adds a roll to the cache.
-   * @param {YearZeroRoll} roll Year Zero Roll to cache
-   * @returns {Collection} The cached Collection (Map)
-   * @static
-   */
-  static cache(roll) {
-    return game.yzrolls.set(roll._id, roll);
-  }
-
-  /**
-   * Retrieves a roll from the cache with its ID.
-   * @param {string}   id             Reference (ID) of the roll to retrieve
-   * @param {boolean} [strict=false]  Throws an Error if the requested id does not exist, otherwise return null. Default is `false`
-   * @returns {YearZeroRoll|undefined} Returns `undefined` if nothing was found or if the cached roll wasn't pushable
-   * @static
-   */
-  static grab(id, strict = false) {
-    return game.yzrolls.get(id, strict);
-  }
-
-  /**
-   * Cleanse the cache.
-   * @returns {boolean} `true` if the cache was cleansed
-   * @static
-   */
-  static clean() {
-    if (!game.yzrolls) return false;
-    game.yzrolls.clear();
-    console.warn(`${YearZeroRollManager.name} | Cache cleansed.`);
-    return true;
-  }
-
-  /** @override */
-  set(id, roll) {
-    // 1 — Checks if the cache exists.
-    if (!game.yzrolls || !(game.yzrolls instanceof this)) {
-      YearZeroRollManager._initialize();
-    }
-    // 2 — Validates the roll to cache.
-    if (!(roll instanceof YearZeroRoll)) {
-      throw new TypeError(`${YearZeroRollManager.name} | Can only cache YearZeroRoll objects.`);
-    }
-    // 3 — Caches only pushable rolls.
-    if (!roll.pushable) return this;
-    // 4 — Caches the roll.
-    return super.set(id, roll);
-  }
-
-  /** @override */
-  get(id, strict) {
-    /** @type {YearZeroRoll} */
-    const roll = super.get(id, { strict });
-    if (!roll) return undefined;
-    if (!roll.pushable) {
-      super.delete(roll._id);
-      return undefined;
-    }
-    return roll;
-  }
-
+export class YearZeroRollManager {
   /**
    * Registers the Year Zero dice for the specified game
    * and the cache for the pushable Roll objects.
@@ -159,29 +97,29 @@ export class YearZeroRollManager extends Collection {
     if (game.yzrolls) {
       console.warn(`${YearZeroRollManager.name} | Overwritting "game.yzrolls"`);
     }
-    YearZeroRollManager._initialize();
+    YearZeroRollManager._initialize(yzGame);
     console.log(`${YearZeroRollManager.name} | Registration complete!`);
   }
 
   /**
    * Registers all the Year Zero Dice.
-   * @param {?GameTypeString} game The game used (for the choice of die types to register). If omitted, registers all the dice.
+   * @param {?GameTypeString} yzGame The game used (for the choice of die types to register). If omitted, registers all the dice.
    * @static
    */
-  static registerDice(game) {
+  static registerDice(yzGame) {
     // Registers all the dice if `game` is omitted.
-    if (!game) {
-      for (const g of YZRoller.GAMES) {
-        const diceTypes = YZRoller.DIE_TYPES_MAP[g];
+    if (!yzGame) {
+      for (const g of YearZeroRollManager.GAMES) {
+        const diceTypes = YearZeroRollManager.DIE_TYPES_MAP[g];
         for (const type of diceTypes) YearZeroRollManager.registerDie(type);
       }
     }
     else {
       // Checks the game validity.
-      if (!YZRoller.GAMES.includes(game)) throw new GameTypeError(game);
+      if (!YearZeroRollManager.GAMES.includes(yzGame)) throw new GameTypeError(yzGame);
 
       // Registers the game's dice.
-      const diceTypes = YZRoller.DIE_TYPES_MAP[game];
+      const diceTypes = YearZeroRollManager.DIE_TYPES_MAP[yzGame];
       for (const type of diceTypes) YearZeroRollManager.registerDie(type);
     }
 
@@ -195,7 +133,7 @@ export class YearZeroRollManager extends Collection {
    * @static
    */
   static registerDie(type) {
-    const cls = YZRoller.DIE_TYPES[type];
+    const cls = YearZeroRollManager.DIE_TYPES[type];
     if (!cls) throw new DieTypeError(type);
 
     const deno = cls.DENOMINATION;
@@ -215,12 +153,82 @@ export class YearZeroRollManager extends Collection {
   }
 
   /**
+   * @param {GameTypeString} yzGame The game used (for the choice of die types to register)
    * @private
    * @static
    */
-  static _initialize() {
-    game.yzrolls = new this();
-    console.log(`${YearZeroRollManager.name} | Cache created.`);
+  static _initialize(yzGame) {
+    if (game.yzrolls?.game) {
+      console.warn(
+        `${YearZeroRollManager.name} | Overwritting the default Year Zero game ${game.yzrolls.game} with: "${yzGame}"`,
+      );
+    }
+    game.yzrolls = { game: yzGame };
+    console.log(`${YearZeroRollManager.name} | The name of the Year Zero game is: "${yzGame}".`);
+  }
+
+  /* -------------------------------------------- */
+
+  /**
+   * Die Types and their classes.
+   * @type {Object<DieTypeString, YearZeroDie>}
+   * @constant
+   * @readonly
+   * @static
+   */
+  static get DIE_TYPES() {
+    // Wrapped like this because of class declarations issues.
+    return {
+      'base': BaseDie,
+      'skill': SkillDie,
+      'neg': NegativeDie,
+      'gear': GearDie,
+      'stress': StressDie,
+      'arto': ArtifactDie,
+      'artoD8': D8ArtifactDie,
+      'artoD10': D10ArtifactDie,
+      'artoD12': D12ArtifactDie,
+      'a': D12TwilightDie,
+      'b': D10TwilightDie,
+      'c': D8TwilightDie,
+      'd': D6TwilightDie,
+      'ammo': AmmoDie,
+      'loc': LocationDie,
+    };
+  }
+
+  /**
+   * Die Types mapped with Games.
+   * @type {Object<GameTypeString, DieTypeString[]>}
+   * @constant
+   * @static
+   */
+  static get DIE_TYPES_MAP() {
+    return {
+      // Mutant Year Zero
+      'myz': ['base', 'skill', 'gear', 'neg'],
+      // Forbidden Lands
+      'fbl': ['base', 'skill', 'gear', 'neg', 'artoD8', 'artoD10', 'artoD12'],
+      // Alien RPG
+      'alien': ['skill', 'stress'],
+      // Tales From the Loop
+      'tales': ['skill'],
+      // Coriolis
+      'cor': ['skill'],
+      // Vaesen
+      'vae': ['skill'],
+      // Twilight 2000
+      't2k': ['a', 'b', 'c', 'd', 'ammo', 'loc'],
+    };
+  }
+
+  /**
+   * @type {GameTypeString[]}
+   * @constant
+   * @static
+   */
+  static get GAMES() {
+    return Object.keys(YearZeroRollManager.DIE_TYPES_MAP);
   }
 }
 
@@ -237,73 +245,17 @@ export class YZRoller {
   }
 
   /**
-   * Generates a roll based on the number of dice.
-   * @param {GameTypeString} game The game used
-   * @param {DiceQuantities} dice    An object with quantities of dice
-   * @param {?number}  dice.base     The quantity of base dice
-   * @param {?number}  dice.skill    The quantity of skill dice
-   * @param {?number}  dice.gear     The quantity of gear dice
-   * @param {?number}  dice.neg      The quantity of negative dice
-   * @param {?number}  dice.stress   The quantity of stress dice
-   * @param {?number}  dice.ammo     The quantity of ammo dice
-   * @param {?number}  dice.loc      The quantity of location dice
-   * @param {?number}  dice.artoD8   The quantity of artoD8 dice
-   * @param {?number}  dice.artoD10  The quantity of artoD10 dice
-   * @param {?number}  dice.artoD12  The quantity of artoD12 dice
-   * @param {?number}  dice.a        The quantity of T2K D12 dice
-   * @param {?number}  dice.b        The quantity of T2K D10 dice
-   * @param {?number}  dice.c        The quantity of T2K D8 dice
-   * @param {?number}  dice.d        The quantity of T2K D6 dice
-   * @param {number}  [maxPush=1]    The maximum number of pushes
-   */
-  static create(game = 'myz', {
-    dice = {
-      base: 0,
-      skill: 0,
-      gear: 0,
-      neg: 0,
-      stress: 0,
-      ammo: 0,
-      loc: 0,
-      artoD8: 0,
-      artoD10: 0,
-      artoD12: 0,
-      a: 0,
-      b: 0,
-      c: 0,
-      d: 0,
-    },
-    maxPush = 1,
-  } = {}) {
-    if (!YZRoller.GAMES.includes(game)) {
-      throw new GameTypeError(game);
-    }
-
-    // Builds the formula.
-    const out = [];
-    for (const [type, n] of Object.entries(dice)) {
-      if (n <= 0) continue;
-      const cls = YZRoller.DIE_TYPES[type];
-      const deno = cls.DENOMINATION;
-      const str = `${n}d${deno}`;
-      out.push(str);
-    }
-    const formula = out.join(' + ');
-
-    // Creates the roll inside the roller.
-    const roll = new YearZeroRoll(formula, { game, maxPush }).roll();
-    console.warn(roll);
-    return roll;
-  }
-
-  /**
    * Applies a difficulty modifier to a quantity of dice.
-   * @param {GameTypeString} yzGame  The game used (for the choice of die types to register) 
-   * @param {number}         mod     Difficulty modifier (bonus or malus)
-   * @param {DiceQuantities} dice    An object with quantities of dice
+   * @param {DiceQuantities}  dice    An object with quantities of dice
+   * @param {number}          mod     Difficulty modifier (bonus or malus)
+   * @param {GameTypeString} [yzGame] The game used (for the choice of die types to register)
    * @returns {DiceQuantities}
    */
-  static modify(yzGame, mod, dice) {
+  static modify(dice, mod, yzGame) {
+    // Gets the default game.
+    yzGame = yzGame || game.yzrolls?.game;
+    if (!YZRoller.GAMES.includes(yzGame)) throw new GameTypeError(yzGame);
+
     // Twilight 2000
     if (yzGame === 't2k') {
       const dieTypes = ['d', 'c', 'b', 'a'];
@@ -313,12 +265,13 @@ export class YZRoller {
         if (dieTypes.includes(k)) {
           for (; v > 0; v--) arr.push(k);
         }
+        return arr;
       }, []);
       const n = pool.length;
 
       // Exits early on 3+ dice.
       if (n > 2) return dice;
-      if (n <= 1 && pool === ['d']) return dice;
+      if (n <= 1 && pool.includes('d')) return dice;
 
       // Initializes null dice.
       for (const type of dieTypes) if (!dice[type]) dice[type] = 0;
@@ -327,9 +280,9 @@ export class YZRoller {
       const die = pool.reduce((a, b) => {
         if (mod > 0) {
           if (b === 'a') return a;
-          return a > b ? a : b;
+          return a < b ? a : b;
         }
-        return a < b ? a : b;
+        return a > b ? a : b;
       }, '');
 
       // Exits early if we didn't find a die to change.
@@ -380,7 +333,7 @@ export class YZRoller {
       const neg = Math.max(-mod - dice.skill, 0);
       dice.skill += mod;
       if (neg > 0) {
-         if (!dice.neg) dice.neg = 0;
+        if (!dice.neg) dice.neg = 0;
         dice.neg += neg;
       }
     }
@@ -392,65 +345,6 @@ export class YZRoller {
     return dice;
   }
 
-  /* -------------------------------------------- */
-
-  /**
-   * Die Types and their classes.
-   * @type {Object<DieTypeString, YearZeroDie>}
-   * @constant
-   * @readonly
-   * @static
-   */
-  static get DIE_TYPES() {
-    // Wrapped like this because of class declarations issues.
-    return {
-      'base': BaseDie,
-      'skill': SkillDie,
-      'gear': GearDie,
-      'neg': NegativeDie,
-      'stress': StressDie,
-      'arto': ArtifactDie,
-      'artoD8': D8ArtifactDie,
-      'artoD10': D10ArtifactDie,
-      'artoD12': D12ArtifactDie,
-      'a': D12TwilightDie,
-      'b': D10TwilightDie,
-      'c': D8TwilightDie,
-      'd': D6TwilightDie,
-      'ammo': AmmoDie,
-      'loc': LocationDie,
-    };
-  }
-
-  /**
-   * Die Types mapped with Games.
-   * @type {Object<GameTypeString, DieTypeString[]>}
-   * @constant
-   * @static
-   */
-  static DIE_TYPES_MAP = {
-    // Mutant Year Zero
-    'myz': ['base', 'skill', 'gear', 'neg'],
-    // Forbidden Lands
-    'fbl': ['base', 'skill', 'gear', 'neg', 'artoD8', 'artoD10', 'artoD12'],
-    // Alien RPG
-    'alien': ['skill', 'stress'],
-    // Tales From the Loop
-    'tales': ['skill'],
-    // Coriolis
-    'cor': ['skill'],
-    // Vaesen
-    'vae': ['skill'],
-    // Twilight 2000
-    't2k': ['a', 'b', 'c', 'd', 'ammo', 'loc'],
-  };
-
-  /**
-   * @type {GameTypeString[]}
-   * @constant
-   * @static
-   */
-  static GAMES = Object.keys(YZRoller.DIE_TYPES_MAP);
 }
 
 /* -------------------------------------------- */
@@ -465,32 +359,15 @@ export class YearZeroRoll extends Roll {
   /**
    * @param {string} formula  The string formula to parse
    * @param {Object} data     The data object against which to parse attributes within the formula
-   * @param {string} data._id      The ID of the roll
    * @param {string} data.game     The game used
    * @param {number} data.maxPush  The maximum number of times the roll can be pushed
    */
   constructor(formula, data = {}) {
     super(formula, data);
-
-    if (!this.data._id) {
-      Object.defineProperty(this.data, '_id', {
-        value: randomID(6),
-        enumerable: false,
-        configurable: false,
-        writable: false,
-      });
-    }
+    if (!this.data.maxPush) data.maxPush = 1;
   }
 
-  /**
-   * The ID number of the roll.
-   * @type {string}
-   * @readonly
-   * @private
-   */
-  get _id() {
-    return this.data._id;
-  }
+  /* -------------------------------------------- */
 
   /**
    * The game used.
@@ -500,6 +377,21 @@ export class YearZeroRoll extends Roll {
   get game() {
     if (!this.data.game) return YZRoller.GAMES[0];
     return this.data.game;
+  }
+  set game(yzGame) {
+    this.data.game = yzGame;
+  }
+
+  /**
+   * The maximum number of pushes.
+   * @type {number}
+   * @readonly
+   */
+  get maxPush() {
+    return this.data.maxPush;
+  }
+  set maxPush(n) {
+    this.data.maxPush = n;
   }
 
   /**
@@ -512,12 +404,21 @@ export class YearZeroRoll extends Roll {
   }
 
   /**
+   * The number of times this roll has been pushed.
+   * @type {number}
+   * @readonly
+   */
+  get pushCount() {
+    return this.terms.reduce((c, t) => Math.max(c, t.pushCount || 0), 0);
+  }
+
+  /**
    * Whether the roll was pushed or not.
    * @type {boolean}
    * @readonly
    */
   get pushed() {
-    return this.data.pushCount > 0;
+    return this.pushCount > 0;
   }
 
   /**
@@ -527,7 +428,7 @@ export class YearZeroRoll extends Roll {
    */
   get pushable() {
     return (
-      this.data.pushCount < this.data.maxPush
+      this.pushCount < this.maxPush
       && this.terms.some(t => t.pushable)
       && !this.mishap
     );
@@ -540,7 +441,7 @@ export class YearZeroRoll extends Roll {
    * @deprecated
    */
   get successCount() {
-    console.warn('YZRoll | YearZeroRoll#successCount is deprecated. Use #total instead.')
+    console.warn('YZRoll | YearZeroRoll#successCount is deprecated. Use #total instead.');
     return this.total;
   }
 
@@ -604,11 +505,68 @@ export class YearZeroRoll extends Roll {
     return this.baneCount >= 2 || this.baneCount >= this.size;
   }
 
-  /** @override */
-  roll() {
-    super.roll();
-    YearZeroRollManager.cache(this);
-    return this;
+  /* -------------------------------------------- */
+
+  /**
+   * Generates a roll based on the number of dice.
+   * @param {DiceQuantities} dice    An object with quantities of dice
+   * @param {?number}  dice.base     The quantity of base dice
+   * @param {?number}  dice.skill    The quantity of skill dice
+   * @param {?number}  dice.gear     The quantity of gear dice
+   * @param {?number}  dice.neg      The quantity of negative dice
+   * @param {?number}  dice.stress   The quantity of stress dice
+   * @param {?number}  dice.ammo     The quantity of ammo dice
+   * @param {?number}  dice.loc      The quantity of location dice
+   * @param {?number}  dice.artoD8   The quantity of artoD8 dice
+   * @param {?number}  dice.artoD10  The quantity of artoD10 dice
+   * @param {?number}  dice.artoD12  The quantity of artoD12 dice
+   * @param {?number}  dice.a        The quantity of T2K D12 dice
+   * @param {?number}  dice.b        The quantity of T2K D10 dice
+   * @param {?number}  dice.c        The quantity of T2K D8 dice
+   * @param {?number}  dice.d        The quantity of T2K D6 dice
+   * @param {GameTypeString} [yzGame]    The game used
+   * @param {number}         [maxPush=1] The maximum number of pushes
+   * @override
+   */
+  static createFromDice({ yzGame = null, maxPush = 1,
+    dice = {
+      base: 0,
+      skill: 0,
+      neg: 0,
+      gear: 0,
+      stress: 0,
+      artoD8: 0,
+      artoD10: 0,
+      artoD12: 0,
+      a: 0,
+      b: 0,
+      c: 0,
+      d: 0,
+      ammo: 0,
+      loc: 0,
+    },
+  } = {}) {
+    // Checks the game.
+    yzGame = yzGame || game.yzrolls?.game;
+    if (!YearZeroRollManager.GAMES.includes(yzGame)) throw new GameTypeError(yzGame);
+
+    // Builds the formula.
+    const out = [];
+    for (const [type, n] of Object.entries(dice)) {
+      if (n <= 0) continue;
+      const cls = YearZeroRollManager.DIE_TYPES[type];
+      const deno = cls.DENOMINATION;
+      const str = `${n}d${deno}`;
+      out.push(str);
+    }
+    let formula = out.join(' + ');
+
+    if (!YearZeroRoll.validate(formula)) formula = '1ds';
+
+    // Creates the roll inside the roller.
+    const roll = new YearZeroRoll(formula, { game: yzGame, maxPush });
+    console.warn(roll);
+    return roll;
   }
 
   /**
@@ -626,17 +584,20 @@ export class YearZeroRoll extends Roll {
     this.results = this.terms.map(t => t.evaluate ? t.total : t);
 
     // Step 3 — Safely evaluates the final total.
-    let total = this._safeEval(this.results.join(" "));
-    if ( total === null ) total = 0;
-    if ( !Number.isNumeric(total) ) {
-      throw new Error(game.i18n.format("DICE.ErrorNonNumeric", {formula: this.formula}));
+    let total = this._safeEval(this.results.join(' '));
+    if (total === null) total = 0;
+    if (!Number.isNumeric(total)) {
+      throw new Error(game.i18n.format('DICE.ErrorNonNumeric', { formula: this.formula }));
     }
 
     // Stores the final output.
     this._dice = []; // TODO
     this._total = total;
-    YearZeroRollManager.cache(this);
+    console.warn(this);
+    return this;
   }
+
+  /* -------------------------------------------- */
 
   /**
    * Gets all the dice terms of a certain type.
@@ -644,16 +605,14 @@ export class YearZeroRoll extends Roll {
    * @returns {DiceTerm[]}
    */
   getTerms(type) {
-    // const cls = DIE_TYPES[type];
-    // if (!cls) throw new TypeError(`Year Zero Roll | Die type unknown: "${type}".`);
     return this.terms.filter(t => t.type === type);
   }
 
   /**
    * Counts the values of a certain type in the roll.
    * If `seed` is omitted, counts all the dice of a certain type.
-   * @param {DieTypeString} type The type of the die
-   * @param {number} seed The number to search, if any
+   * @param {DieTypeString} type  The type of the die
+   * @param {number}       [seed] The number to search, if any
    * @returns {number} Total count
    */
   count(type, seed) {
@@ -666,11 +625,11 @@ export class YearZeroRoll extends Roll {
         }
         return c;
       }, 0);
-
     }
     return this.terms.reduce((c, t) => t.type === type ? c + t.number : c, 0);
-    // return this.getTerms(type).reduce((c, t) => c + t.number, 0);
   }
+
+  /* -------------------------------------------- */
 
   /**
    * Renders the tooltip HTML for a Roll instance.
@@ -682,44 +641,76 @@ export class YearZeroRoll extends Roll {
     const parts = this.dice.map(d => {
       const cls = d.constructor;
       return {
-      formula: d.formula,
-      total: d.total,
-      faces: d.faces,
-      flavor: d.options.flavor,
-      rolls: d.results.map(r => {
-        const hasSuccess = r.success !== undefined;
-        const hasFailure = r.failure !== undefined;
-        // START MODIFIED PART ==>
-        // // const isMax = r.result === d.faces;
-        // // const isMin = r.result === 1;
-        let isMax = false, isMin = false;
-        if (d.type === 'neg') {
-          isMax = false;
-          isMin = r.result === 6;
-        }
-        else {
-          isMax = r.result === d.faces || r.count >= 1;
-          isMin = r.result === 1 && d.type !== 'skill' && d.type !== 'loc';
-        }
-        // <== END MODIFIED PART
-        return {
-        result: cls.getResultLabel(r.result),
-        classes: [
-          cls.name.toLowerCase(),
-          "d" + d.faces,
-          r.success ? "success" : null,
-          r.failure ? "failure" : null,
-          r.rerolled ? "rerolled" : null,
-          r.exploded ? "exploded" : null,
-          r.discarded ? "discarded" : null,
-          !(hasSuccess || hasFailure) && isMin ? "min" : null,
-          !(hasSuccess || hasFailure) && isMax ? "max" : null
-        ].filter(c => c).join(" ")
-        }
-      })
+        formula: d.formula,
+        total: d.total,
+        faces: d.faces,
+        flavor: d.options.flavor,
+        rolls: d.results.map(r => {
+          const hasSuccess = r.success !== undefined;
+          const hasFailure = r.failure !== undefined;
+          // START MODIFIED PART ==>
+          // // const isMax = r.result === d.faces;
+          // // const isMin = r.result === 1;
+          let isMax = false, isMin = false;
+          if (d.type === 'neg') {
+            isMax = false;
+            isMin = r.result === 6;
+          }
+          else {
+            isMax = r.result === d.faces || r.count >= 1;
+            isMin = r.result === 1 && d.type !== 'skill' && d.type !== 'loc';
+          }
+          // <== END MODIFIED PART
+          return {
+            result: cls.getResultLabel(r.result),
+            classes: [
+              cls.name.toLowerCase(),
+              'd' + d.faces,
+              r.success ? 'success' : null,
+              r.failure ? 'failure' : null,
+              r.rerolled ? 'rerolled' : null,
+              r.exploded ? 'exploded' : null,
+              r.discarded ? 'discarded' : null,
+              !(hasSuccess || hasFailure) && isMin ? 'min' : null,
+              !(hasSuccess || hasFailure) && isMax ? 'max' : null,
+            ].filter(c => c).join(' '),
+          };
+        }),
       };
     });
     return renderTemplate(this.constructor.TOOLTIP_TEMPLATE, { parts });
+  }
+
+  /* -------------------------------------------- */
+
+  /** @override */
+  toMessage(messageData = {}, { rollMode = null, create = true } = {}) {
+    messageData = mergeObject({
+      user: game.user._id,
+      speaker: ChatMessage.getSpeaker(),
+      content: this.total,
+      roll: this,
+      type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+      sound: CONFIG.sounds.dice,
+    }, messageData);
+    return super.toMessage(messageData, { rollMode, create });
+  }
+
+  /* -------------------------------------------- */
+
+  /** @override */
+  static fromData(data) {
+    const roll = super.fromData(data);
+    roll.data = data.data || {};
+    return roll;
+  }
+
+  /** @override */
+  toJSON() {
+    return {
+      ...super.toJSON(),
+      data: this.data,
+    };
   }
 }
 
@@ -729,9 +720,13 @@ export class YearZeroRoll extends Roll {
 
 export class YearZeroDie extends Die {
   constructor(termData) {
+    if (!termData) termData = {};
     termData.faces = termData.faces || 6;
     super(termData);
 
+    // if (!this.options.maxPush) {
+    //   this.options.maxPush = 1;
+    // }
     // TODO
     // if (!this.options.flavor) {
     //   const clsName = this.constructor.name;
@@ -750,18 +745,28 @@ export class YearZeroDie extends Die {
   }
 
   /**
+   * The maximum number of pushes.
+   * @type {number}
+   * @readonly
+   *
+  get maxPush() {
+    return this.options.maxPush;
+  }//*/
+
+  /**
    * Whether the die can be pushed (according to its type).
    * @type {boolean}
    * @readonly
    */
   get pushable() {
+    // if (this.pushCount >= this.maxPush) return false;
     for (const r of this.results) {
       if (!r.active || r.discarded) continue;
       if (!this.constructor.LOCKED_VALUES.includes(r.result)) {
         return true;
       }
     }
-    return true;
+    return false;
   }
 
   /**
@@ -770,7 +775,7 @@ export class YearZeroDie extends Die {
    * @readonly
    */
   get pushCount() {
-    return this.results.reduce((c, r) => c + (r.pushed ? 1 : 0), 0);
+    return this.results.reduce((c, r) => Math.max(c, r.push || 0), 0);
   }
 
   /**
@@ -781,7 +786,7 @@ export class YearZeroDie extends Die {
   get pushed() {
     return this.pushCount > 0;
   }
-  
+
   /** @override */
   roll(options) {
     const roll = super.roll(options);
@@ -795,6 +800,7 @@ export class YearZeroDie extends Die {
   }
 
   push() {
+    const _push = 1 + (this.pushCount || 0);
     let count = 0;
     for (const r of this.results) {
       if (!r.active) continue;
@@ -802,6 +808,7 @@ export class YearZeroDie extends Die {
         r.active = false;
         r.discarded = true;
         r.pushed = true;
+        r.push = _push;
         count++;
       }
     }
@@ -815,13 +822,13 @@ export class YearZeroDie extends Die {
     if (result === 6) return '☢';
     return result;
   }
-
-  static LOCKED_VALUES = [6];
-  static MODIFIERS = mergeObject(
-    { 'p' : 'push' },
-    Die.MODIFIERS,
-  );
 }
+
+YearZeroDie.LOCKED_VALUES = [6];
+YearZeroDie.MODIFIERS = mergeObject(
+  { 'p' : 'push' },
+  Die.MODIFIERS,
+);
 
 /**
  * Base Die: 1 & 6 cannot be re-rolled.
@@ -829,9 +836,9 @@ export class YearZeroDie extends Die {
  */
 export class BaseDie extends YearZeroDie {
   get type() { return 'base'; }
-  static DENOMINATION = 'b';
-  static LOCKED_VALUES = [1, 6];
 }
+BaseDie.DENOMINATION = 'b';
+BaseDie.LOCKED_VALUES = [1, 6];
 
 /**
  * Skill Die: 6 cannot be re-rolled.
@@ -839,12 +846,12 @@ export class BaseDie extends YearZeroDie {
  */
 export class SkillDie extends YearZeroDie {
   get type() { return 'skill'; }
-  static DENOMINATION = 's';
   /** @override */
   static getResultLabel(result) {
     return result >= 6 ? '☢' : result;
   }
 }
+SkillDie.DENOMINATION = 's';
 
 /**
  * Gear Die: 1 & 6 cannot be re-rolled.
@@ -858,9 +865,9 @@ export class GearDie extends YearZeroDie {
     if (result === 6) return '☢';
     return result;
   }
-  static DENOMINATION = 'g';
-  static LOCKED_VALUES = [1, 6];
 }
+GearDie.DENOMINATION = 'g';
+GearDie.LOCKED_VALUES = [1, 6];
 
 /**
  * Negative Die: 6 cannot be re-rolled.
@@ -875,8 +882,8 @@ export class NegativeDie extends SkillDie {
     this.results[this.results.length - 1] = roll;
     return roll;
   }
-  static DENOMINATION = 'n';
 }
+NegativeDie.DENOMINATION = 'n';
 
 /* -------------------------------------------- */
 
@@ -886,8 +893,6 @@ export class NegativeDie extends SkillDie {
  */
 export class StressDie extends YearZeroDie {
   get type() { return 'stress'; }
-  static DENOMINATION = 's';
-  static LOCKED_VALUES = [1, 6];
   /** @override */
   static getResultLabel(result) {
     if (result >= 6) return '✔️';
@@ -895,6 +900,8 @@ export class StressDie extends YearZeroDie {
     return result;
   }
 }
+StressDie.DENOMINATION = 's';
+StressDie.LOCKED_VALUES = [1, 6];
 
 /* -------------------------------------------- */
 
@@ -915,41 +922,36 @@ export class ArtifactDie extends SkillDie {
   }
   /** @override */
   static getResultLabel(result) {
-    return result;
-    // TODO
-    if (result >= 6 && result < ArtifactDie.SUCCESS_TABLE.length) {
-      const n = ArtifactDie.SUCCESS_TABLE[result];
-      return '•'.repeat(n); //⚔️
-    }
+    // Must be overriden because it extends SkillDie.
     return result;
   }
-  static SUCCESS_TABLE = [null, 0, 0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4];
-  static LOCKED_VALUES = [6, 7, 8, 9, 10, 11, 12];
 }
+ArtifactDie.SUCCESS_TABLE = [null, 0, 0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4];
+ArtifactDie.LOCKED_VALUES = [6, 7, 8, 9, 10, 11, 12];
 
 export class D8ArtifactDie extends ArtifactDie {
   constructor(termData) {
     termData.faces = 8;
     super(termData);
   }
-  static DENOMINATION = '8';
 }
+D8ArtifactDie.DENOMINATION = '8';
 
 export class D10ArtifactDie extends ArtifactDie {
   constructor(termData) {
     termData.faces = 10;
     super(termData);
   }
-  static DENOMINATION = '10';
 }
+D10ArtifactDie.DENOMINATION = '10';
 
 export class D12ArtifactDie extends ArtifactDie {
   constructor(termData) {
     termData.faces = 12;
     super(termData);
   }
-  static DENOMINATION = '12';
 }
+D12ArtifactDie.DENOMINATION = '12';
 
 /* -------------------------------------------- */
 
@@ -958,47 +960,47 @@ export class D12ArtifactDie extends ArtifactDie {
  * @extends {ArtifactDie} But LOCKED_VALUES is not the same
  */
 export class TwilightDie extends ArtifactDie {
-  get type() { return 'base' }
+  get type() { return 'base'; }
   /** @override */
   static getResultLabel(result) {
     if (result === 1) return '•';
     return result;
   }
-  static SUCCESS_TABLE = [null, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2];
-  static LOCKED_VALUES = [1, 6, 7, 8, 9, 10, 11, 12];
 }
+TwilightDie.SUCCESS_TABLE = [null, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2];
+TwilightDie.LOCKED_VALUES = [1, 6, 7, 8, 9, 10, 11, 12];
 
 export class D6TwilightDie extends TwilightDie {
   constructor(termData) {
     termData.faces = 6;
     super(termData);
   }
-  static DENOMINATION = 'd';
 }
+D6TwilightDie.DENOMINATION = 'd';
 
 export class D8TwilightDie extends TwilightDie {
   constructor(termData) {
     termData.faces = 8;
     super(termData);
   }
-  static DENOMINATION = 'c';
 }
+D8TwilightDie.DENOMINATION = 'c';
 
 export class D10TwilightDie extends TwilightDie {
   constructor(termData) {
     termData.faces = 10;
     super(termData);
   }
-  static DENOMINATION = 'b';
 }
+D10TwilightDie.DENOMINATION = 'b';
 
 export class D12TwilightDie extends TwilightDie {
   constructor(termData) {
     termData.faces = 12;
     super(termData);
   }
-  static DENOMINATION = 'a';
 }
+D12TwilightDie.DENOMINATION = 'a';
 
 /* -------------------------------------------- */
 
@@ -1007,10 +1009,8 @@ export class AmmoDie extends YearZeroDie {
     termData.faces = 6;
     super(termData);
   }
-  get type() { return 'ammo' }
-  get hit() { return this.count(6)}
-  static DENOMINATION = 'm';
-  static LOCKED_VALUES = [];
+  get type() { return 'ammo'; }
+  get hit() { return this.count(6);}
   /** @override */
   static getResultLabel(result) {
     if (result === 1) return '•';
@@ -1018,13 +1018,15 @@ export class AmmoDie extends YearZeroDie {
     return result;
   }
 }
+AmmoDie.DENOMINATION = 'm';
+AmmoDie.LOCKED_VALUES = [];
 
 export class LocationDie extends Die {
   constructor(termData) {
     termData.faces = 6;
     super(termData);
   }
-  get type() { return 'loc' }
+  get type() { return 'loc'; }
   /** @override */
   roll(options) {
     const roll = super.roll(options);
@@ -1041,7 +1043,19 @@ export class LocationDie extends Die {
       '6': 'H',
     }[result];
   }
-  static DENOMINATION = 'l';
+}
+LocationDie.DENOMINATION = 'l';
+
+/* -------------------------------------------- */
+/*  Custom Dialog                               */
+/* -------------------------------------------- */
+
+export class YZRollDialog extends Dialog {
+  /** @override */
+  activateListeners(html) {
+    super.activateListeners(html);
+    html.find('input').focus(ev => ev.currentTarget.select());
+  }
 }
 
 /* -------------------------------------------- */
