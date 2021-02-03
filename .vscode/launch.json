@@ -9,7 +9,13 @@
       "request": "launch",
       "name": "Launch Chrome against localhost",
       "url": "http://localhost:30000/join",
-      "webRoot": "${workspaceFolder}"
+      "webRoot": "${workspaceFolder}",
+      "skipFiles": [
+        "<node_internals>/**",
+				"${workspaceFolder}/node_modules/**/*.js",
+				"${workspaceFolder}/lib/**/*.js",
+        "**/jquery.min.js"
+      ]
     }
   ]
 }

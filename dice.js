@@ -10,11 +10,11 @@
  * 
  * - YearZeroRollManager: Interface for registering dice.
  * 
- * - YZRoller: Helper class for YZ dice rolls building.
+ * - YearZeroRoll: Custom implementation of the default Foundry Roll class,
+ *     with many extra getters and utility functions.
  * 
- * - YearZeroRoll: Custom implementation of the default Foundry Roll class.
- * 
- * - YearZeroDie: Custom implementation of the default Foundry DieTerm class.
+ * - YearZeroDie: Custom implementation of the default Foundry DieTerm class,
+ *     also with many extra getters.
  * 
  * - (Base/Skill/Gear/etc..)Die: Extends of the YearZeroDie class with specific
  *     DENOMINATION and LOCKED_VALUE constants.
@@ -57,17 +57,12 @@
 /* -------------------------------------------- */
 
 /**
- * Interface for registering Year Zero dice
- * and creating a cache for the pushable rolls.
+ * Interface for registering Year Zero dice.
  * 
  * To register the game and its dice,
  * call the static `YearZeroRollManager.register()` method
- * at the end of the `init` or `setup` Hooks.
+ * at the start of the `init` Hooks.
  * 
- * To save and retrieve dice for pushes, use the
- * static methods `.cache(roll)` and `.grab(id)`.
- * 
- * @extends {Collection} The Foundry extends of Map
  * @abstract
  * @interface
  * 
@@ -92,11 +87,7 @@ export class YearZeroRollManager {
   static register(yzGame) {
     // Registers the dice.
     YearZeroRollManager.registerDice(yzGame);
-
-    // Creates the dice cache.
-    if (game.yzrolls) {
-      console.warn(`${YearZeroRollManager.name} | Overwritting "game.yzrolls"`);
-    }
+    // Registers the YZ game.
     YearZeroRollManager._initialize(yzGame);
     console.log(`${YearZeroRollManager.name} | Registration complete!`);
   }
@@ -160,7 +151,7 @@ export class YearZeroRollManager {
   static _initialize(yzGame) {
     if (game.yzrolls?.game) {
       console.warn(
-        `${YearZeroRollManager.name} | Overwritting the default Year Zero game ${game.yzrolls.game} with: "${yzGame}"`,
+        `${YearZeroRollManager.name} | Overwritting the default Year Zero game "${game.yzrolls.game}" with: "${yzGame}"`,
       );
     }
     game.yzrolls = { game: yzGame };
@@ -222,6 +213,16 @@ export class YearZeroRollManager {
     };
   }
 
+  static get DIE_TYPES_SWAP() {
+    return {
+      'alien': { base: 'skill', gear: 'skill' },
+      'tales': { base: 'skill', gear: 'skill' },
+      'cor': { base: 'skill', gear: 'skill' },
+      'vae': { base: 'skill', gear: 'skill' },
+      't2k': { base: 'b', skill: 'd', gear: 'ammo' },
+    };
+  }
+
   /**
    * @type {GameTypeString[]}
    * @constant
@@ -230,121 +231,6 @@ export class YearZeroRollManager {
   static get GAMES() {
     return Object.keys(YearZeroRollManager.DIE_TYPES_MAP);
   }
-}
-
-/* -------------------------------------------- */
-/*  Custom YZ Roller class                      */
-/* -------------------------------------------- */
-
-/**
- * Helper class for creating a Year Zero Roll.
- */
-export class YZRoller {
-  constructor() {
-    throw new SyntaxError(`${this.constructor.name} cannot be instanciated. Use static methods instead.`);
-  }
-
-  /**
-   * Applies a difficulty modifier to a quantity of dice.
-   * @param {DiceQuantities}  dice    An object with quantities of dice
-   * @param {number}          mod     Difficulty modifier (bonus or malus)
-   * @param {GameTypeString} [yzGame] The game used (for the choice of die types to register)
-   * @returns {DiceQuantities}
-   */
-  static modify(dice, mod, yzGame) {
-    // Gets the default game.
-    yzGame = yzGame || game.yzrolls?.game;
-    if (!YZRoller.GAMES.includes(yzGame)) throw new GameTypeError(yzGame);
-
-    // Twilight 2000
-    if (yzGame === 't2k') {
-      const dieTypes = ['d', 'c', 'b', 'a'];
-
-      // Creates a dice pool array and finds the total quantities of each die.
-      const pool = Object.entries(dice).reduce((arr, [k, v]) => {
-        if (dieTypes.includes(k)) {
-          for (; v > 0; v--) arr.push(k);
-        }
-        return arr;
-      }, []);
-      const n = pool.length;
-
-      // Exits early on 3+ dice.
-      if (n > 2) return dice;
-      if (n <= 1 && pool.includes('d')) return dice;
-
-      // Initializes null dice.
-      for (const type of dieTypes) if (!dice[type]) dice[type] = 0;
-
-      // Gets the die to modify.
-      const die = pool.reduce((a, b) => {
-        if (mod > 0) {
-          if (b === 'a') return a;
-          return a < b ? a : b;
-        }
-        return a > b ? a : b;
-      }, '');
-
-      // Exits early if we didn't find a die to change.
-      if (!die) return dice;
-
-      // Modifies the range.
-      let excess = mod;
-      const currentRangeIndex = dieTypes.indexOf(die);
-      if (currentRangeIndex >= 0) {
-        const maxRangeIndex = dieTypes.length - 1;
-        const newRangeIndex = currentRangeIndex + mod;
-        const rangeIndex = clampNumber(newRangeIndex, 0, maxRangeIndex);
-        const newDie = dieTypes[rangeIndex];
-        excess -= (rangeIndex - currentRangeIndex);
-
-        // Positive excess means adding an extra die.
-        // Note: the pool can only have a maximum of 2 dice.
-        if (excess > 0) {
-          dice[die] -= 1;
-          dice[newDie] += 1;
-
-          if (n < 2) {
-            const ex = Math.min(dieTypes.length, excess);
-            const extraDie = dieTypes[ex - 1];
-            dice[extraDie] += 1;
-            if (excess > ex) YZRoller.modify(yzGame, excess - ex);
-          }
-          else {
-            YZRoller.modify(yzGame, excess, dice);
-          }
-        }
-        // Negative excess means removing the die and decreasing another one.
-        // Note: The pool has always 1 die.
-        else if (excess < 0 && n > 1) {
-          dice[die] -= 1;
-          // We add 1 because we removed one die (which is 1 step).
-          YZRoller.modify(yzGame, excess + 1, dice);
-        }
-        else {
-          dice[die] -= 1;
-          dice[newDie] += 1;
-        }
-      }
-    }
-    // Mutant Year Zero & Forbidden Lands
-    else if (yzGame === 'myz' || yzGame === 'fbl') {
-      if (!dice.skill) dice.skill = 0;
-      const neg = Math.max(-mod - dice.skill, 0);
-      dice.skill += mod;
-      if (neg > 0) {
-        if (!dice.neg) dice.neg = 0;
-        dice.neg += neg;
-      }
-    }
-    // All other games
-    else {
-      if (!dice.skill) dice.skill = 0;
-      dice.skill += mod;
-    }
-    return dice;
-  }
-
 }
 
 /* -------------------------------------------- */
@@ -375,7 +261,7 @@ export class YearZeroRoll extends Roll {
    * @readonly
    */
   get game() {
-    if (!this.data.game) return YZRoller.GAMES[0];
+    if (!this.data.game) return YearZeroRollManager.GAMES[0];
     return this.data.game;
   }
   set game(yzGame) {
@@ -509,7 +395,10 @@ export class YearZeroRoll extends Roll {
 
   /**
    * Generates a roll based on the number of dice.
-   * @param {DiceQuantities} dice    An object with quantities of dice
+   * @param {GameTypeString} [yzGame]     The game used
+   * @param {number}         [maxPush=1]  The maximum number of pushes
+   * @param {boolean}        [push=false] Whether to add a push modifier to the roll
+   * @param {DiceQuantities}  dice  An object with quantities of dice
    * @param {?number}  dice.base     The quantity of base dice
    * @param {?number}  dice.skill    The quantity of skill dice
    * @param {?number}  dice.gear     The quantity of gear dice
@@ -524,11 +413,10 @@ export class YearZeroRoll extends Roll {
    * @param {?number}  dice.b        The quantity of T2K D10 dice
    * @param {?number}  dice.c        The quantity of T2K D8 dice
    * @param {?number}  dice.d        The quantity of T2K D6 dice
-   * @param {GameTypeString} [yzGame]    The game used
-   * @param {number}         [maxPush=1] The maximum number of pushes
    * @override
    */
-  static createFromDice({ yzGame = null, maxPush = 1,
+  static createFromDiceQuantities({
+    yzGame = null, maxPush = 1, push = false,
     dice = {
       base: 0,
       skill: 0,
@@ -556,14 +444,14 @@ export class YearZeroRoll extends Roll {
       if (n <= 0) continue;
       const cls = YearZeroRollManager.DIE_TYPES[type];
       const deno = cls.DENOMINATION;
-      const str = `${n}d${deno}`;
+      const str = `${n}d${deno}${push ? 'p' : ''}`;
       out.push(str);
     }
-    let formula = out.join(' + ');
+    const formula = out.join(' + ');
 
-    if (!YearZeroRoll.validate(formula)) formula = '1ds';
+    if (!YearZeroRoll.validate(formula)) throw new RollError(formula);
 
-    // Creates the roll inside the roller.
+    // Creates the roll.
     const roll = new YearZeroRoll(formula, { game: yzGame, maxPush });
     console.warn(roll);
     return roll;
@@ -616,17 +504,144 @@ export class YearZeroRoll extends Roll {
    * @returns {number} Total count
    */
   count(type, seed) {
-    if (seed != null) {
-      return this.terms.reduce((c, t) => {
-        if (t.type !== type) return c;
+    return this.terms.reduce((c, t) => {
+      if (t.type === type) {
         for (const r of t.results) {
           if (!r.active) continue;
-          if (r.result === seed) c++;
+          if (seed != null) {
+            if (r.result === seed) c++;
+          }
+          else {
+            c += t.number;
+          }
         }
-        return c;
-      }, 0);
+      }
+      return c;
+    }, 0);
+  }
+
+  /**
+   * Gets the quantities of each die type.
+   * @returns {DiceQuantities}
+   */
+  getDiceQuantities() {
+    const dice = {};
+    for (const type of Object.keys(YearZeroRollManager.DIE_TYPES)) {
+      const qty = this.count(type);
+      if (qty > 0) dice[type] = qty;
     }
-    return this.terms.reduce((c, t) => t.type === type ? c + t.number : c, 0);
+    return dice;
+  }
+
+  /* -------------------------------------------- */
+
+  /**
+   * Applies a difficulty modifier to a quantity of dice.
+   * @param {number} mod Difficulty modifier (bonus or malus)
+   * @returns {YearZeroRoll} A new roll instance, modified
+   */
+  modify(mod) {
+    // Gets the dice quantities.
+    const dice = this.getDiceQuantities();
+
+    let occurenceNb = 0;
+    while (mod !== 0 && occurenceNb < 100) {
+      // Watches the number of occurences to avoid infinite loops.
+      occurenceNb++;
+      if (occurenceNb >= 100) throw new Error(`${this.constructor.name} | Infinite modify loop!`);
+
+      // Twilight 2000
+      if (this.game === 't2k') {
+        const dieTypes = ['d', 'c', 'b', 'a'];
+
+        // Creates a dice pool array and finds the total quantities of each die.
+        const pool = Object.entries(dice).reduce((arr, [k, v]) => {
+          if (dieTypes.includes(k)) {
+            for (; v > 0; v--) arr.push(k);
+          }
+          return arr;
+        }, []);
+        const n = pool.length;
+
+        // Exits early on 3+ dice.
+        if (n > 2) break;
+        if (n <= 1 && pool.includes('d')) break;
+
+        // Initializes null dice.
+        for (const type of dieTypes) if (!dice[type]) dice[type] = 0;
+
+        // Gets the die to modify.
+        const die = pool.reduce((a, b) => {
+          if (mod > 0) {
+            if (b === 'a') return a;
+            return a < b ? a : b;
+          }
+          return a > b ? a : b;
+        }, '');
+
+        // Exits early if we didn't find a die to change.
+        if (!die) break;
+
+        // Modifies the range.
+        const currentRangeIndex = dieTypes.indexOf(die);
+        if (currentRangeIndex >= 0) {
+          const maxRangeIndex = dieTypes.length - 1;
+          const newRangeIndex = currentRangeIndex + mod;
+          const rangeIndex = clampNumber(newRangeIndex, 0, maxRangeIndex);
+          const newDie = dieTypes[rangeIndex];
+          mod -= (rangeIndex - currentRangeIndex);
+
+          // Positive excess mod means adding an extra die.
+          // Note: the pool can only have a maximum of 2 dice.
+          if (mod > 0) {
+            dice[die] -= 1;
+            dice[newDie] += 1;
+
+            if (n < 2) {
+              const ex = Math.min(dieTypes.length, mod);
+              const extraDie = dieTypes[ex - 1];
+              dice[extraDie] += 1;
+              if (mod > ex) mod -= ex;
+            }
+          }
+          // Negative excess mod means removing the die and decreasing another one.
+          // Note: The pool has always 1 die.
+          else if (mod < 0 && n > 1) {
+            dice[die] -= 1;
+            // We add 1 because we removed one die (which is 1 step).
+            mod += 1;
+          }
+          else {
+            dice[die] -= 1;
+            dice[newDie] += 1;
+          }
+        }
+      }
+      // Mutant Year Zero & Forbidden Lands
+      else if (this.game === 'myz' || this.game === 'fbl') {
+        if (!dice.skill) dice.skill = 0;
+        const neg = Math.max(-mod - dice.skill, 0);
+        dice.skill += mod;
+        if (neg > 0) {
+          if (!dice.neg) dice.neg = 0;
+          dice.neg += neg;
+        }
+        mod = 0;
+      }
+      // All other games
+      else {
+        if (!dice.skill) dice.skill = 0;
+        dice.skill += mod;
+        mod = 0;
+      }
+    }
+
+    // Builds the new roll instance.
+    return this.constructor.createFromDiceQuantities({
+      yzGame: this.game,
+      maxPush: this.maxPush,
+      dice,
+    });
   }
 
   /* -------------------------------------------- */
@@ -736,12 +751,13 @@ export class YearZeroDie extends Die {
 
   /**
    * The type of the die.
-   * @abstract Must be implemented by other dice.
+   * //@abstract Must be implemented by other dice.
    * @type {DieTypeString}
    * @readonly
    */
   get type() {
-    return undefined;
+    // return undefined;
+    return invertObject(YearZeroRollManager.DIE_TYPES)[this.constructor.name];
   }
 
   /**
@@ -835,7 +851,7 @@ YearZeroDie.MODIFIERS = mergeObject(
  * @extends {YearZeroDie}
  */
 export class BaseDie extends YearZeroDie {
-  get type() { return 'base'; }
+  // get type() { return 'base'; }
 }
 BaseDie.DENOMINATION = 'b';
 BaseDie.LOCKED_VALUES = [1, 6];
@@ -845,7 +861,7 @@ BaseDie.LOCKED_VALUES = [1, 6];
  * @extends {YearZeroDie}
  */
 export class SkillDie extends YearZeroDie {
-  get type() { return 'skill'; }
+  // get type() { return 'skill'; }
   /** @override */
   static getResultLabel(result) {
     return result >= 6 ? '☢' : result;
@@ -858,7 +874,7 @@ SkillDie.DENOMINATION = 's';
  * @extends {YearZeroDie}
  */
 export class GearDie extends YearZeroDie {
-  get type() { return 'gear'; }
+  // get type() { return 'gear'; }
   /** @override */
   static getResultLabel(result) {
     if (result === 1) return '💥';
@@ -874,7 +890,7 @@ GearDie.LOCKED_VALUES = [1, 6];
  * @extends {SkillDie}
  */
 export class NegativeDie extends SkillDie {
-  get type() { return 'neg'; }
+  // get type() { return 'neg'; }
   /** @override */
   roll(options) {
     const roll = super.roll(options);
@@ -892,7 +908,7 @@ NegativeDie.DENOMINATION = 'n';
  * @extends {YearZeroDie}
  */
 export class StressDie extends YearZeroDie {
-  get type() { return 'stress'; }
+  // get type() { return 'stress'; }
   /** @override */
   static getResultLabel(result) {
     if (result >= 6) return '✔️';
@@ -910,7 +926,7 @@ StressDie.LOCKED_VALUES = [1, 6];
  * @extends {SkillDie}
  */
 export class ArtifactDie extends SkillDie {
-  get type() { return 'arto'; }
+  // get type() { return 'arto'; }
   /** @override */
   roll(options) {
     const roll = super.roll(options);
@@ -957,10 +973,10 @@ D12ArtifactDie.DENOMINATION = '12';
 
 /**
  * Twilight Die: 1 & 6+ cannot be re-rolled.
- * @extends {ArtifactDie} But LOCKED_VALUES is not the same
+ * @extends {ArtifactDie} But LOCKED_VALUES are not the same
  */
 export class TwilightDie extends ArtifactDie {
-  get type() { return 'base'; }
+  // get type() { return 'base'; }
   /** @override */
   static getResultLabel(result) {
     if (result === 1) return '•';
@@ -1009,7 +1025,7 @@ export class AmmoDie extends YearZeroDie {
     termData.faces = 6;
     super(termData);
   }
-  get type() { return 'ammo'; }
+  // get type() { return 'ammo'; }
   get hit() { return this.count(6);}
   /** @override */
   static getResultLabel(result) {
@@ -1026,7 +1042,7 @@ export class LocationDie extends Die {
     termData.faces = 6;
     super(termData);
   }
-  get type() { return 'loc'; }
+  // get type() { return 'loc'; }
   /** @override */
   roll(options) {
     const roll = super.roll(options);
@@ -1064,14 +1080,21 @@ export class YZRollDialog extends Dialog {
 
 class GameTypeError extends TypeError {
   constructor(msg) {
-    super(`Unknown game: "${msg}". Allowed games are: ${YZRoller.GAMES.join(', ')}.`);
+    super(`Unknown game: "${msg}". Allowed games are: ${YearZeroRollManager.GAMES.join(', ')}.`);
     this.name = 'YZ GameType Error';
   }
 }
 
 class DieTypeError extends TypeError {
   constructor(msg) {
-    super(`Unknown die type: "${msg}". Allowed types are: ${Object.keys(YZRoller.DIE_TYPES).join(', ')}.`);
+    super(`Unknown die type: "${msg}". Allowed types are: ${Object.keys(YearZeroRollManager.DIE_TYPES).join(', ')}.`);
     this.name = 'YZ DieType Error';
+  }
+}
+
+class RollError extends SyntaxError {
+  constructor(msg) {
+    super(`Invalid roll formula: "${msg}"`);
+    this.name = 'YZ Roll Error';
   }
 }

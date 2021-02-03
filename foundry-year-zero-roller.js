@@ -12,9 +12,9 @@ import * as YZDice from './dice.js';
 Hooks.once('init', function() {
 
   // Records configuration values.
-  CONFIG.debug.hooks = true;
+  // CONFIG.debug.hooks = true;
 
-  YZDice.YearZeroRollManager.register('myz');
+  YZDice.YearZeroRollManager.register('t2k');
   game.yzdice = YZDice;
 });
 
