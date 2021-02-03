@@ -14,7 +14,8 @@ Hooks.once('init', function() {
   // Records configuration values.
   CONFIG.debug.hooks = true;
 
-  YZDice.YearZeroRollManager.register();
+  YZDice.YearZeroRollManager.register('myz');
+  game.yzdice = YZDice;
 });
 
 Hooks.once('ready', function() {
@@ -35,7 +36,7 @@ Hooks.once('ready', function() {
       startingItem.sheet.render(true);//*/
     }
     catch (error) {
-      console.warn(`YZRoll | DEBUG | Cannot find starting Entity.`, error);
+      console.warn('YZRoll | DEBUG | Cannot find starting Entity.', error);
     }
   }
 });

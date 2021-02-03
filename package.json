@@ -16,13 +16,13 @@
   "author": "Stefouch",
   "license": "MIT",
   "devDependencies": {
+    "@typhonjs-fvtt/eslint-foundry.js": "^0.3.1",
+    "babel-eslint": "^10.1.0",
     "eslint": "^7.18.0",
     "eslint-config-prettier": "^7.1.0",
     "eslint-plugin-prettier": "^3.3.1",
-    "prettier": "^2.2.1",
-    "foundry-vtt-types": "github:League-of-Foundry-Developers/foundry-vtt-types"
+    "prettier": "^2.2.1"
   },
-  "dependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Stefouch/foundry-year-zero-roller.git"
