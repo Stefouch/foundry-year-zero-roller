@@ -534,12 +534,12 @@ export class YearZeroRoll extends Roll {
     const dice = this.getDiceQuantities();
 
     let occurenceNb = 0;
-    while (mod !== 0 && occurenceNb < 100) {
-      // Watches the number of occurences to avoid infinite loops.
+    while (mod !== 0) {
+      // Failsafe – Watches the number of occurences to avoid infinite loops.
       occurenceNb++;
       if (occurenceNb >= 100) throw new RangeError(`${this.constructor.name} | Infinite modify loop!`);
 
-      // Twilight 2000
+      // TWILIGHT 2000
       if (this.game === 't2k') {
         const dieTypes = ['d', 'c', 'b', 'a'];
 
@@ -552,57 +552,68 @@ export class YearZeroRoll extends Roll {
         }, []);
         const n = pool.length;
 
-        // Exits early on 3+ dice.
-        if (n > 2) break;
-        if (n <= 1 && pool.includes('d')) break;
+        // Early exits.
+        if (mod > 0) {
+          if (n > 2) break;
+        }
+        else if (n === 0) {
+          dice.d = 1;
+          break;
+        }
+        else if (n === 1 && pool.includes('d')) {
+          break;
+        }
 
         // Initializes null dice.
         for (const type of dieTypes) if (!dice[type]) dice[type] = 0;
 
         // Gets the die to modify.
-        let die;
-        if (mod > 0) die = pool.sort().pop();
-        else die = pool.sort().shift();
-
-        // Exits early if we didn't find a die to change.
-        if (!die) break;
+        // For a positive modifier, we take the highest die.
+        // For a negative modifier, we take the lowest one.
+        const die = pool.reduce((a, b) => {
+          if (mod > 0) {
+            if (b === 'a') return a;
+            return a < b ? a : b;
+          }
+          return a > b ? a : b;
+        }, undefined);
 
         // Modifies the range.
         const currentRangeIndex = dieTypes.indexOf(die);
+        let newDie;
         if (currentRangeIndex >= 0) {
           const maxRangeIndex = dieTypes.length - 1;
-          const newRangeIndex = currentRangeIndex + mod;
-          const rangeIndex = clampNumber(newRangeIndex, 0, maxRangeIndex);
-          const newDie = dieTypes[rangeIndex];
-          mod -= (rangeIndex - currentRangeIndex);
+          const rangeIndex = currentRangeIndex + mod;
+          const newRangeIndex = clampNumber(rangeIndex, 0, maxRangeIndex);
+          newDie = dieTypes[newRangeIndex];
+          mod -= (newRangeIndex - currentRangeIndex);
+          dice[die]--;
+          dice[newDie]++;
+        }
 
-          // Positive excess mod means adding an extra die.
-          // Note: the pool can only have a maximum of 2 dice.
-          if (mod > 0) {
-            dice[die] -= 1;
-            dice[newDie] += 1;
-
-            if (n < 2) {
-              const ex = Math.min(dieTypes.length, mod);
-              const extraDie = dieTypes[ex - 1];
-              dice[extraDie] += 1;
-              if (mod > ex) mod -= ex;
-            }
-          }
-          // Negative excess mod means removing the die and decreasing another one.
-          // Note: The pool has always 1 die.
-          else if (mod < 0 && n > 1) {
-            dice[die] -= 1;
-            // We add 1 because we removed one die (which is 1 step).
-            mod += 1;
+        // Positive excess mod means adding an extra die.
+        // Note: the pool can only have a maximum of 2 dice.
+        if (mod > 0) {
+          if (n < 2) {
+            const ex = Math.min(dieTypes.length, mod);
+            dice[dieTypes[ex - 1]]++;
+            if (mod > ex) mod -= ex;
+            else break;
           }
           else {
-            dice[die] -= 1;
-            dice[newDie] += 1;
+            const diceBelowMaxRange = Object.entries(dice).filter(([k, v]) => v > 0 && k > 'a').length;
+            if (diceBelowMaxRange <= 0) break;
           }
         }
+        // Negative excess mod means removing the die and decreasing another one.
+        // Note: The pool has always 1 die.
+        else if (mod < 0 && n > 1) {
+          dice[newDie]--;
+          // We add 1 because we removed one die (which is 1 step).
+          mod++;
+        }
       }
-      // Mutant Year Zero & Forbidden Lands
+      // MUTANT YEAR ZERO & FORBIDDEN LANDS
       else if (this.game === 'myz' || this.game === 'fbl') {
         // Balances skill & neg dice.
         if (dice.skill > 0 && dice.neg > 0) {
@@ -620,7 +631,7 @@ export class YearZeroRoll extends Roll {
         }
         mod = 0;
       }
-      // All other games
+      // ALL OTHER GAMES
       else {
         if (!dice.skill) dice.skill = 0;
         dice.skill = Math.max(1, dice.skill + mod);
@@ -1273,10 +1284,10 @@ class DieTypeError extends TypeError {
   }
 }
 
-class RollError extends SyntaxError {
-  constructor(msg, obj) {
-    super(msg);
-    this.name = 'YZ Roll Error';
-    if (obj) console.error(obj);
-  }
-}
+// class RollError extends SyntaxError {
+//   constructor(msg, obj) {
+//     super(msg);
+//     this.name = 'YZ Roll Error';
+//     if (obj) console.error(obj);
+//   }
+// }
