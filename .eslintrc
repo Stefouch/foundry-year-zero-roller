@@ -7,9 +7,12 @@
   "extends": [
     "eslint:recommended",
     "./node_modules/@typhonjs-fvtt/eslint-foundry.js/config/latest/.eslintrc",
-    "prettier"
+    // "prettier",
+    // "plugin:prettier/recommended"
   ],
-  "plugins": [],
+  "plugins": [
+    // "prettier"
+  ],
   // "parser": "babel-eslint",
   "parserOptions": {
     "sourceType": "module",
@@ -19,6 +22,7 @@
     }
   },
   "rules": {
+    // "prettier/prettier": ["error"],
     "brace-style": ["error", "stroustrup", { "allowSingleLine": true }],
     "comma-dangle": ["error", "always-multiline"],
     "comma-spacing": "error",
@@ -27,6 +31,7 @@
     "dot-location": ["error", "property"],
     "handle-callback-err": "off",
     "indent": ["error", 2, { "SwitchCase": 1 }],
+    "max-len": ["error", { "code": 120 }],
     "max-nested-callbacks": ["error", { "max": 4 }],
     "max-statements-per-line": ["error", { "max": 2 }],
     "no-console": "off",
