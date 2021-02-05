@@ -87,19 +87,16 @@
 export class YearZeroRollManager {
   /**
    * Registers the Year Zero dice for the specified game
-   * and the cache for the pushable Roll objects.
    * 
    * You must call this method in `Hooks.once('init')`.
    * 
-   * @param {GameTypeString} yzGame            The game used (for the choice of die types to register).
-   *                                           If omitted, registers all the dice.
-   * 
-   * @param {string}        [chatRollTemplate] The template used to renders the dice results in the Chat log.
+   * @param {GameTypeString}  yzGame  The game used (for the choice of die types to register).
+   * @param {string}         [config] Custom config to merge with the initial config.
    * @static
    */
-  static register(yzGame, chatRollTemplate) {
+  static register(yzGame, config) {
     // Registers the config.
-    YearZeroRollManager.registerConfig(chatRollTemplate);
+    YearZeroRollManager.registerConfig(config);
     // Registers the YZ game.
     YearZeroRollManager._initialize(yzGame);
     // Registers the dice.
@@ -110,17 +107,16 @@ export class YearZeroRollManager {
   /**
    * Registers the Year Zero Universal Roller config.
    * *(See the config details at the very bottom of this file.)*
-   * @param {string} [chatRollTemplate] The template used to renders the dice results in the Chat log.
+   * @param {string} [config] Custom config to merge with the initial config.
    * @static
    */
-  static registerConfig(chatRollTemplate) {
-    CONFIG.YZUR = YZUR;
-    if (chatRollTemplate) CONFIG.YZUR.chatRollTemplate = chatRollTemplate;
+  static registerConfig(config) {
+    CONFIG.YZUR = mergeObject(YZUR, config);
   }
 
   /**
    * Registers all the Year Zero Dice.
-   * @param {?GameTypeString} yzGame The game used (for the choice of die types to register). If omitted, registers all the dice.
+   * @param {?GameTypeString} yzGame The game used (for the choice of die types to register)
    * @static
    */
   static registerDice(yzGame) {
@@ -142,6 +138,8 @@ export class YearZeroRollManager {
 
     // Finally, registers our custom Roll class for Year Zero games.
     CONFIG.Dice.rolls[0] = YearZeroRoll;
+    CONFIG.Dice.rolls[0].CHAT_TEMPLATE = CONFIG.YZUR.DICE.chatTemplate;
+    CONFIG.Dice.rolls[0].TOOLTIP_TEMPLATE = CONFIG.YZUR.DICE.tooltipTemplate;
   }
 
   /**
@@ -161,7 +159,9 @@ export class YearZeroRollManager {
     // Registers the die in the Foundry CONFIG.
     const reg = CONFIG.Dice.terms[deno];
     if (reg) {
-      console.warn(`${YearZeroRollManager.name} | Die Registration: "${deno}" | Overwritting ${reg.name} with "${cls.name}".`);
+      console.warn(
+        `${YearZeroRollManager.name} | Die Registration: "${deno}" | Overwritting ${reg.name} with "${cls.name}".`,
+      );
     }
     else {
       console.log(`${YearZeroRollManager.name} | Die Registration: "${deno}" with ${cls.name}.`);
@@ -235,6 +235,7 @@ export class YearZeroRoll extends Roll {
    * @param {string} formula  The string formula to parse
    * @param {Object} data     The data object against which to parse attributes within the formula
    * @param {string} data.game     The game used
+   * @param {string} data.name     The name of the roll
    * @param {number} data.maxPush  The maximum number of times the roll can be pushed
    */
   constructor(formula, data = {}) {
@@ -252,6 +253,14 @@ export class YearZeroRoll extends Roll {
    */
   get game() { return this.data.game; }
   set game(yzGame) { this.data.game = yzGame; }
+
+  /**
+   * The name of the roll.
+   * @type {string}
+   * @readonly
+   */
+  get name() { return this.data.name; }
+  set name(str) { this.data.name = str; }
 
   /**
    * The maximum number of pushes.
@@ -648,12 +657,7 @@ export class YearZeroRoll extends Roll {
 
   /* -------------------------------------------- */
 
-  /**
-   * Renders the tooltip HTML for a Roll instance.
-   * @return {Promise<HTMLElement>}
-   * @override
-   * @async
-   */
+  /** @override */
   getTooltip() {
     const parts = this.dice.map(d => {
       const cls = d.constructor;
@@ -661,11 +665,20 @@ export class YearZeroRoll extends Roll {
         formula: d.formula,
         total: d.total,
         faces: d.faces,
-        flavor: d.options.flavor,
-        rolls: d.results.map(r => {
+        // ==>
+        // // flavor: d.options.flavor,
+        flavor: d.options.flavor || (
+          CONFIG.YZUR?.DICE?.localizeDieTypes
+            ? game.i18n.localize(`DICE.TYPES.${cls.name}`)
+            : cls.name
+        ),
+        number: d.number,
+        // // rolls: d.results.map(r => {
+        rolls: d.results.map((r, i) => {
+          // <==
           const hasSuccess = r.success !== undefined;
           const hasFailure = r.failure !== undefined;
-          // START MODIFIED PART ==>
+          // ==>
           // // const isMax = r.result === d.faces;
           // // const isMin = r.result === 1;
           let isMax = false, isMin = false;
@@ -677,9 +690,13 @@ export class YearZeroRoll extends Roll {
             isMax = r.result === d.faces || r.count >= 1;
             isMin = r.result === 1 && d.type !== 'skill' && d.type !== 'loc';
           }
-          // <== END MODIFIED PART
+          // <==
           return {
             result: cls.getResultLabel(r.result),
+            // ==>
+            row: r.indexPush,
+            col: r.indexResult,
+            // <==
             classes: [
               cls.name.toLowerCase(),
               'd' + d.faces,
@@ -688,6 +705,9 @@ export class YearZeroRoll extends Roll {
               r.rerolled ? 'rerolled' : null,
               r.exploded ? 'exploded' : null,
               r.discarded ? 'discarded' : null,
+              // ==>
+              r.pushed ? 'pushed' : null,
+              // <==
               !(hasSuccess || hasFailure) && isMin ? 'min' : null,
               !(hasSuccess || hasFailure) && isMax ? 'max' : null,
             ].filter(c => c).join(' '),
@@ -695,7 +715,46 @@ export class YearZeroRoll extends Roll {
         }),
       };
     });
-    return renderTemplate(this.constructor.TOOLTIP_TEMPLATE, { parts });
+    // START MODIFIED PART ==>
+    if (this.pushed) {
+      // Converts "parts.rolls" into a matrix.
+      for (const part of parts) {
+        // Builds the matrix;
+        const matrix = [];
+        const n = part.number;
+        let p = this.pushCount;
+        for (; p >= 0; p--) matrix[p] = new Array(n).fill(undefined);
+
+        // Fills the matrix.
+        for (const r of part.rolls) {
+          matrix[r.row][r.col] = r;
+        }
+        part.rolls = matrix;
+        console.warn(matrix);
+      }
+    }
+    // // return renderTemplate(this.constructor.TOOLTIP_TEMPLATE, { parts });
+    return renderTemplate(this.constructor.TOOLTIP_TEMPLATE, {
+      parts,
+      pushed: this.pushed,
+      pushCounts: this.pushed
+        ? [...Array(this.pushCount + 1).keys()].sort((a, b) => b - a)
+        : undefined,
+      config: CONFIG.YZUR || {},
+    });
+    // <== END MODIFIED PART
+  }
+
+  /* -------------------------------------------- */
+
+  /** @override */
+  async render(chatOptions = {}) {
+    console.warn(this);
+    chatOptions = mergeObject({
+      flavor: this.name,
+      template: this.constructor.CHAT_TEMPLATE,
+    }, chatOptions);
+    return await super.render(chatOptions);
   }
 
   /* -------------------------------------------- */
@@ -706,10 +765,10 @@ export class YearZeroRoll extends Roll {
       user: game.user._id,
       speaker: ChatMessage.getSpeaker(),
       content: this.total,
-      roll: this,
       type: CONST.CHAT_MESSAGE_TYPES.ROLL,
       sound: CONFIG.sounds.dice,
     }, messageData);
+    // messageData.roll = this; // Already added in super.
     return super.toMessage(messageData, { rollMode, create });
   }
 
@@ -761,15 +820,6 @@ export class YearZeroDie extends Die {
   }
 
   /**
-   * The maximum number of pushes.
-   * @type {number}
-   * @readonly
-   *
-  get maxPush() {
-    return this.options.maxPush;
-  }//*/
-
-  /**
    * Whether the die can be pushed (according to its type).
    * @type {boolean}
    * @readonly
@@ -791,7 +841,7 @@ export class YearZeroDie extends Die {
    * @readonly
    */
   get pushCount() {
-    return this.results.reduce((c, r) => Math.max(c, r.push || 0), 0);
+    return this.results.reduce((c, r) => Math.max(c, r.indexPush || 0), 0);
   }
 
   /**
@@ -807,8 +857,22 @@ export class YearZeroDie extends Die {
 
   /** @override */
   roll(options) {
+    // Modifies the result.
     const roll = super.roll(options);
     roll.count = roll.result >= 6 ? 1 : 0;
+
+    // Stores indexes
+    roll.indexResult = options.indexResult;
+    if (roll.indexResult == undefined) {
+      roll.indexResult = 1 + this.results.reduce((c, r) => {
+        let i = r.indexResult;
+        if (i == undefined) i = -1;
+        return Math.max(c, i);
+      }, -1);
+    }
+    roll.indexPush = options.indexPush || this.pushCount;
+
+    // Overwrites the result.
     this.results[this.results.length - 1] = roll;
     return roll;
   }
@@ -818,19 +882,23 @@ export class YearZeroDie extends Die {
   }
 
   push() {
-    const _push = 1 + (this.pushCount || 0);
-    let count = 0;
+    const indexPush = this.pushCount + 1;
+    const indexesResult = [];
     for (const r of this.results) {
       if (!r.active) continue;
       if (!this.constructor.LOCKED_VALUES.includes(r.result)) {
         r.active = false;
         r.discarded = true;
         r.pushed = true;
-        r.push = _push;
-        count++;
+        indexesResult.push(r.indexResult);
       }
     }
-    for (; count > 0; count--) this.roll();
+    for (let i = 0; i < indexesResult.length; i++) {
+      this.roll({
+        indexResult: indexesResult[i],
+        indexPush,
+      });
+    }
     return this;
   }
 }
@@ -1064,8 +1132,10 @@ LocationDie.DENOMINATION = 'l';
 
 const YZUR = {
   game: '',
-  chatRollTemplate: '',
   DICE: {
+    chatTemplate: 'templates/dice/roll.html',
+    tooltipTemplate: 'templates/dice/tooltip.html',
+    localizeDieTypes: true,
     DIE_TYPES: {
       'base': BaseDie,
       'skill': SkillDie,

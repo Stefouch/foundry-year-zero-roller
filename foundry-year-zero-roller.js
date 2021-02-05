@@ -10,11 +10,13 @@ import * as YZDice from './yearzero-dice.js';
 /* -------------------------------------------- */
 
 Hooks.once('init', function() {
-
-  // Records configuration values.
   // CONFIG.debug.hooks = true;
 
-  YZDice.YearZeroRollManager.register('t2k');
+  // Copy that in your Hooks.once(init)
+  YZDice.YearZeroRollManager.register('myz', {
+    'DICE.chatTemplate': 'systems/foundry-year-zero-roller/templates/dice/roll.hbs',
+    'DICE.tooltipTemplate': 'systems/foundry-year-zero-roller/templates/dice/tooltip.hbs',
+  });
   game.yzdice = YZDice;
 });
 
