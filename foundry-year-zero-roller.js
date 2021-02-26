@@ -14,8 +14,9 @@ Hooks.once('init', function() {
 
   // Copy that in your Hooks.once(init)
   YZDice.YearZeroRollManager.register('myz', {
-    'DICE.chatTemplate': 'systems/foundry-year-zero-roller/templates/dice/roll.hbs',
-    'DICE.tooltipTemplate': 'systems/foundry-year-zero-roller/templates/dice/tooltip.hbs',
+    'ROLL.chatTemplate': 'systems/foundry-year-zero-roller/templates/dice/roll.hbs',
+    'ROLL.tooltipTemplate': 'systems/foundry-year-zero-roller/templates/dice/tooltip.hbs',
+    'ROLL.infosTemplate': 'systems/foundry-year-zero-roller/templates/dice/infos.hbs',
   });
   game.yzdice = YZDice;
 });

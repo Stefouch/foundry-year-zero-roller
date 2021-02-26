@@ -9,6 +9,14 @@
   </div>
 </div>
 
+{{!-- Extra info added for Year Zero rolls --}}
+{{#if showInfos}}
+{{{infos}}}
+{{/if}}
+
+{{!-- Push button --}}
+{{#if pushable}}
 <div class="dice-buttons">
-  <button class="dice-button push">{{pushLabel}}</button>
+  <button class="dice-button push" data-action="push">{{localize "YZUR.CHAT.ROLL.push"}}</button>
 </div>
+{{/if}}
