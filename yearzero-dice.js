@@ -969,7 +969,7 @@ YearZeroDie.MODIFIERS = mergeObject(
 export class BaseDie extends YearZeroDie {
   /** @override */
   static getResultLabel(result) {
-    return CONFIG.YZUR.DICE.ICONS[CONFIG.YZUR.game].base[result];
+    return CONFIG.YZUR.DICE.ICONS.getLabel('base', result);
   }
 }
 BaseDie.TYPE = 'base';
@@ -983,7 +983,7 @@ BaseDie.LOCKED_VALUES = [1, 6];
 export class SkillDie extends YearZeroDie {
   /** @override */
   static getResultLabel(result) {
-    return CONFIG.YZUR.DICE.ICONS[CONFIG.YZUR.game].skill[result];
+    return CONFIG.YZUR.DICE.ICONS.getLabel('skill', result);
   }
 }
 SkillDie.TYPE = 'skill';
@@ -996,7 +996,7 @@ SkillDie.DENOMINATION = 's';
 export class GearDie extends YearZeroDie {
   /** @override */
   static getResultLabel(result) {
-    return CONFIG.YZUR.DICE.ICONS[CONFIG.YZUR.game].gear[result];
+    return CONFIG.YZUR.DICE.ICONS.getLabel('gear', result);
   }
 }
 GearDie.TYPE = 'gear';
@@ -1017,7 +1017,7 @@ export class NegativeDie extends SkillDie {
   }
   /** @override */
   static getResultLabel(result) {
-    return CONFIG.YZUR.DICE.ICONS[CONFIG.YZUR.game].neg[result];
+    return CONFIG.YZUR.DICE.ICONS.getLabel('neg', result);
   }
 }
 NegativeDie.TYPE = 'neg';
@@ -1032,7 +1032,7 @@ NegativeDie.DENOMINATION = 'n';
 export class StressDie extends YearZeroDie {
   /** @override */
   static getResultLabel(result) {
-    return CONFIG.YZUR.DICE.ICONS.alien.stress[result];
+    return CONFIG.YZUR.DICE.ICONS.getLabel('stress', result);
   }
 }
 StressDie.TYPE = 'stress';
@@ -1058,7 +1058,7 @@ export class ArtifactDie extends SkillDie {
   /** @override */
   static getResultLabel(result) {
     // Must be overriden because it extends SkillDie.
-    return CONFIG.YZUR.DICE.ICONS.fbl.arto[result];
+    return CONFIG.YZUR.DICE.ICONS.getLabel('arto', result);
   }
 }
 ArtifactDie.TYPE = 'arto';
@@ -1098,7 +1098,7 @@ D12ArtifactDie.DENOMINATION = '12';
 export class TwilightDie extends ArtifactDie {
   /** @override */
   static getResultLabel(result) {
-    return CONFIG.YZUR.DICE.ICONS.t2k.base[result];
+    return CONFIG.YZUR.DICE.ICONS.getLabel('base', result);
   }
 }
 TwilightDie.TYPE = 'base';
@@ -1147,7 +1147,7 @@ export class AmmoDie extends YearZeroDie {
   get hit() { return this.count(6);}
   /** @override */
   static getResultLabel(result) {
-    return CONFIG.YZUR.DICE.ICONS.t2k.ammo[result];
+    return CONFIG.YZUR.DICE.ICONS.getLabel('ammo', result);
   }
 }
 AmmoDie.TYPE = 'ammo';
@@ -1169,7 +1169,7 @@ export class LocationDie extends Die {
   }
   /** @override */
   static getResultLabel(result) {
-    return CONFIG.YZUR.DICE.ICONS.t2k.loc[result];
+    return CONFIG.YZUR.DICE.ICONS.getLabel('loc', result);
   }
 }
 LocationDie.TYPE = 'loc';
@@ -1211,6 +1211,9 @@ const YZUR = {
       'loc': LocationDie,
     },
     ICONS: {
+      getLabel: function(type, result) {
+        return this[YZUR.game][type][result];
+      },
       myz: {
         base: {
           '1': '☣',
