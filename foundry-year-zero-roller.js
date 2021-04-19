@@ -1,5 +1,5 @@
 // Imports Modules.
-import * as YZDice from './yearzero-dice.js';
+import * as YZDice from './lib/yzur.js';
 
 // Imports Entities.
 
