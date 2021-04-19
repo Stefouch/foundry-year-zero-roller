@@ -6,7 +6,8 @@
   },
   "extends": [
     "eslint:recommended",
-    "./node_modules/@typhonjs-fvtt/eslint-foundry.js/config/latest/.eslintrc",
+    "@typhonjs-fvtt/eslint-config-foundry.js"
+    // "@typhonjs-fvtt/eslint-config-foundry.js/diff-0.7.9-0.8.0",
     // "prettier",
     // "plugin:prettier/recommended"
   ],
