@@ -132,20 +132,20 @@ roll.push();
 Add a listener to the button in the chat to get the roll and push it. See example below.
 
 ```js
-export function addChatListeners(html) {
+Hooks.on('renderChatLog', (app, html, data) => {
   html.on('click', '.dice-button.push', _onPush);
-}
+});
 
-function _onPush() {
+function _onPush(event) {
   event.preventDefault();
 
   // Gets the message.
   let chatCard = event.currentTarget.closest('.chat-message');
-  let messageID = chatCard.attr('data-message-id');
-  let message = game.messages.get(messageID);
-  
-  // Gets the roll.
-  let roll = duplicate(message.roll);
+  let messageId = chatCard.dataset.messageId;
+  let message = game.messages.get(messageId);
+
+  // Copies the roll.
+  let roll = YearZeroRoll.fromData(message.roll.toJSON());
 
   // Pushes the roll.
   if (roll.pushable) {
@@ -177,6 +177,8 @@ The new `YearZeroRoll` class offers the following additional getters and setters
 | pushable | boolean | Tells if the roll is pushable. |
 | successCount | number | The quantity of successes.<br/>**Deprecated:** Use `roll.total` instead. |
 | baneCount | number | The quantity of ones (banes). |
+| baseBaneCount | number | The quantity of ones (banes) on base dice. |
+| ammoBaneCount | number | The quantity of ones (banes) on ammo dice. |
 | attributeTrauma | number | The quantity of traumas ("1" on base dice). |
 | gearDamage | number | The quantity of gear damage ("1" on gear dice). |
 | stress | number | The quantity of stress dice. |
