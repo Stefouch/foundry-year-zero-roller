@@ -9,7 +9,7 @@ Hooks.once('init', function() {
   // CONFIG.debug.hooks = true;
 
   // Copy this in your Hooks.once('init')
-  YZUR.YearZeroRollManager.register('myz', {
+  YZUR.YearZeroRollManager.register('fbl', {
     'ROLL.chatTemplate': 'systems/foundry-year-zero-roller/templates/dice/roll.hbs',
     'ROLL.tooltipTemplate': 'systems/foundry-year-zero-roller/templates/dice/tooltip.hbs',
     'ROLL.infosTemplate': 'systems/foundry-year-zero-roller/templates/dice/infos.hbs',
@@ -25,7 +25,7 @@ Hooks.on('renderChatLog', (app, html, data) => {
   html.on('click', '.dice-button.push', _onPush);
 });
 
-function _onPush(event) {
+async function _onPush(event) {
   event.preventDefault();
 
   // Gets the message.
@@ -34,11 +34,11 @@ function _onPush(event) {
   const message = game.messages.get(messageId);
 
   // Gets the roll.
-  const roll = YZUR.YearZeroRoll.fromData(message.roll.toJSON());
+  const roll = message.roll.duplicate();
 
   // Pushes the roll.
   if (roll.pushable) {
-    roll.push();
+    await roll.push({ async: true });
     roll.toMessage();
   }
 }
