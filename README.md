@@ -62,13 +62,13 @@ import { YearZeroRollManager } from './lib/yzur.js';
 ```
 
 3. In your init hook, initialize the dice with the `.register()` method.<br/>
-• Replace `'your_game'` with the code of the game to be used.<br/>
+• Replace `'<your_game>'` with the code of the game to be used.<br/>
 • The second argument is an object of options. Add there the paths to the three templates and your own custom settings.
 
 ```js
 Hooks.once('init', function() {
 
-  YearZeroRollManager.register('your_game', {
+  YearZeroRollManager.register('<your_game>', {
     'ROLL.chatTemplate': 'systems/your_system/templates/dice/roll.hbs',
     'ROLL.tooltipTemplate': 'systems/your_system/templates/dice/tooltip.hbs',
     'ROLL.infosTemplate': 'systems/your_system/templates/dice/infos.hbs',
@@ -101,7 +101,7 @@ let dice = {
 let roll = YearZeroRoll.createFromDiceQuantities(dice);
 
 // Rolls the roll, same methods as usual.
-roll.roll();
+await roll.roll({ async: true });
 roll.toMessage();
 ```
 
@@ -115,7 +115,7 @@ let modifier = -1;
 let modifiedRoll = roll.modify(modifier);
 
 // Rolls and sends.
-modifiedRoll.roll();
+await modifiedRoll.roll({ async: true });
 modifiedRoll.toMessage();
 ```
 
@@ -132,24 +132,24 @@ roll.push();
 Add a listener to the button in the chat to get the roll and push it. See example below.
 
 ```js
-export function addChatListeners(html) {
+Hooks.on('renderChatLog', (app, html, data) => {
   html.on('click', '.dice-button.push', _onPush);
-}
+});
 
-function _onPush() {
+async function _onPush(event) {
   event.preventDefault();
 
   // Gets the message.
   let chatCard = event.currentTarget.closest('.chat-message');
-  let messageID = chatCard.attr('data-message-id');
-  let message = game.messages.get(messageID);
-  
-  // Gets the roll.
-  let roll = duplicate(message.roll);
+  let messageId = chatCard.dataset.messageId;
+  let message = game.messages.get(messageId);
+
+  // Copies the roll.
+  let roll = message.roll.duplicate();
 
   // Pushes the roll.
   if (roll.pushable) {
-    roll.push();
+    await roll.push({ async: true });
     roll.toMessage();
   }
 }
@@ -177,6 +177,8 @@ The new `YearZeroRoll` class offers the following additional getters and setters
 | pushable | boolean | Tells if the roll is pushable. |
 | successCount | number | The quantity of successes.<br/>**Deprecated:** Use `roll.total` instead. |
 | baneCount | number | The quantity of ones (banes). |
+| baseBaneCount | number | The quantity of ones (banes) on base dice. |
+| ammoBaneCount | number | The quantity of ones (banes) on ammo dice. |
 | attributeTrauma | number | The quantity of traumas ("1" on base dice). |
 | gearDamage | number | The quantity of gear damage ("1" on gear dice). |
 | stress | number | The quantity of stress dice. |

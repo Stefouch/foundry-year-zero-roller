@@ -1,9 +1,5 @@
 // Imports Modules.
-import * as YZDice from './lib/yzur.js';
-
-// Imports Entities.
-
-// Imports Applications.
+import * as YZUR from './lib/yzur.js';
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -12,34 +8,37 @@ import * as YZDice from './lib/yzur.js';
 Hooks.once('init', function() {
   // CONFIG.debug.hooks = true;
 
-  // Copy that in your Hooks.once(init)
-  YZDice.YearZeroRollManager.register('myz', {
+  // Copy this in your Hooks.once('init')
+  YZUR.YearZeroRollManager.register('fbl', {
     'ROLL.chatTemplate': 'systems/foundry-year-zero-roller/templates/dice/roll.hbs',
     'ROLL.tooltipTemplate': 'systems/foundry-year-zero-roller/templates/dice/tooltip.hbs',
     'ROLL.infosTemplate': 'systems/foundry-year-zero-roller/templates/dice/infos.hbs',
   });
-  game.yzdice = YZDice;
+  game.yzur = YZUR;
 });
 
 Hooks.once('ready', function() {
-  console.warn('YZRoll | READY!');
-
-  // Debugging
-  if (CONFIG.debug.hooks === true) {
-    try {
-      // Renders a starting actor or item.
-      /** @type {Actor} *
-      const startingActor = game.actors.get('PD9O4dYhP1ED6Pmp');
-      startingActor.sheet.render(true);//*/
-      /** @type {Actor} *
-      const startingVehicle = game.actors.get('PqpLwMzCw6WTmsHx');
-      startingVehicle.sheet.render(true);//*/
-      /** @type {Item} *
-      const startingItem = game.items.get('63JHOmp3e1HLbdrL');
-      startingItem.sheet.render(true);//*/
-    }
-    catch (error) {
-      console.warn('YZRoll | DEBUG | Cannot find starting Entity.', error);
-    }
-  }
+  console.warn('YZ Roller Tester | READY!');
 });
+
+Hooks.on('renderChatLog', (app, html, data) => {
+  html.on('click', '.dice-button.push', _onPush);
+});
+
+async function _onPush(event) {
+  event.preventDefault();
+
+  // Gets the message.
+  const chatCard = event.currentTarget.closest('.chat-message');
+  const messageId = chatCard.dataset.messageId;
+  const message = game.messages.get(messageId);
+
+  // Gets the roll.
+  const roll = message.roll.duplicate();
+
+  // Pushes the roll.
+  if (roll.pushable) {
+    await roll.push({ async: true });
+    roll.toMessage();
+  }
+}
