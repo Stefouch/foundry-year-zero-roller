@@ -33,12 +33,13 @@ Features:
 - Push support (except Alien atm).
 - Custom roll template with push stack and push button.
 - Customisable settings.
-- Compatible with Foundry 0.7.9
+- Compatible with Foundry 0.8.8
+- Compatible with Dice So Nice!
 
 Not included:
 
 - Roll dialog.
-- Push button listener (you have to create one and call the roll.push() method).
+- Push button listener (you have to create one and call the roll.push() method, see example below).
 - Dice So Nice configuration.
 
 # How to Set Up
@@ -231,7 +232,7 @@ Read more about the new methods and their documentation in the source code of th
 
 # Dice So Nice
 
-DsN is not integrated, but since all dice are already preset, configuring DsN should be easy.
+DsN is supported but not configured. See the [API](https://gitlab.com/riccisi/foundryvtt-dice-so-nice/-/wikis/API/Customization) for how to create a proper configuration for your custom dice.
 
 # Author
 
