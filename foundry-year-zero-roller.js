@@ -9,7 +9,7 @@ Hooks.once('init', function() {
   // CONFIG.debug.hooks = true;
 
   // Copy this in your Hooks.once('init')
-  YZUR.YearZeroRollManager.register('fbl', {
+  YZUR.YearZeroRollManager.register('t2k', {
     'ROLL.chatTemplate': 'systems/foundry-year-zero-roller/templates/dice/roll.hbs',
     'ROLL.tooltipTemplate': 'systems/foundry-year-zero-roller/templates/dice/tooltip.hbs',
     'ROLL.infosTemplate': 'systems/foundry-year-zero-roller/templates/dice/infos.hbs',
@@ -18,6 +18,7 @@ Hooks.once('init', function() {
 });
 
 Hooks.once('ready', function() {
+  CONFIG.debug.dice = true;
   console.warn('YZ Roller Tester | READY!');
 });
 

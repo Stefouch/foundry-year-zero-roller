@@ -3,6 +3,31 @@ All notable changes to this project will be documented in this file.
 <br />The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 <br />and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2021-07-04
+Last minute changes for T2K.
+
+### Changed
+- Updated `infos.hbs` template with correct T2K weapon-related infos.
+
+### Added
+- New getters for the `YearZeroRoll`, mostly used by T2K:
+  - `.jamCount`: The quantity of ones (banes) on base dice and ammo dice.
+  - `.jammed`: Tells if the roll caused a weapon jam.
+- Missing locked values for Ammo dice.
+- Setting the global "`CONFIG.debug.dice = true`" will log the roll objects in the console.
+
+### Removed
+- The two getters previously added. They were useless in fact:
+  - `YearZeroRoll.baseBaneCount`
+  - `YearZeroRoll.ammoBaneCount`
+
+### Fixed
+- `YearZeroRoll.ammoSpent` is now correctly returning the sum of the active values on ammo dice.
+- Modifiers for T2K rolls now properly work as detailed in the rules.
+
+### Deprecated
+- `YearZeroRoll.mishap` is deprecated (useless for now).
+
 ## [1.0.0] - 2021-07-04
 Update for Foundry V8.
 

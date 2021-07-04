@@ -176,17 +176,17 @@ The new `YearZeroRoll` class offers the following additional getters and setters
 | pushCount | number | The number of times the roll has been pushed. |
 | pushed | boolean | Whether the roll was pushed or not. |
 | pushable | boolean | Tells if the roll is pushable. |
-| successCount | number | The quantity of successes.<br/>**Deprecated:** Use `roll.total` instead. |
-| baneCount | number | The quantity of ones (banes). |
-| baseBaneCount | number | The quantity of ones (banes) on base dice. |
-| ammoBaneCount | number | The quantity of ones (banes) on ammo dice. |
+| ~~successCount~~ | number | The total quantity of successes.<br/>**Deprecated:** Use `roll.total` instead. |
+| baneCount | number | The total quantity of ones (banes). |
 | attributeTrauma | number | The quantity of traumas ("1" on base dice). |
 | gearDamage | number | The quantity of gear damage ("1" on gear dice). |
 | stress | number | The quantity of stress dice. |
 | panic | number | The quantity of panic ("1" on stress dice). |
-| mishap | boolean | Tells if the roll is a mishap (double 1's). |
+| ~~mishap~~ | boolean | **Deprecated**. Tells if the roll is a mishap (double 1's). |
 | ammoSpent | number | The quantity of ammo spent. Equal to the sum of the ammo dice. |
 | hitCount | number | The quantity of successes on ammo dice. |
+| jamCount | number | The quantity of ones (banes) on base dice and ammo dice. |
+| jammed | boolean | Tells if the roll caused a weapon jam. |
 
 If you need to count another specific result, use the `count(type, seed)` method.
 
