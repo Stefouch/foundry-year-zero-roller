@@ -35,3 +35,4 @@ package-lock.json
 
 # Foundry VTT files
 foundry.js
+/*.lock
