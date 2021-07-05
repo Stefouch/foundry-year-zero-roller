@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 <br />The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 <br />and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2021-07-05
+### Fixed
+- Correct rendering of result labels.
+- Ensure that `YZUR.DICE.ICONS.getLabel()` returns a string.
+- A bug causing numerical result labels to throw an error in Dice So Nice!
+
 ## [1.1.0] - 2021-07-04
 Last minute changes for T2K.
 
