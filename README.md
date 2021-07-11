@@ -187,6 +187,9 @@ The new `YearZeroRoll` class offers the following additional getters and setters
 | hitCount | number | The quantity of successes on ammo dice. |
 | jamCount | number | The quantity of ones (banes) on base dice and ammo dice. |
 | jammed | boolean | Tells if the roll caused a weapon jam. |
+| baseSuccessQty | number | The total successes produced by base dice. |
+| hitLocations | number[] | The rolled hit locations. |
+| bestHitLocation | number | The best rolled hit location. |
 
 If you need to count another specific result, use the `count(type, seed)` method.
 

@@ -3,6 +3,22 @@ All notable changes to this project will be documented in this file.
 <br />The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 <br />and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2021-07-11
+### Added
+- New getters for the `YearZeroRoll`, mostly used by T2K:
+  - `baseSuccessQty`: he total successes produced by base dice.
+  - `hitLocations `: The rolled hit locations.
+  - `bestHitLocation `: The best rolled hit location.
+- Tooltip dice parts in the chat are now sorted.
+- The sort order is stored in `YZUR.CHAT.diceSorting`.
+- Plenty of CSS classes in the templates.
+
+### Changed
+- `YearZeroRoll#jamCount` now returns 0 if there are no bane on ammo dice.
+
+### Fixed
+- A bug where a modifier to a T2K roll could lead to an infinite loop.
+
 ## [1.1.1] - 2021-07-05
 ### Fixed
 - Correct rendering of result labels.
