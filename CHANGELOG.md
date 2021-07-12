@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 <br />The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 <br />and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2021-07-12
+### Added
+- New data option "title" (the name of the roll) for `YearZeroRoll#createFromDiceQuantities(dice, data)`.
+
+### Fixed
+- A bug where a modified roll would not keep its name.
+
 ## [1.2.0] - 2021-07-11
 ### Added
 - New getters for the `YearZeroRoll`, mostly used by T2K:
