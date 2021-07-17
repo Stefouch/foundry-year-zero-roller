@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 <br />The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 <br />and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.2] - 2021-07-17
+### Added
+- New getter for all `YearZeroDie` classes `.isYearZeroDie`: Tells whether it's a Year Zero Die. This property is also passed to the templates.
+
+### Fixed
+- Errors throwed when rolling unregistered dice that are still common like d4, d20 or d100.
+
 ## [1.2.1] - 2021-07-12
 ### Added
 - New data option "title" (the name of the roll) for `YearZeroRoll#createFromDiceQuantities(dice, data)`.
