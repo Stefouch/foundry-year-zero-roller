@@ -3,6 +3,24 @@ All notable changes to this project will be documented in this file.
 <br />The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 <br />and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2021-07-19
+> :warning: **Breaking Change**
+> Use `roll.successCount` instead of `roll.total`.
+
+### Changed
+- Total number of success is returned by `YearZeroRoll#successCount`. *(Thus, the deprecation of this property is reverted.)*
+- Total sum of the dice's values is returned by `YearZeroRoll#total`. *(Back to default behavior.)*
+
+### Added
+- The roll object is entirely passed to the chat template, for better access to its getters.
+- Two new getters for the `YearZeroDie` class:
+  - `.success`: Number of successes rolled by this Year Zero DieTerm
+  - `.failure`: Number of banes rolled
+- Placeholder for a future `YearZeroDie#nopush()` method.
+
+### Removed
+- The DieTerm classes `NegativeDie` and `ArtifactDie` (which includes T2K dice) won't override the `.roll()` method anymore. No more `result.count` value for these dice. The calculation of successes is instead obtained with the `YearZeroDie#success` getter.
+
 ## [1.2.2] - 2021-07-17
 ### Added
 - New getter for all `YearZeroDie` classes `.isYearZeroDie`: Tells whether it's a Year Zero Die. This property is also passed to the templates.

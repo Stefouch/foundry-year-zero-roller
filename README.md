@@ -176,7 +176,7 @@ The new `YearZeroRoll` class offers the following additional getters and setters
 | pushCount | number | The number of times the roll has been pushed. |
 | pushed | boolean | Whether the roll was pushed or not. |
 | pushable | boolean | Tells if the roll is pushable. |
-| ~~successCount~~ | number | The total quantity of successes.<br/>**Deprecated:** Use `roll.total` instead. |
+| successCount | number | The total quantity of successes. |
 | baneCount | number | The total quantity of ones (banes). |
 | attributeTrauma | number | The quantity of traumas ("1" on base dice). |
 | gearDamage | number | The quantity of gear damage ("1" on gear dice). |
