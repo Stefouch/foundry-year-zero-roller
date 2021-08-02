@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 
 ## [2.1.0] - 2021-08-02
 ### Added
-- New properties on the Term level: `.maxPush`: Max number of pushes for this term.
+- New properties on the Term level: `YearZeroDie#maxPush`: Max number of pushes for this term.
 - New modifier for roll formulae: `np` (set maxPush to 0).
 - New modifier for roll formulae: `pX` (set maxPush to X).
 - `banes: this.failure` property in `YearZeroDie#getTooltipData()`.
