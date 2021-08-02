@@ -1,6 +1,6 @@
 {
   "name": "foundry-year-zero-roller",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "",
   "main": "foundry-year-zero-roller.js",
   "scripts": {
@@ -17,7 +17,7 @@
   "license": "MIT",
   "devDependencies": {
     "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
-    "eslint": "^7.31.0"
+    "eslint": "^7.32.0"
   },
   "repository": {
     "type": "git",

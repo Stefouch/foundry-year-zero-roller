@@ -3,6 +3,19 @@ All notable changes to this project will be documented in this file.
 <br />The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 <br />and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2021-08-02
+### Added
+- New properties on the Term level: `.maxPush`: Max number of pushes for this term.
+- New modifier for in-chat rolls: `np` (set maxPush to 0).
+- New modifier for in-chat rolls: `pX` (set maxPush to X).
+- `banes: this.failure` property in `YearZeroDie#getTooltipData()`.
+
+### Changed
+- `YearZeroRoll#maxPush` now acts on the Term level.
+
+### Fixed
+- A bug where it was not possible to set `maxPush = 0`.
+
 ## [2.0.0] - 2021-07-19
 > :warning: **Breaking Change**
 > Use `roll.successCount` instead of `roll.total`.
