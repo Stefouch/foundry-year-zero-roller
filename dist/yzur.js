@@ -1698,7 +1698,7 @@ YearZeroRollManager.GAMES = Object.keys(YearZeroRollManager.DIE_TYPES_MAP);
  *    YEAR ZERO UNIVERSAL DICE ROLLER FOR THE FOUNDRY VTT
  * ===============================================================================
  * Author: @Stefouch
- * Version: 2.1.1     for:     Foundry VTT V8 (0.8.8)
+ * Version: 3.0.0     for:     Foundry VTT V8 (0.8.8)
  * Licence: MIT
  * ===============================================================================
  * Content:

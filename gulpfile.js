@@ -1,3 +1,4 @@
+const argv = require('yargs').argv;
 const dotenv = require('dotenv');
 const execa = require('execa');
 const fs = require('fs-extra');
@@ -6,7 +7,6 @@ const path = require('path');
 const { rollup } = require('rollup');
 const rollupConfig = require('./rollup.config.js');
 const semver = require('semver');
-const { argv } = require('process');
 
 /* -------------------------------------------- */
 /*  Configuration                               */
@@ -110,7 +110,8 @@ async function bumpVersion(cb) {
   const packageJson = fs.readJSONSync('package.json');
   const packageLockJson = fs.existsSync('package-lock.json') ? fs.readJSONSync('package-lock.json') : undefined;
   const manifest = getManifest();
-  let changelog = fs.existsSync('CHANGELOG.md') ? fs.readFileSync('CHANGELOG.md') : undefined;
+  const changelog = fs.existsSync('CHANGELOG.md') ? fs.readFileSync('CHANGELOG.md', 'utf-8') : undefined;
+  const mainJs = fs.readFileSync('src/main.js', 'utf-8');
 
   if (!manifest) cb(Error('Manifest JSON not found'));
 
@@ -129,22 +130,43 @@ async function bumpVersion(cb) {
 
     packageJson.version = targetVersion;
     fs.writeJSONSync('package.json', packageJson, { spaces: '  ' });
+    console.log('  Updated: package.json');
 
     if (packageLockJson) {
       packageLockJson.version = targetVersion;
       fs.writeJSONSync('package-lock.json', packageLockJson, { spaces: '  ' });
+      console.log('  Updated: package-lock.json');
     }
 
     manifest.file.version = targetVersion;
     fs.writeJSONSync(manifest.name, manifest.file, { spaces: '  ' });
+    console.log(`  Updated: manifest ${manifest.name}`);
 
     if (changelog) {
       const pad = (s) => s < 10 ? '0' + s : s;
       const d = new Date(Date.now());
-      const date = [pad(d.getFullYear), pad(d.getMonth + 1), pad(d.getDate)].join('-');
-      const rgx = /^## \[(.*)\] - (.+)$/;
-      changelog = changelog.replace(rgx, `## [${targetVersion}] - ${date}`);
-      console.warn(changelog);
+      const date = [pad(d.getFullYear()), pad(d.getMonth() + 1), pad(d.getDate())].join('-');
+      const rgx = /^## \[(.*)\] - (.+)$/m;
+      const newChangelog = changelog.replace(rgx, `## [${targetVersion}] - ${date}`);
+      if (newChangelog !== changelog) {
+        fs.writeFileSync('CHANGELOG.md', newChangelog, 'utf-8');
+        console.log(`  Updated: changelog last entry => ${date}`);
+      }
+      else {
+        console.warn('  No change for the changelog.');
+      }
+    }
+
+    if (mainJs) {
+      const rgx = /(?<=^ \* Version: )([.\d]+)$/m;
+      const newMainJs = mainJs.replace(rgx, targetVersion);
+      if (newMainJs !== mainJs) {
+        fs.writeFileSync('src/main.js', newMainJs, 'utf-8');
+        console.log('  Updated: src/main.js');
+      }
+      else {
+        console.warn('  No change for main.js.');
+      }
     }
   }
   catch (error) {
@@ -155,5 +177,5 @@ async function bumpVersion(cb) {
 
 exports.build = gulp.series(buildCode);
 exports.watch = gulp.series(buildWatch);
-exports.bump = gulp.series(bumpVersion, update, buildCode);
+exports.bump = gulp.series(bumpVersion);//, update, buildCode);
 exports.release = commitTagPush;

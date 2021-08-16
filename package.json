@@ -4,10 +4,10 @@
   "description": "",
   "main": "foundry-year-zero-roller.js",
   "scripts": {
-    "build": "rollup --config",
-    "watch": "gulp",
-    "gulp": "gulp",
-    "compile": "gulp css"
+    "build": "gulp build",
+    "bump": "gulp bump --release",
+    "watch": "gulp watch",
+    "gulp": "gulp"
   },
   "keywords": [
     "Foundry",
@@ -24,7 +24,8 @@
     "gulp": "^4.0.2",
     "path": "^0.12.7",
     "rollup": "^2.56.2",
-    "semver": "^7.3.5"
+    "semver": "^7.3.5",
+    "yargs": "^17.1.1"
   },
   "repository": {
     "type": "git",
