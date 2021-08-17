@@ -1,9 +1,8 @@
 const argv = require('yargs').argv;
-const dotenv = require('dotenv');
+const chalk = require('chalk');
 const execa = require('execa');
 const fs = require('fs-extra');
 const gulp = require('gulp');
-const path = require('path');
 const { rollup } = require('rollup');
 const rollupConfig = require('./rollup.config.js');
 const semver = require('semver');
@@ -12,15 +11,10 @@ const semver = require('semver');
 /*  Configuration                               */
 /* -------------------------------------------- */
 
-const repoName = path.basename(path.resolve('.'));
 const sourceDirectory = './src';
-const distDirectory = './dist';
 const sourceFileExtension = 'js';
 
 // Loads environment variables
-const result = dotenv.config();
-if (result.error) throw result.error;
-const env = process.env.NODE_ENV || 'development';
 const stdio = 'inherit';
 
 /* -------------------------------------------- */
@@ -95,15 +89,6 @@ async function commitTagPush() {
 }
 
 /**
- * Updates dependencies
- */
-async function update() {
-  await execa('npm', ['outdated'], { stdio });
-  await execa('npm', ['update'], { stdio });
-  return;
-}
-
-/**
  * Updates version.
  */
 async function bumpVersion(cb) {
@@ -111,20 +96,20 @@ async function bumpVersion(cb) {
   const packageLockJson = fs.existsSync('package-lock.json') ? fs.readJSONSync('package-lock.json') : undefined;
   const manifest = getManifest();
   const changelog = fs.existsSync('CHANGELOG.md') ? fs.readFileSync('CHANGELOG.md', 'utf-8') : undefined;
-  const mainJs = fs.readFileSync('src/main.js', 'utf-8');
+  const mainJs = fs.readFileSync('./src/main.js', 'utf-8');
 
-  if (!manifest) cb(Error('Manifest JSON not found'));
+  if (!manifest) cb(Error(chalk.red('Manifest JSON not found')));
 
   try {
     const release = argv.release || argv.r;
     const currentVersion = packageJson.version;
 
-    if (!release) return cb(Error('Missing release type'));
+    if (!release) return cb(Error(chalk.red('Missing release type')));
 
     const targetVersion = getTargetVersion(currentVersion, release);
 
-    if (!targetVersion) return cb(Error('Incorrect version arguments'));
-    if (targetVersion === currentVersion) return cb(Error('Target version is identical to current version'));
+    if (!targetVersion) return cb(Error(chalk.red('Incorrect version arguments')));
+    if (targetVersion === currentVersion) return cb(Error(chalk.red('Target version is identical to current version')));
 
     console.log(`Updating version number to ${targetVersion}`);
 
@@ -150,22 +135,22 @@ async function bumpVersion(cb) {
       const newChangelog = changelog.replace(rgx, `## [${targetVersion}] - ${date}`);
       if (newChangelog !== changelog) {
         fs.writeFileSync('CHANGELOG.md', newChangelog, 'utf-8');
-        console.log(`  Updated: changelog last entry => ${date}`);
+        console.log(`  Updated: changelog with date ${date}`);
       }
       else {
-        console.warn('  No change for the changelog.');
+        console.warn(chalk.yellow('  No change for the changelog'));
       }
     }
 
     if (mainJs) {
-      const rgx = /(?<=^ \* Version: )([.\d]+)$/m;
+      const rgx = /(?<=^ \* Version: )(.+?)(?=\s{2,})/m;
       const newMainJs = mainJs.replace(rgx, targetVersion);
       if (newMainJs !== mainJs) {
-        fs.writeFileSync('src/main.js', newMainJs, 'utf-8');
+        fs.writeFileSync('./src/main.js', newMainJs, 'utf-8');
         console.log('  Updated: src/main.js');
       }
       else {
-        console.warn('  No change for main.js.');
+        console.warn(chalk.yellow('  No change for main.js'));
       }
     }
   }
@@ -177,5 +162,5 @@ async function bumpVersion(cb) {
 
 exports.build = gulp.series(buildCode);
 exports.watch = gulp.series(buildWatch);
-exports.bump = gulp.series(bumpVersion);//, update, buildCode);
+exports.bump = gulp.series(bumpVersion, buildCode);
 exports.release = commitTagPush;
