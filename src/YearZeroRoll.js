@@ -241,6 +241,15 @@ export class YearZeroRoll extends Roll {
   }
 
   /* -------------------------------------------- */
+  /*  Static Class Methods                        */
+  /* -------------------------------------------- */
+
+  /** @override */
+  static create(formula, data = {}, options = {}) {
+    return new YearZeroRoll(formula, data, options);
+  }
+
+  /* -------------------------------------------- */
   /*  YearZeroRoll Utility Methods                */
   /* -------------------------------------------- */
 
@@ -314,6 +323,7 @@ export class YearZeroRoll extends Roll {
 
   /**
    * Adds a number of dice to the roll.
+   * Note: If a negative quantity is passed, instead it removes that many dice.
    * @param {number}        qty      The quantity to add
    * @param {DieTypeString} type     The type of dice to add
    * @param {number}       [range=6] The number of faces of the die
@@ -356,7 +366,7 @@ export class YearZeroRoll extends Roll {
         }
       }
       // eslint-disable-next-line no-undef
-      this.terms.push(new OperatorTerm({ operator: '+' }));
+      this.terms.push(new OperatorTerm({ operator: type === 'neg' ? '-' : '+' }));
       this.terms.push(term);
     }
     // Adapts the formula accordingly.
