@@ -1,5 +1,5 @@
-import YZUR from './constants.js';
 import { YearZeroRoll } from './YearZeroRoll.js';
+import YZUR from './constants.js';
 import { DieTypeError, GameTypeError } from './errors.js';
 
 /* -------------------------------------------- */
@@ -218,12 +218,3 @@ YearZeroRollManager.DIE_TYPES_MAP = {
 
 /** @type {GameTypeString} */
 YearZeroRollManager.GAMES = Object.keys(YearZeroRollManager.DIE_TYPES_MAP);
-
-// TODO clean this code
-// YearZeroRollManager.DIE_TYPES_SWAP = {
-//   'alien': { base: 'skill', gear: 'skill' },
-//   'tales': { base: 'skill', gear: 'skill' },
-//   'cor': { base: 'skill', gear: 'skill' },
-//   'vae': { base: 'skill', gear: 'skill' },
-//   't2k': { base: 'b', skill: 'd', gear: 'ammo' },
-// };
