@@ -3,12 +3,29 @@ All notable changes to this project will be documented in this file.
 <br />The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 <br />and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [wip] - 2021-08-00
+## [XXXX] - 2021-08-XX
+> :warning: **BREAKING CHANGE**
+> The YZUR library is now compiled with rollup. Accessing the classes might have changed.
+
+```js
+before: import * as YZUR from './lib/yzur.js';
+after:  import YZUR      from './dist/yzur.js';
+```
+
 ### Added
+- `YearZeroRoll#addDice(qty, type, options)`: Adds a number of dice to the roll.
+- `YearZeroRoll#removeDice(qty, type)`: Removes a number of dice from the roll.
 - "chatOptions" in `YearZeroRoll#render(chatOptions)` is passed to the renderTemplate with property "options".
+
+### Changed
+- `YearZeroRoll#modify(n)` is refactored and now modifies the roll instead of a copy of it. The old (fixed) modify method is still accessible with `_modify()`.
+- `YearZeroRoll#getTerms(search)` now accepts an object of comparaison values as an argument.
 
 ### Fixed
 - `YearZeroRoll#modify(n)` now retains all data/options set before.
+
+### Deprecated
+- `YearZeroRoll#getDiceQuantities()` is now useless and will be removed in a future release.
 
 ## [2.1.1] - 2021-08-09
 ### Fixed
