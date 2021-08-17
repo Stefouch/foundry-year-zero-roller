@@ -2,10 +2,10 @@
 /*  Custom Roll Class                           */
 /* -------------------------------------------- */
 
+import YearZeroRollManager from './YearZeroRollManager.js';
+import { YearZeroDie } from './YearZeroDice.js';
 import YZUR from './constants.js';
 import { GameTypeError } from './errors.js';
-import { YearZeroDie } from './YearZeroDice.js';
-import YearZeroRollManager from './YearZeroRollManager.js';
 
 /**
  * Custom Roll class for Year Zero games.
@@ -55,8 +55,6 @@ export class YearZeroRoll extends Roll {
       }
     }
   }
-  // TODO clean
-  // get maxPush() { return this.data.maxPush; }
   get maxPush() {
     return this.terms.reduce((max, t) => t instanceof YearZeroDie ? Math.max(max, t.maxPush) : max, 0);
   }
@@ -243,6 +241,8 @@ export class YearZeroRoll extends Roll {
   }
 
   /* -------------------------------------------- */
+  /*  YearZeroRoll Utility Methods                */
+  /* -------------------------------------------- */
 
   /**
    * Generates a roll based on the number of dice.
@@ -285,53 +285,130 @@ export class YearZeroRoll extends Roll {
   /* -------------------------------------------- */
 
   /**
-   * Pushes the roll, following the YZ rules.
-   * @param {DiceQuantities} extraDice
-   * @param {object} [options={}] Options which inform how the Roll is evaluated
-   * @param {boolean} [options.async=false] Evaluate the roll asynchronously, receiving a Promise as the returned value.
-   * @returns {YearZeroRoll} The roll instance, pushed
+   * Gets all the dice terms of a certain type or that match an object of values.
+   * @param {DieTypeString|{}} search Die type to search or an object with comparison values
+   * @returns {YearZeroDie[]|DiceTerm[]}
    */
-  // TODO support for additional dice when pushing
-  push2(extraDice = {}, { async } = {}) {
-    // // Step 0 — Prepares extra dice.
-    // const extraRoll = YearZeroRoll.createFromDiceQuantities(extraDice);
-    // extraRoll.roll();
-    // // Step
-    // if (!this._evaluated) this.evaluate();
-    // if (!this.pushable) return this;
+  getTerms(search) {
+    if (typeof search === 'string') return this.terms.filter(t => t.type === search);
+    return this.terms.filter(t => {
+      let f = true;
+      if (search.type ?? false) f = f && search.type === t.type;
+      if (search.number ?? false) f = f && search.number === t.number;
+      if (search.faces ?? false) f = f && search.faces === t.faces;
+      if (search.options) {
+        for (const key in search.options) {
+          f = f && search.options[key] === t.options[key];
+        }
+      }
+      if (search.results) {
+        for (const key in search.results) {
+          f = f && t.results.some(r => r[key] === search.results[key]);
+        }
+      }
+      return f;
+    });
   }
-  async push({ async } = {}) {
-    if (!this._evaluated) await this.evaluate({ async });
-    if (!this.pushable) return this;
 
-    // Step 1 — Pushes the terms.
-    this.terms.forEach(t => t instanceof YearZeroDie ? t.push() : t);
+  /* -------------------------------------------- */
 
-    // Step 2 — Re-evaluates all pushed terms.
-    //   The evaluate() method iterates each terms and runs only
-    //   the die's own evaluate() method on new (pushed) dice.
-    this._evaluated = false;
-    await this.evaluate({ async });
+  /**
+   * Adds a number of dice to the roll.
+   * @param {number}        qty      The quantity to add
+   * @param {DieTypeString} type     The type of dice to add
+   * @param {number}       [range=6] The number of faces of the die
+   * @param {number}       [value]   The predefined value for the new die
+   * @param {object}       [options] Additional options that modify the term
+   * @returns {YearZeroRoll} This roll
+   * @async
+   */
+  async addDice(qty, type, { range = 6, value = null, options } = {}) {
+    if (!qty) return this;
+    const search = { type, faces: range, options };
+    if (qty < 0) return this.removeDice(-qty, search);
+    if (value ?? false) await this.roll({ async: true });
 
+    let term = this.getTerms(search)[0];
+    if (term) {
+      for (; qty > 0; qty--) {
+        term.number++;
+        if (this._evaluated) {
+          term.roll();
+          if (value ?? false) {
+            term.results[term.results.length - 1].result = value;
+          }
+        }
+      }
+    }
+    // If the DieTerm doesn't exist, creates it.
+    else {
+      const cls = YZUR.DICE.DIE_TYPES[type];
+      term = new cls({
+        number: qty,
+        faces: range,
+        maxPush: this.maxPush,
+        options,
+      });
+      if (this._evaluated) {
+        await term.evaluate({ async: true });
+        if (value ?? false) {
+          term.results.forEach(r => r.result = value);
+        }
+      }
+      // eslint-disable-next-line no-undef
+      this.terms.push(new OperatorTerm({ operator: '+' }));
+      this.terms.push(term);
+    }
+    // Adapts the formula accordingly.
+    this._formula = this.constructor.getFormula(this.terms);
+    // Returns the roll entity.
     return this;
   }
 
   /* -------------------------------------------- */
 
   /**
-   * Gets all the dice terms of a certain type.
-   * @param {DieTypeString} type Die type to search
-   * @returns {YearZeroDie[]|DiceTerm[]}
+   * Removes a number of dice from the roll.
+   * @param {number}          [qty=1] The quantity to remove
+   * @param {DieTypeString|{}} search   The type of dice to remove, or an object of values for comparison
+   * @returns {YearZeroRoll} This roll
    */
-  getTerms(type) {
-    return this.terms.filter(t => t.type === type);
+  removeDice(qty, search) {
+    if (!qty) return this;
+
+    for (; qty > 0; qty--) {
+      const term = this.getTerms(search)[0];
+      if (term) {
+        term.number--;
+        if (term.number <= 0) {
+          const type = search.type ?? search;
+          const index = this.terms.findIndex(t => t.type === type && t.number === 0);
+          this.terms.splice(index, 1);
+          if (this.terms[index - 1]?.operator) {
+            this.terms.splice(index - 1, 1);
+          }
+        }
+        else if (this._evaluated) {
+          const index = term.results.findIndex(r => r.active);
+          if (index < 0) break;
+          term.results.splice(index, 1);
+        }
+      }
+      else { break; }
+    }
+    // Adapts the formula accordingly.
+    this._formula = this.constructor.getFormula(this.terms);
+    // Returns the roll entity.
+    return this;
   }
+
+  /* -------------------------------------------- */
 
   /**
    * Counts the values of a certain type in the roll.
    * If `seed` is omitted, counts all the dice of a certain type.
    * @param {DieTypeString} type  The type of the die
-   * @param {number}       [seed] The number to search, if any
+   * @param {number}       [seed] The value to search, if any
    * @param {string}       [comparison='='] The comparison to use against the seed: `>`, `<`, or `=`
    * @returns {number} Total count
    */
@@ -360,12 +437,17 @@ export class YearZeroRoll extends Roll {
     }, 0);
   }
 
+  /* -------------------------------------------- */
+
   /**
    * Gets the quantities of each die type.
    * @returns {DiceQuantities}
+   * @deprecated Useless now
    */
   // TODO Why did I put a todo tag here?
+  // TODO remove
   getDiceQuantities() {
+    console.warn('YZUR | getDiceQuantities() is deprecated and will be removed in a future release.');
     return this.terms.reduce((dice, t) => {
       if (t instanceof YearZeroDie) {
         const clsName = t.constructor.name;
@@ -377,13 +459,76 @@ export class YearZeroRoll extends Roll {
   }
 
   /* -------------------------------------------- */
+  /*  Push                                        */
+  /* -------------------------------------------- */
+
+  /**
+   * Pushes the roll, following the YZ rules.
+   * @param {DiceQuantities} extraDice
+   * @param {object} [options={}] Options which inform how the Roll is evaluated
+   * @param {boolean} [options.async=false] Evaluate the roll asynchronously, receiving a Promise as the returned value.
+   * @returns {YearZeroRoll} The roll instance, pushed
+   */
+  async push({ async } = {}) {
+    if (!this._evaluated) await this.evaluate({ async });
+    if (!this.pushable) return this;
+
+    // Step 1 — Pushes the terms.
+    this.terms.forEach(t => t instanceof YearZeroDie ? t.push() : t);
+
+    // Step 2 — Re-evaluates all pushed terms.
+    //   The evaluate() method iterates each terms and runs only
+    //   the term's own evaluate() method on new (pushed) dice.
+    this._evaluated = false;
+    await this.evaluate({ async });
+
+    return this;
+  }
+
+  /* -------------------------------------------- */
+  /*  Modify                                      */
+  /* -------------------------------------------- */
 
   /**
    * Applies a difficulty modifier to the roll.
    * @param {number} mod Difficulty modifier (bonus or malus)
-   * @returns {YearZeroRoll} A new roll instance, modified
+   * @returns {YearZeroRoll} This roll, modified
    */
-  modify(mod) {
+  async modify(mod = 0) {
+    if (!mod) return this;
+
+    // TWILIGHT 2000
+    if (this.game === 't2k') {
+      return this._modify(mod);
+    }
+    // MUTANT YEAR ZERO & FORBIDDEN LANDS
+    else if (['myz', 'fbl'].includes(this.type)) {
+      // 1 — Balances skill & neg dice.
+      while (this.count('skill') > 0 && this.count('neg') > 0) {
+        this.removeDice(1, 'skill');
+        this.removeDice(1, 'neg');
+      }
+      const skill = this.count('skill');
+      const neg = Math.max(0, -mod - skill);
+      await this.addDice(mod, 'skill');
+      if (neg > 0) await this.addDice(neg, 'neg');
+    }
+    // ALL OTHER GAMES
+    else {
+      const skill = this.count('skill');
+      if (mod < 0) mod -= skill - 1 + mod; // Minimum of 1 skill die
+      await this.addDice(mod, 'skill');
+    }
+    return this;
+  }
+
+  /**
+   * @deprecated This is the old modify method.
+   * TODO remove
+   */
+  _modify(mod) {
+    // eslint-disable-next-line max-len
+    console.warn('YZUR | You are using the old _modify() method, which is deprecated and will be removed in a future release.');
     // Exits early if no modifier.
     if (!mod) return this.duplicate();
 
@@ -501,16 +646,24 @@ export class YearZeroRoll extends Roll {
     const _roll = YearZeroRoll.createFromDiceQuantities(dice);
     const _data = _roll.toJSON();
     const data = this.toJSON();
+    // Keeps options.
+    for (const t of data.terms) {
+      if (!foundry.utils.isObjectEmpty(t.options)) {
+        for (const _t of _data.terms) {
+          if (_t.type === t.type) {
+            _t.options = t.options;
+            break;
+          }
+        }
+      }
+    }
     data.terms = _data.terms;
     data.formula = _data.formula;
     return this.constructor.fromData(data);
-    // return YearZeroRoll.createFromDiceQuantities(dice, {
-    //   yzGame: this.game,
-    //   maxPush: this.maxPush,
-    //   title: this.name,
-    // });
   }
 
+  /* -------------------------------------------- */
+  /*  Templating                                  */
   /* -------------------------------------------- */
 
   /** @override */
@@ -682,6 +835,8 @@ export class YearZeroRoll extends Roll {
     return await super.toMessage(messageData, { rollMode, create });
   }
 
+  /* -------------------------------------------- */
+  /*  JSON                                        */
   /* -------------------------------------------- */
 
   /** @override */
