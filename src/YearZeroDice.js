@@ -10,11 +10,6 @@ export class YearZeroDie extends Die {
     if (this.maxPush == undefined) {
       this.maxPush = termData.maxPush ?? 1;
     }
-    // TODO add support for a default flavor?
-    // if (!this.options.flavor) {
-    //   const clsName = this.constructor.name;
-    //   this.options.flavor = game.i18n.localize(`YZDIE.${clsName}`);
-    // }
   }
 
   /**
@@ -103,11 +98,9 @@ export class YearZeroDie extends Die {
   /* -------------------------------------------- */
 
   /** @override */
-  roll(options) {
+  roll(options = {}) {
     // Modifies the result.
     const roll = super.roll(options);
-    // TODO clean this line
-    // roll.count = roll.result >= 6 ? 1 : 0;
 
     // Stores indexes
     roll.indexResult = options.indexResult;
@@ -125,6 +118,8 @@ export class YearZeroDie extends Die {
     return roll;
   }
 
+  /* -------------------------------------------- */
+
   /**
    * Counts the number of times a single value appears.
    * @param {number} n The single value to count
@@ -133,6 +128,8 @@ export class YearZeroDie extends Die {
   count(n) {
     return this.values.filter(v => v === n).length;
   }
+
+  /* -------------------------------------------- */
 
   /**
    * Pushes the dice.
@@ -338,16 +335,7 @@ GearDie.LOCKED_VALUES = [1, 6];
  * Negative Die: 6 cannot be re-rolled.
  * @extends {SkillDie}
  */
-export class NegativeDie extends SkillDie {
-  // TODO clean this code
-  // /** @override */
-  // roll(options) {
-  //   const roll = super.roll(options);
-  //   roll.count = roll.result >= 6 ? -1 : 0;
-  //   this.results[this.results.length - 1] = roll;
-  //   return roll;
-  // }
-}
+export class NegativeDie extends SkillDie {}
 NegativeDie.TYPE = 'neg';
 NegativeDie.DENOMINATION = 'n';
 
@@ -369,16 +357,6 @@ StressDie.LOCKED_VALUES = [1, 6];
  * @extends {SkillDie}
  */
 export class ArtifactDie extends SkillDie {
-  // TODO clean this code
-  // /** @override */
-  // roll(options) {
-  //   const roll = super.roll(options);
-  //   if (roll.result < this.constructor.SUCCESS_TABLE.length) {
-  //     roll.count = this.constructor.SUCCESS_TABLE[roll.result];
-  //   }
-  //   this.results[this.results.length - 1] = roll;
-  //   return roll;
-  // }
   /** @override */
   getResultLabel(result) {
     return CONFIG.YZUR.DICE.ICONS.getLabel(
