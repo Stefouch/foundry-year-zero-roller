@@ -82,7 +82,7 @@ async function commitTagPush() {
   const commitMsg = `chore: release v${version}`;
   await execa('git', ['add', '-A'], { stdio });
   await execa('git', ['commit', '--message', commitMsg], { stdio });
-  await execa('git', ['tag', `${version}`], { stdio });
+  await execa('git', ['tag', `v${version}`], { stdio });
   await execa('git', ['push', 'upstream'], { stdio });
   await execa('git', ['push', 'upstream', '--tag'], { stdio });
   return;
@@ -131,7 +131,7 @@ async function bumpVersion(cb) {
       const pad = (s) => s < 10 ? '0' + s : s;
       const d = new Date(Date.now());
       const date = [pad(d.getFullYear()), pad(d.getMonth() + 1), pad(d.getDate())].join('-');
-      const rgx = /^## \[(.*)\] - (.+)$/m;
+      const rgx = /^## \[.*\].*$/m;
       const newChangelog = changelog.replace(rgx, `## [${targetVersion}] - ${date}`);
       if (newChangelog !== changelog) {
         fs.writeFileSync('CHANGELOG.md', newChangelog, 'utf-8');
@@ -159,6 +159,8 @@ async function bumpVersion(cb) {
   }
   return cb();
 }
+
+/* -------------------------------------------- */
 
 exports.build = gulp.series(buildCode);
 exports.watch = gulp.series(buildWatch);

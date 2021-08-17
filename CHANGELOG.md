@@ -15,9 +15,11 @@ after:  import YZUR      from './dist/yzur.js';
 ### Added
 - `YearZeroRoll#addDice(qty, type, options)`: Adds a number of dice to the roll.
 - `YearZeroRoll#removeDice(qty, type)`: Removes a number of dice from the roll.
+- `YearZeroRoll#create()`: Overrides the default Foundry's Roll method.
 - "chatOptions" in `YearZeroRoll#render(chatOptions)` is passed to the renderTemplate with property "options".
 
 ### Changed
+- Rollup: built `yzur.js` libraries are now artifacts in Github releases.
 - `YearZeroRoll#modify(n)` is refactored and now modifies the roll instead of a copy of it. The old (fixed) modify method is still accessible with `_modify()`.
 - `YearZeroRoll#getTerms(search)` now accepts an object of comparaison values as an argument.
 
