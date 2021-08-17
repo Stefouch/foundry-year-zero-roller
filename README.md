@@ -59,7 +59,7 @@ templates/
 2. In your main script, import the library:
 
 ```js
-import { YearZeroRollManager } from './lib/yzur.js';
+import { YearZeroRollManager } from './dist/yzur.js';
 ```
 
 3. In your init hook, initialize the dice with the `.register()` method.<br/>

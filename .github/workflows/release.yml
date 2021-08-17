@@ -1,0 +1,59 @@
+name: Create Release
+
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+    - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+jobs:
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: 📡 Checkout Code
+        uses: actions/checkout@v2
+
+      - name: ⚙ Setup NodeJS 16.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          cache: 'npm'
+
+      - name: ☕ Install Dependencies
+        run: npm ci
+
+      - name: 🛠 Build Library
+        run: npm run build
+
+      - name: 🏷️ Get Version Tag
+        id: tag_name
+        run: |
+          echo ::set-output name=current_version::${GITHUB_REF#refs/tags/v}
+        shell: bash
+
+      - name: 📜 Get Changelog Entry
+        id: changelog_reader
+        uses: mindsers/changelog-reader-action@v2
+        with:
+          validation_depth: 10
+          version: ${{ steps.tag_name.outputs.current_version }}
+          path: ./CHANGELOG.md
+
+      - name: 🚀 Create Release
+        id: create_release
+        uses: ncipollo/release-action@v1.8.8
+        with:
+          # This pulls from the "Get Changelog Entry" step above, referencing it's ID to get its outputs object.
+          # See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          allowUpdates: true # set this to false if you want to prevent updating existing releases
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: v${{ steps.changelog_reader.outputs.version }}
+          name: v${{ steps.changelog_reader.outputs.version }}
+          body: ${{ steps.changelog_reader.outputs.changes }}
+          artifacts: './dist/yzur.js'
+          prerelease: ${{ steps.changelog_reader.outputs.status == 'prereleased' }}
+          draft: ${{ steps.changelog_reader.outputs.status == 'unreleased' }}

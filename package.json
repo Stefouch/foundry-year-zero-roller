@@ -4,10 +4,10 @@
   "description": "",
   "main": "foundry-year-zero-roller.js",
   "scripts": {
-    "build": "gulp",
-    "watch": "gulp",
-    "gulp": "gulp",
-    "compile": "gulp css"
+    "build": "gulp build",
+    "bump": "gulp bump --release",
+    "update": "npm outdated && npm update",
+    "watch": "gulp watch"
   },
   "keywords": [
     "Foundry",
@@ -17,7 +17,13 @@
   "license": "MIT",
   "devDependencies": {
     "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
-    "eslint": "^7.32.0"
+    "eslint": "^7.32.0",
+    "execa": "^5.1.1",
+    "fs-extra": "^10.0.0",
+    "gulp": "^4.0.2",
+    "rollup": "^2.56.2",
+    "semver": "^7.3.5",
+    "yargs": "^17.1.1"
   },
   "repository": {
     "type": "git",

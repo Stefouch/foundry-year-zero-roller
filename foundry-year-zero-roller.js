@@ -1,5 +1,5 @@
 // Imports Modules.
-import * as YZUR from './lib/yzur.js';
+import YZUR from './dist/yzur.js';
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */

@@ -3,6 +3,32 @@ All notable changes to this project will be documented in this file.
 <br />The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 <br />and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+> :warning: **BREAKING CHANGE**
+> The YZUR library is now compiled with rollup. Accessing the classes might have changed.
+
+```js
+before: import * as YZUR from './lib/yzur.js';
+after:  import YZUR      from './dist/yzur.js';
+```
+
+### Added
+- `YearZeroRoll#addDice(qty, type, options)`: Adds a number of dice to the roll.
+- `YearZeroRoll#removeDice(qty, type)`: Removes a number of dice from the roll.
+- `YearZeroRoll#create()`: Overrides the default Foundry's Roll method.
+- "chatOptions" in `YearZeroRoll#render(chatOptions)` is passed to the renderTemplate with property "options".
+
+### Changed
+- Rollup: built `yzur.js` libraries are now artifacts in Github releases.
+- `YearZeroRoll#modify(n)` is refactored and now modifies the roll instead of a copy of it. The old (fixed) modify method is still accessible with `_modify()`.
+- `YearZeroRoll#getTerms(search)` now accepts an object of comparaison values as an argument.
+
+### Deprecated
+- `YearZeroRoll#getDiceQuantities()` is now useless and will be removed in a future release.
+
+### Fixed
+- `YearZeroRoll#modify(n)` now retains all data/options set before.
+
 ## [2.1.1] - 2021-08-09
 ### Fixed
 - A bug where setting the maxPush in the YearZeroRoll constructor was not working.
@@ -24,16 +50,16 @@ All notable changes to this project will be documented in this file.
 > :warning: **Breaking Change**
 > Use `roll.successCount` instead of `roll.total`.
 
-### Changed
-- Total number of success is returned by `YearZeroRoll#successCount`. *(Thus, the deprecation of this property is reverted.)*
-- Total sum of the dice's values is returned by `YearZeroRoll#total`. *(Back to default behavior.)*
-
 ### Added
 - The roll object is entirely passed to the chat template, for better access to its getters.
 - Two new getters for the `YearZeroDie` class:
   - `.success`: Number of successes rolled by this Year Zero DieTerm
   - `.failure`: Number of banes rolled
 - Placeholder for a future `YearZeroDie#nopush()` method.
+
+### Changed
+- Total number of success is returned by `YearZeroRoll#successCount`. *(Thus, the deprecation of this property is reverted.)*
+- Total sum of the dice's values is returned by `YearZeroRoll#total`. *(Back to default behavior.)*
 
 ### Removed
 - The DieTerm classes `NegativeDie` and `ArtifactDie` (which includes T2K dice) won't override the `.roll()` method anymore. No more `result.count` value for these dice. The calculation of successes is instead obtained with the `YearZeroDie#success` getter.
@@ -77,15 +103,18 @@ All notable changes to this project will be documented in this file.
 ## [1.1.0] - 2021-07-04
 Last minute changes for T2K.
 
-### Changed
-- Updated `infos.hbs` template with correct T2K weapon-related infos.
-
 ### Added
 - New getters for the `YearZeroRoll`, mostly used by T2K:
   - `.jamCount`: The quantity of ones (banes) on base dice and ammo dice.
   - `.jammed`: Tells if the roll caused a weapon jam.
 - Missing locked values for Ammo dice.
 - Setting the global "`CONFIG.debug.dice = true`" will log the roll objects in the console.
+
+### Changed
+- Updated `infos.hbs` template with correct T2K weapon-related infos.
+
+### Deprecated
+- `YearZeroRoll.mishap` is deprecated (useless for now).
 
 ### Removed
 - The two getters previously added. They were useless in fact:
@@ -95,9 +124,6 @@ Last minute changes for T2K.
 ### Fixed
 - `YearZeroRoll.ammoSpent` is now correctly returning the sum of the active values on ammo dice.
 - Modifiers for T2K rolls now properly work as detailed in the rules.
-
-### Deprecated
-- `YearZeroRoll.mishap` is deprecated (useless for now).
 
 ## [1.0.0] - 2021-07-04
 Update for Foundry V8.
