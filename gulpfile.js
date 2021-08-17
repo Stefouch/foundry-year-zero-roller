@@ -83,8 +83,8 @@ async function commitTagPush() {
   await execa('git', ['add', '-A'], { stdio });
   await execa('git', ['commit', '--message', commitMsg], { stdio });
   await execa('git', ['tag', `v${version}`], { stdio });
-  await execa('git', ['push', 'upstream'], { stdio });
-  await execa('git', ['push', 'upstream', '--tag'], { stdio });
+  await execa('git', ['push'], { stdio });
+  await execa('git', ['push', '--tag'], { stdio });
   return;
 }
 
