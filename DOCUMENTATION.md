@@ -1,3 +1,6 @@
+- [YearZeroRoll](#yearzeroroll)
+- [YearZeroDie](#yearzerodie)
+
 # YearZeroRoll
 
 ```js
@@ -74,7 +77,7 @@ Generates a roll based on the number of dice.
 ### Parameters
 
 | Name | Type | Default | Description |
-| :-- | :-- | :-- | :-- |
+| :-- | :-- | :--: | :-- |
 | dice | DiceQuantities (object) | `{}` | An object with quantities of dice |
 | options | object | `{}` | Additional options which configure the roll |
 | options.title | string | | The name of the roll |
@@ -93,7 +96,7 @@ Gets all the dice terms of a certain type or that match an object of values.
 ### Parameters
 
 | Name | Type | Default | Description |
-| :-- | :-- | :-- | :-- |
+| :-- | :-- | :--: | :-- |
 | search | DieTypeString (string) \|&nbsp;object | | Die type to search or an object with comparison values |
 
 ### Example of Comparison
@@ -131,7 +134,7 @@ If `seed` is omitted, counts all the dice of a certain type.
 ### Parameters
 
 | Name | Type | Default | Description |
-| :-- | :-- | :-- | :-- |
+| :-- | :-- | :--: | :-- |
 | type | DieTypeString (string) | | The type of the die |
 | seed | number | `null` | The value to search, if any |
 | comparison | string | `"="` | The comparison to use against the seed: `>`, `>=`, `<`, `<=` or `=` |
@@ -148,7 +151,7 @@ Note: If a negative quantity is passed, instead it removes that many dice.
 ### Parameters
 
 | Name | Type | Default | Description |
-| :-- | :-- | :-- | :-- |
+| :-- | :-- | :--: | :-- |
 | qty | number | | The quantity to add |
 | type | DieTypeString (string) | | The type of dice to add |
 | data | object | `{}` | Additional data which defines the new dice |
@@ -167,7 +170,7 @@ Removes a number of dice from the roll.
 ### Parameters
 
 | Name | Type | Default | Description |
-| :-- | :-- | :-- | :-- |
+| :-- | :-- | :--: | :-- |
 | qty | number | | The quantity to remove |
 | search | DieTypeString (string) \|&nbsp;object | | The type of dice to remove, or an object of values for comparison, see <a href="#yearzerorollgetterms">YearZeroRoll#getTerms</a> |
 | options | object | `{}` | Additional options for the dice removal |
@@ -185,7 +188,7 @@ Pushes the roll, following the YZ rules.
 ### Parameters
 
 | Name | Type | Default | Description |
-| :-- | :-- | :-- | :-- |
+| :-- | :-- | :--: | :-- |
 | options | object | `{}` | Options which inform how the Roll is evaluated |
 | options.minimize | boolean | `false` | Minimize the result, obtaining the smallest possible value |
 | options.maximize | boolean | `false` | Maximize the result, obtaining the largest possible value |
@@ -202,7 +205,7 @@ Applies a difficulty modifier to the roll.
 ### Parameters
 
 | Name | Type | Default | Description |
-| :-- | :-- | :-- | :-- |
+| :-- | :-- | :--: | :-- |
 | mod | number | `0` | Difficulty modifier (bonus or malus) |
 
 ## YearZeroRoll.getRollInfos
@@ -214,7 +217,7 @@ Applies a difficulty modifier to the roll.
 Renders the infos of a Year Zero roll.
 
 | Name | Type | Default | Description |
-| :-- | :-- | :-- | :-- |
+| :-- | :-- | :--: | :-- |
 | template | string | *default* | The path to the template |
 
 ## YearZeroRoll.duplicate
@@ -244,7 +247,7 @@ new YearZeroDie(termData)
 ### Parameters
 
 | Name | Type | Default | Description |
-| :-- | :-- | :-- | :-- |
+| :-- | :-- | :--: | :-- |
 | termData | object | `{}` | Data used to create the Dice Term |
 | termData.number | number | `1` | The number of dice of this term to roll, before modifiers are applied |
 | termData.faces | number | `6` | The number of faces on each die of this type |
