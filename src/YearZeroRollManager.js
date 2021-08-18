@@ -86,12 +86,12 @@ import { DieTypeError, GameTypeError } from './errors.js';
  */
 export default class YearZeroRollManager {
   /**
-   * Registers the Year Zero dice for the specified game
+   * Registers the Year Zero dice for the specified game.
    * 
    * You must call this method in `Hooks.once('init')`.
    * 
    * @param {GameTypeString}  yzGame  The game used (for the choice of die types to register).
-   * @param {string}         [config] Custom config to merge with the initial config.
+   * @param {object}         [config] Custom config to merge with the initial config.
    * @static
    */
   static register(yzGame, config) {
@@ -138,11 +138,11 @@ export default class YearZeroRollManager {
 
   /**
    * Registers the roll.
-   * @param {class}  [cls] YearZeroRoll class
+   * @param {class}  [cls] The roll class to register
    * @param {number} [i=0] Index of the registration
    * @static
    */
-  static registerRoll(cls = YearZeroRoll, i = 1) {
+  static registerRoll(cls = YearZeroRoll, i = 0) {
     CONFIG.Dice.rolls[i] = cls;
     CONFIG.Dice.rolls[i].CHAT_TEMPLATE = CONFIG.YZUR.ROLL.chatTemplate;
     CONFIG.Dice.rolls[i].TOOLTIP_TEMPLATE = CONFIG.YZUR.ROLL.tooltipTemplate;
@@ -193,7 +193,7 @@ export default class YearZeroRollManager {
     console.log(`YZUR | The name of the Year Zero game is: "${yzGame}".`);
   }
 
-  static _overrideRollCreate(index) {
+  static _overrideRollCreate(index = 1) {
     Roll.prototype.constructor.create = function(formula, data = {}, options = {}) {
       const YZURFormula = data.yzur
         ?? data.game
@@ -231,5 +231,5 @@ YearZeroRollManager.DIE_TYPES_MAP = {
   't2k': ['a', 'b', 'c', 'd', 'ammo', 'loc'],
 };
 
-/** @type {GameTypeString} */
+/** @type {GameTypeString[]} */
 YearZeroRollManager.GAMES = Object.keys(YearZeroRollManager.DIE_TYPES_MAP);
