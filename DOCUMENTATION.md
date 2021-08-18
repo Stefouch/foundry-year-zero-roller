@@ -65,7 +65,7 @@ Read more about the new methods and their documentation in the source code of th
 
 ## YearZeroRoll.createFromDiceQuantities
 
-```ts
+```typescript
 (static) createFromDiceQuantities(dice, options): YearZeroRoll
 ```
 
@@ -84,7 +84,7 @@ Generates a roll based on the number of dice.
 
 ## YearZeroRoll.getTerms
 
-```ts
+```typescript
 getTerms(search): YearZeroDie[] | DiceTerm[]
 ```
 
@@ -121,7 +121,7 @@ let terms = getTerms({
 
 ## YearZeroRoll.count
 
-```ts
+```typescript
 count(type, seed, comparison): number
 ```
 
@@ -138,7 +138,7 @@ If `seed` is omitted, counts all the dice of a certain type.
 
 ## YearZeroRoll.addDice
 
-```ts
+```typescript
 (async) addDice(qty, type, data): Promise<YearZeroRoll>
 ```
 
@@ -158,7 +158,7 @@ Note: If a negative quantity is passed, instead it removes that many dice.
 
 ## YearZeroRoll.removeDice
 
-```ts
+```typescript
 removeDice(qty, search, options): YearZeroRoll
 ```
 
@@ -169,14 +169,14 @@ Removes a number of dice from the roll.
 | Name | Type | Default | Description |
 | :-- | :-- | :-- | :-- |
 | qty | number | | The quantity to remove |
-| search | DieTypeString (string) \|&nbsp;object | | The type of dice to remove, or an object of values for comparison, see <a href="#YearZeroRoll.getTerms">YearZeroRoll#getTerms</a> |
+| search | DieTypeString (string) \|&nbsp;object | | The type of dice to remove, or an object of values for comparison, see <a href="#yearzerorollgetterms">YearZeroRoll#getTerms</a> |
 | options | object | `{}` | Additional options for the dice removal |
 | options.discard | boolean | `false` | Whether the term should be marked as "discarded" instead of removed |
 | options.disable | boolean | `false` | Whether the term should be marked as "active: false" instead of removed |
 
 ## YearZeroRoll.push
 
-```ts
+```typescript
 (async) push(options): Promise<YearZeroRoll>
 ```
 
@@ -193,7 +193,7 @@ Pushes the roll, following the YZ rules.
 
 ## YearZeroRoll.modify
 
-```ts
+```typescript
 (async) modify(mod): Promise<YearZeroRoll>
 ```
 
@@ -207,7 +207,7 @@ Applies a difficulty modifier to the roll.
 
 ## YearZeroRoll.getRollInfos
 
-```ts
+```typescript
 (async) getRollInfos(template): Promise<string>
 ```
 
@@ -219,7 +219,7 @@ Renders the infos of a Year Zero roll.
 
 ## YearZeroRoll.duplicate
 
-```ts
+```typescript
 duplicate(): YearZeroRoll
 ```
 
@@ -278,7 +278,7 @@ The new `YearZeroDie` class offers the following additional getters and setters.
 
 ## YearZeroDie.count
 
-```ts
+```typescript
 count(n): number
 ```
 
@@ -292,7 +292,7 @@ Counts the number of times a single value appears.
 
 ## YearZeroDie.push
 
-```ts
+```typescript
 push(): YearZeroDie
 ```
 
@@ -300,7 +300,7 @@ Pushes the dice.
 
 ## YearZeroDie.nopush
 
-```ts
+```typescript
 nopush(): void
 ```
 
@@ -308,7 +308,7 @@ Roll Modifier method that blocks pushes.
 
 ## YearZeroDie.setpush
 
-```ts
+```typescript
 setpush(modifier): void
 ```
 
