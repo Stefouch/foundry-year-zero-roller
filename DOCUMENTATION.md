@@ -275,7 +275,7 @@ new YearZeroDie(termData)
 | termData.faces | number | `6` | The number of faces on each die of this type |
 | termData.maxPush | number | `1` | The maximum number of times this term can be pushed |
 | termData.modifiers | string[] | |  An array of modifiers applied to the results |
-| termData.results | TermDataResult[] (object[]) | | An optional array of pre-cast results for the term |
+| termData.results | DiceTermResult[] (object[]) | | An optional array of pre-cast results for the term |
 | termData.options | object | `{}` | Additional options that modify the term |
 | termData.options .flavor | string | | Optional flavor text which modifies and describes this term |
 
