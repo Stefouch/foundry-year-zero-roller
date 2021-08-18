@@ -1,22 +1,25 @@
 # Changelog
 All notable changes to this project will be documented in this file.
-<br />The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-<br />and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+<br/>The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+<br/>and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [3.0.0] - 2021-08-19
 > :warning: **BREAKING CHANGE**
 > The YZUR library is now compiled with rollup. Accessing the classes might have changed.
 
 ```js
-before: import * as YZUR from './lib/yzur.js';
-after:  import YZUR      from './dist/yzur.js';
+before:   import * as YZUR from './lib/yzur.js';
+after:    import YZUR      from './dist/yzur.js';
 ```
 
 ### Added
+- [Documentation](./DOCUMENTATION.md)!
+- Expanded details in the readme.
 - `YearZeroRoll#addDice(qty, type, options)`: Adds a number of dice to the roll.
 - `YearZeroRoll#removeDice(qty, type)`: Removes a number of dice from the roll.
 - `YearZeroRoll#create()`: Overrides the default Foundry's Roll method.
 - "chatOptions" in `YearZeroRoll#render(chatOptions)` is passed to the renderTemplate with property "options".
+- `YearZeroRollManager#_overrideRollCreate(i)`: Polyfills the default Foundry's Roll.create().
 
 ### Changed
 - Rollup: the compiled `yzur.js` libraries are now artifacts in Github releases.
