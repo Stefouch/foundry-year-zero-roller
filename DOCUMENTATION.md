@@ -33,7 +33,7 @@
   - Constants:
     - [DIE_TYPES_MAP](#yearzerorollmanagerdie_types_map)
     - [GAMES](#yearzerorollmanagergames)
-- [Config Constants](#configconstants)
+- [Config Constants](#config-constants)
 
 # YearZeroRoll
 
@@ -442,7 +442,7 @@ Registers the Year Zero dice for the specified game. You must call this method i
 (static) registerConfig(config): void
 ```
 
-Registers the Year Zero Universal Roller config. See [Config](#configconstants).
+Registers the Year Zero Universal Roller config. See [Config](#config-constants).
 
 ### Parameters
 
