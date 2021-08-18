@@ -287,7 +287,6 @@ export class YearZeroRoll extends Roll {
     let formula = out.join(' + ');
 
     if (!YearZeroRoll.validate(formula)) {
-      // throw new RollError(`Invalid roll formula: "${formula}"`, dice);
       console.warn(`${YearZeroRoll.name} | Invalid roll formula: "${formula}"`);
       formula = yzGame === 't2k' ? '1d6' : '1ds';
     }
@@ -335,7 +334,7 @@ export class YearZeroRoll extends Roll {
    * If `seed` is omitted, counts all the dice of a certain type.
    * @param {DieTypeString} type  The type of the die
    * @param {number}       [seed] The value to search, if any
-   * @param {string}       [comparison='='] The comparison to use against the seed: `>`, `<`, or `=`
+   * @param {string}       [comparison='='] The comparison to use against the seed: `>`, `>=`, `<`, `<=` or `=`
    * @returns {number} Total count
    */
   count(type, seed = null, comparison = '=') {
@@ -375,7 +374,7 @@ export class YearZeroRoll extends Roll {
    * @param {number}        qty      The quantity to add
    * @param {DieTypeString} type     The type of dice to add
    * @param {number}       [range=6] The number of faces of the die
-   * @param {number}       [value]   The predefined value for the new die
+   * @param {number}       [value]   The predefined value for the new dice
    * @param {object}       [options] Additional options that modify the term
    * @returns {YearZeroRoll} This roll
    * @async
@@ -503,9 +502,8 @@ export class YearZeroRoll extends Roll {
 
   /**
    * Pushes the roll, following the YZ rules.
-   * @param {DiceQuantities} extraDice
    * @param {object} [options={}] Options which inform how the Roll is evaluated
-   * @param {boolean} [options.async=false] Evaluate the roll asynchronously, receiving a Promise as the returned value.
+   * @param {boolean} [options.async=false] Evaluate the roll asynchronously, receiving a Promise as the returned value
    * @returns {YearZeroRoll} The roll instance, pushed
    */
   async push({ async } = {}) {
@@ -967,7 +965,7 @@ export class YearZeroRoll extends Roll {
   // }
 
   /**
-   * Creates a copy of the roll.
+   * Creates a deep clone copy of the roll.
    * @returns {YearZeroRoll} A copy of this roll instance
    */
   duplicate() {
