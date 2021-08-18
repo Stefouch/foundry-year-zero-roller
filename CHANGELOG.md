@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 <br />The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 <br />and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.2.1] - 2021-08-17
+## [Unreleased]
 > :warning: **BREAKING CHANGE**
 > The YZUR library is now compiled with rollup. Accessing the classes might have changed.
 
@@ -19,12 +19,17 @@ after:  import YZUR      from './dist/yzur.js';
 - "chatOptions" in `YearZeroRoll#render(chatOptions)` is passed to the renderTemplate with property "options".
 
 ### Changed
-- Rollup: built `yzur.js` libraries are now artifacts in Github releases.
+- Rollup: the compiled `yzur.js` libraries are now artifacts in Github releases.
+- `YearZeroRoll#count(type, seed, comparison)` is a bit refactored so it counts empty DiceTerms.
 - `YearZeroRoll#modify(n)` is refactored and now modifies the roll instead of a copy of it. The old (fixed) modify method is still accessible with `_modify()`.
-- `YearZeroRoll#getTerms(search)` now accepts an object of comparaison values as an argument.
+- `YearZeroRoll#getTerms(search)` now accepts also an object of comparaison values as an argument.
 
 ### Deprecated
 - `YearZeroRoll#getDiceQuantities()` is now useless and will be removed in a future release.
+
+### Removed
+- Dropped `YearZeroRoll#data` in place of `YearZeroRoll#options`.
+- Custom toJSON and fromData methods have therefore been dropped too.
 
 ### Fixed
 - `YearZeroRoll#modify(n)` now retains all data/options set before.
