@@ -182,6 +182,10 @@ export class YearZeroDie extends Die {
     this.maxPush = 0;
   }
 
+  /**
+   * Roll modifier method that sets the max number of pushes.
+   * @param {string} modifier
+   */
   setpush(modifier) {
     const rgx = /p([0-9]+)?/i;
     const match = modifier.match(rgx);
