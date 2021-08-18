@@ -208,6 +208,10 @@ let rollMode = game.settings.get('core', 'rollMode');
 await roll.toMessage(messageData, { rollMode });
 ```
 
+# Read More
+
+Read The Fucking Manual here: [DOCUMENTATION](./DOCUMENTATION.md).
+
 # Supported Games
 
 | Game | Code | Dice & Denominations |
