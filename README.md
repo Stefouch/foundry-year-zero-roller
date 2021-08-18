@@ -29,7 +29,7 @@ Features:
 - Documented methods.
 - Support for all Year Zero games.
 - Custom Roll class with many extra getters for stunts, banes, traumas, gear damage, mishaps, ammo, etc.
-- Custom DieTerm classes for each Year Zero dice.
+- Custom DiceTerm classes for each Year Zero dice.
 - Push support (except Alien atm).
 - Custom roll template with push stack and push button.
 - Customisable settings.
@@ -39,7 +39,7 @@ Features:
 Not included:
 
 - Roll dialog.
-- Push button listener (you have to create one and call the roll.push() method, see example below).
+- Chat Message push button listener (you have to create one and call the roll.push() method, see example below).
 - Dice So Nice configuration.
 
 # How to Set Up
@@ -91,41 +91,64 @@ Either create your own formula with it, or use the `.createFromDiceQuantities()`
 ```js
 import { YearZeroRoll } from './lib/yzur.js';
 
-// Sets the dice quantities.
+// Set the dice quantities.
 let dice = {
   base: 5,
   skill: 3,
   gear: 2,
 };
 
-// Creates a roll.
-let roll = YearZeroRoll.createFromDiceQuantities(dice);
+// Set options for the roll.
+let options = {
+  name: 'My Super Year Zero Roll',
+  maxPush: 1,
+};
 
-// Rolls the roll, same methods as usual.
+// Create a roll. Use any of the following methods:
+let roll;
+roll = Roll.create('<my_formula>', { yzur: true });
+roll = YearZeroRoll.create('<my_formula>');
+roll = new YearZeroRoll('<my_formula>', data, options);
+roll = YearZeroRoll.createFromDiceQuantities(dice);
+
+// Roll the roll, same methods as usual
 await roll.roll({ async: true });
-roll.toMessage();
+await roll.toMessage();
 ```
 
 ## Modify
 
+The `.modify(n)` method allows you to add a difficulty modifier to the roll.
+
 ```js
 let roll = YearZeroRoll.createFromDiceQuantities(dice);
 
-// Modifies the roll (returns a new unrolled non-evaluated instance).
+// Modify the roll.
 let modifier = -1;
-let modifiedRoll = roll.modify(modifier);
+roll.modify(modifier);
 
-// Rolls and sends.
-await modifiedRoll.roll({ async: true });
-modifiedRoll.toMessage();
+// Roll and send.
+await roll.roll({ async: true });
+await roll.toMessage();
+```
+
+There are also two other methods to change the quantity of dice in the roll:
+
+```js
+// Add dice.
+await roll.addDice(1, 'skill');
+
+// Remove dice.
+roll.removeDice(1, 'skill');
 ```
 
 ## Push
+
 ```js
 let roll = YearZeroRoll.createFromDiceQuantities(dice);
 
-// Pushes the roll (to call before rolling).
-roll.push();
+// Push the roll.
+await roll.push({ async: true });
 ```
 
 ### Push from the Chat
@@ -140,71 +163,61 @@ Hooks.on('renderChatLog', (app, html, data) => {
 async function _onPush(event) {
   event.preventDefault();
 
-  // Gets the message.
+  // Get the message.
   let chatCard = event.currentTarget.closest('.chat-message');
   let messageId = chatCard.dataset.messageId;
   let message = game.messages.get(messageId);
 
-  // Copies the roll.
+  // Copy the roll.
   let roll = message.roll.duplicate();
 
-  // Pushes the roll.
-  if (roll.pushable) {
-    await roll.push({ async: true });
-    roll.toMessage();
-  }
+  // Delete the previous message.
+  await message.delete();
+
+  // Push the roll and send it.
+  await roll.push({ async: true });
+  await roll.toMessage();
 }
 ```
 
-# Additional Getters & Setters
+If you don't want to create a new message and instead edit the current message, you must call an update for the changes:
 
-The new `YearZeroRoll` class offers the following additional getters and setters.
+```js
+// Update the message (it triggers its rendering).
+await message.update({ roll: JSON.stringify(pushedRoll) });
+```
 
-### Configurable
+## Custom Template
 
-| Name | Type | Default Value | Description |
-| :-- | :-- | :--: | :-- |
-| game | string | `'myz'` | The code of the current game used. |
-| name | string | `null` | The name of the roll. |
-| maxPush | number | `1` | The maximum number of pushes. |
+To dynamically use another template for the roll message, you can use this trick:
 
-### Read-only
+```js
+let templateData = {
+  template: "path_to_my_custom_template.hbs",
+  flavor: "my_custom_roll_flavor",
+  // ...more details see YearZeroRoll#render()...
+};
 
-| Name | Type | Description |
-| :-- | :-- | :-- |
-| size | number | The total number of dice in the roll. |
-| pushCount | number | The number of times the roll has been pushed. |
-| pushed | boolean | Whether the roll was pushed or not. |
-| pushable | boolean | Tells if the roll is pushable. |
-| successCount | number | The total quantity of successes. |
-| baneCount | number | The total quantity of ones (banes). |
-| attributeTrauma | number | The quantity of traumas ("1" on base dice). |
-| gearDamage | number | The quantity of gear damage ("1" on gear dice). |
-| stress | number | The quantity of stress dice. |
-| panic | number | The quantity of panic ("1" on stress dice). |
-| ~~mishap~~ | boolean | **Deprecated**. Tells if the roll is a mishap (double 1's). |
-| ammoSpent | number | The quantity of ammo spent. Equal to the sum of the ammo dice. |
-| hitCount | number | The quantity of successes on ammo dice. |
-| jamCount | number | The quantity of ones (banes) on base dice and ammo dice. |
-| jammed | boolean | Tells if the roll caused a weapon jam. |
-| baseSuccessQty | number | The total successes produced by base dice. |
-| hitLocations | number[] | The rolled hit locations. |
-| bestHitLocation | number | The best rolled hit location. |
+let messageData = {
+  content: await roll.render(templateData):,
+  speaker: ChatMessage.getSpeaker({ actor });
+};
 
-If you need to count another specific result, use the `count(type, seed)` method.
+let rollMode = game.settings.get('core', 'rollMode');
 
-Read more about the new methods and their documentation in the source code of the `yzur.js` library.
+await roll.toMessage(messageData, { rollMode });
+```
 
 # Supported Games
 
 | Game | Code | Dice & Denominations |
 | :-- | :-- | :-- |
-| Alien RPG *(except pushing)* | `alien` | `skill: s`<br/>`stress: z` |
+| Alien RPG | `alien` | `skill: s`<br/>`stress: z` |
 | Coriolis: The Third Horizon | `cor` | `skill: s` |
 | Forbidden Lands | `fbl` | `base: b`<br/>`skill: s`<br/>`gear: g`<br/>`neg: n`<br/>`artoD8: 8`<br/>`artoD10: 10`<br/>`artoD12: 12` |
 | Mutant: Year Zero | `myz` | `base: b`<br/>`skill: s`<br/>`gear: g`<br/>`neg: n` |
 | Tales From the Loop | `tales` | `skill: s` |
-| Twilight 2000 4E | `t2k` | `a: a`<br/>`b: b`<br/>`c: c`<br/>`d: d`<br/>`ammo: m`<br/>`loc: l` |
+| Twilight 2000 (4th Edition) | `t2k` | `a: a`<br/>`b: b`<br/>`c: c`<br/>`d: d`<br/>`ammo: m`<br/>`loc: l` |
 | Vaesen | `vae` | `skill: s` |
 
 ### Examples of commands in the chat
@@ -232,6 +245,17 @@ Read more about the new methods and their documentation in the source code of th
 ```
 /roll 1d10 + 1d8 + 3dm + 1dl
 ```
+
+**Custom Pushes** — Set the max number of pushes:
+
+```
+/roll 5dbnp   5 base dice     (no push)
+/roll 3dsp0   3 skill dice    (max 0 push)
+/roll 3dgp3   3 gear dice     (max 3 pushes)
+/roll 3dbp3 + 3dsp2 + 3dgnp   (can be combined)
+```
+
+<small><i>Note: For full-auto fire, you can add the modifier <code>p100</code>.</i></small>
 
 # Dice So Nice
 
