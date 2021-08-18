@@ -22,6 +22,18 @@
     - [DENOMINATION](#yearzerodiedenomination)
     - [SERIALIZE_ATTRIBUTES](#yearzerodieserialize_attributes)
     - [MODIFIERS](#yearzerodiemodifiers)
+- [YearZeroRollManager](#yearzerorollmanager)
+  - [register](#yearzerorollmanagerregister)
+  - [registerConfig](#yearzerorollmanagerregisterconfig)
+  - [registerRoll](#yearzerorollmanagerregisterroll)
+  - [registerDice](#yearzerorollmanagerregisterdice)
+  - [registerDie](#yearzerorollmanagerregisterdie)
+  - [_initialize](#yearzerorollmanager_initialize)
+  - [_overrideRollCreate](#yearzerorollmanager_overriderollcreate)
+  - Constants:
+    - [DIE_TYPES_MAP](#yearzerorollmanagerdie_types_map)
+    - [GAMES](#yearzerorollmanagergames)
+- [Config Constants](#configconstants)
 
 # YearZeroRoll
 
@@ -347,20 +359,196 @@ Roll modifier method that sets the max number of pushes.
 
 ## YearZeroDie.TYPE
 
+```js
+TYPE :string
+```
+
 A DieTypeString that defines the type of the die.
 
 ## YearZeroDie.LOCKED_VALUES
+
+```js
+LOCKED_VALUES :number[]
+```
 
 An array of numbers that tells which roll results cannot be rerolled.
 
 ## YearZeroDie.DENOMINATION
 
+```js
+DENOMINATION :string
+```
+
 A single character that defines the denomination used to register this DiceTerm type in `CONFIG.Dice.terms`.
 
 ## YearZeroDie.SERIALIZE_ATTRIBUTES
+
+```js
+SERIALIZE_ATTRIBUTES :string[]
+```
 
 An array of additional attributes which should be retained when the term is serialized. The `YearZeroDie` class adds the property `maxPush` to the list.
 
 ## YearZeroDie.MODIFIERS
 
+```js
+MODIFIERS :object.<string, (string|function)>
+```
+
 An object of key-pairs that defines the named modifiers that can be applied for this particular DiceTerm type.
+
+<p>&nbsp;</p>
+<hr/>
+<p>&nbsp;</p>
+
+# YearZeroRollManager
+
+```js
+class YearZeroRollManager extends Die
+```
+
+Interface for registering Year Zero dice.
+
+To register the game and its dice, call the static `YearZeroRollManager.register()` method at the start of the `init` Hooks.
+
+### Example
+
+```js
+import { YearZeroRollManager } from './lib/yzur.js';
+Hooks.once('init', function() {
+  YearZeroRollManager.register('yourgame', { options });
+  ...
+});
+```
+
+## YearZeroRollManager.register
+
+```js
+(static) register(yzGame, config): void
+```
+
+Registers the Year Zero dice for the specified game. You must call this method in `Hooks.once('init')`.
+
+### Parameters
+
+| Name | Type | Default | Description |
+| :-- | :-- | :--: | :-- |
+| yzGame | GameTypeString (string) | | The game used (for the choice of die types to register) |
+| config | object | | Custom config to merge with the initial config |
+
+## YearZeroRollManager.registerConfig
+
+```js
+(static) registerConfig(config): void
+```
+
+Registers the Year Zero Universal Roller config. See [Config](#configconstants).
+
+### Parameters
+
+| Name | Type | Default | Description |
+| :-- | :-- | :--: | :-- |
+| config | object | | Custom config to merge with the initial config |
+
+## YearZeroRollManager.registerRoll
+
+```js
+(static) registerRoll(cls, i): void
+```
+
+Registers the roll.
+
+### Parameters
+
+| Name | Type | Default | Description |
+| :-- | :-- | :--: | :-- |
+| cls | class | `YearZeroRoll` | The roll class to register |
+| i | number | `0` | Index of the registration |
+
+## YearZeroRollManager.registerDice
+
+```js
+(static) registerDice(yzGame): void
+```
+
+Registers all the Year Zero Dice.
+
+### Parameters
+
+| Name | Type | Default | Description |
+| :-- | :-- | :--: | :-- |
+| yzGame | GameTypeString (string) | | The game used (for the choice of die types to register) |
+
+## YearZeroRollManager.registerDie
+
+```js
+(static) registerDie(type): void
+```
+
+Registers a die in Foundry.
+
+### Parameters
+
+| Name | Type | Default | Description |
+| :-- | :-- | :--: | :-- |
+| type | DieTypeString (string) | | Type of die to register |
+
+## YearZeroRollManager.registerDie
+
+```js
+(static) _initialize(yzGame): void
+```
+
+### Parameters
+
+| Name | Type | Default | Description |
+| :-- | :-- | :--: | :-- |
+| yzGame | GameTypeString (string) | | The game used (for the choice of die types to register) |
+
+## YearZeroRollManager._overrideRollCreate
+
+```js
+(static) _overrideRollCreate(index): void
+```
+
+### Parameters
+
+| Name | Type | Default | Description |
+| :-- | :-- | :--: | :-- |
+| index | number | `1` | Index of the registration |
+
+## YearZeroRollManager.DIE_TYPES_MAP
+
+```js
+DIE_TYPES_MAP :object.<GameTypeString, DieTypeString[]>
+```
+
+Die Types mapped with Games. Used by the register method to choose which dice to activate.
+
+## YearZeroRollManager.GAMES
+
+```js
+GAMES :GameTypeString[]
+```
+
+List of GameTypeStrings.
+
+<p>&nbsp;</p>
+<hr/>
+<p>&nbsp;</p>
+
+# Config Constants
+
+| Name | Type | Default | Description |
+| :-- | :-- | :--: | :-- |
+| YZUR.game | GameTypeString (string) | `""` | The name of the game used |
+| YZUR.CHAT.showInfos | boolean | true | Whether to show the roll infos template beneath the roll tooltip |
+| YZUR.CHAT.diceSorting | DieTypeString[] (string[]) | *default* | Defines the dice tooltips sorting order |
+| YZUR.ROLL.chatTemplate | string | *default* | The path to the roll message template |
+| YZUR.ROLL.tooltipTemplate | string | *default* | The path to the roll tooltip template |
+| YZUR.ROLL.infosTemplate | string | *default* | The path to the roll infos template |
+| YZUR.DICE.localizeDieTypes | boolean | true | Whether to localize the default die type flavor |
+| YZUR.DICE.DIE_TYPES | object | *default* | Map of `{ DieTypeString: class }` pairs |
+| YZUR.DICE.DIE_TYPES_BY_CLASS | object | *default* | Map of `{ string: DieTypeString }` pairs |
+| YZUR.DICE.ICONS.getLabel | function | *default* | A customizable helper function for creating the labels of the die. Note: You must return a string or DsN will throw an error. |
+| YZUR.DICE.ICONS.{{yzGame}} | object | *default* | Icons labels |
