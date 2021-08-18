@@ -143,7 +143,7 @@ let terms = getTerms('skill');
 let terms = getTerms({
   type: 'skill',
   number: 1,
-  faces: 6
+  faces: 6,
   options: {
     flavor: 'Attack',
     // ...etc...
@@ -206,7 +206,7 @@ Removes a number of dice from the roll.
 | Name | Type | Default | Description |
 | :-- | :-- | :--: | :-- |
 | qty | number | | The quantity to remove |
-| search | DieTypeString (string) \|&nbsp;object | | The type of dice to remove, or an object of values for comparison, see [YearZeroRoll#getTerms](#yearzerorollgetterms) |
+| search | DieTypeString (string) \|&nbsp;object | | The type of dice to remove, or an object of values for comparison<br/>See [YearZeroRoll#getTerms](#yearzerorollgetterms) |
 | options | object | `{}` | Additional options for the dice removal |
 | options.discard | boolean | `false` | Whether the term should be marked as "discarded" instead of removed |
 | options.disable | boolean | `false` | Whether the term should be marked as "active: false" instead of removed |
