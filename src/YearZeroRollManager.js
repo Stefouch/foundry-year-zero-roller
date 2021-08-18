@@ -101,7 +101,7 @@ export default class YearZeroRollManager {
     YearZeroRollManager._initialize(yzGame);
     // Registers the dice.
     YearZeroRollManager.registerDice(yzGame);
-    console.log(`${YearZeroRollManager.name} | Registration complete!`);
+    console.log('YZUR | Registration complete!');
   }
 
   /**
@@ -121,7 +121,9 @@ export default class YearZeroRollManager {
    */
   static registerDice(yzGame) {
     // Registers all the dice if `game` is omitted.
-    if (!yzGame) throw new SyntaxError(`${YearZeroRollManager.name} | A game must be specified for the registration.`);
+    if (!yzGame) {
+      throw new SyntaxError('YZUR | A game must be specified for the registration.');
+    }
 
     // Checks the game validity.
     if (!YearZeroRollManager.GAMES.includes(yzGame)) throw new GameTypeError(yzGame);
@@ -140,11 +142,12 @@ export default class YearZeroRollManager {
    * @param {number} [i=0] Index of the registration
    * @static
    */
-  static registerRoll(cls = YearZeroRoll, i = 0) {
+  static registerRoll(cls = YearZeroRoll, i = 1) {
     CONFIG.Dice.rolls[i] = cls;
     CONFIG.Dice.rolls[i].CHAT_TEMPLATE = CONFIG.YZUR.ROLL.chatTemplate;
     CONFIG.Dice.rolls[i].TOOLTIP_TEMPLATE = CONFIG.YZUR.ROLL.tooltipTemplate;
     CONFIG.YZUR.ROLL.index = i;
+    if (i > 0) YearZeroRollManager._overrideRollCreate(i);
   }
 
   /**
@@ -158,18 +161,18 @@ export default class YearZeroRollManager {
 
     const deno = cls.DENOMINATION;
     if (!deno) {
-      throw new SyntaxError(`Undefined DENOMINATION for "${cls.name}".`);
+      throw new SyntaxError(`YZUR | Undefined DENOMINATION for "${cls.name}".`);
     }
 
     // Registers the die in the Foundry CONFIG.
     const reg = CONFIG.Dice.terms[deno];
     if (reg) {
       console.warn(
-        `${YearZeroRollManager.name} | Die Registration: "${deno}" | Overwritting ${reg.name} with "${cls.name}".`,
+        `YZUR | Die Registration: "${deno}" | Overwritting ${reg.name} with "${cls.name}".`,
       );
     }
     else {
-      console.log(`${YearZeroRollManager.name} | Die Registration: "${deno}" with ${cls.name}.`);
+      console.log(`YZUR | Die Registration: "${deno}" with ${cls.name}.`);
     }
     CONFIG.Dice.terms[deno] = cls;
   }
@@ -180,14 +183,26 @@ export default class YearZeroRollManager {
    * @static
    */
   static _initialize(yzGame) {
-    if (!CONFIG.YZUR) throw new ReferenceError('CONFIG.YZUR does not exists!');
+    if (!CONFIG.YZUR) throw new ReferenceError('YZUR | CONFIG.YZUR does not exists!');
     if (CONFIG.YZUR.game) {
       console.warn(
-        `${YearZeroRollManager.name} | Overwritting the default Year Zero game "${CONFIG.YZUR.game}" with: "${yzGame}"`,
+        `YZUR | Overwritting the default Year Zero game "${CONFIG.YZUR.game}" with: "${yzGame}"`,
       );
     }
     CONFIG.YZUR.game = yzGame;
-    console.log(`${YearZeroRollManager.name} | The name of the Year Zero game is: "${yzGame}".`);
+    console.log(`YZUR | The name of the Year Zero game is: "${yzGame}".`);
+  }
+
+  static _overrideRollCreate(index) {
+    Roll.prototype.constructor.create = function(formula, data = {}, options = {}) {
+      const YZURFormula = data.yzur
+        ?? data.game
+        ?? data.maxPush
+        ?? formula.match(/\d*d(:?[bsngzml]|6|8|10|12)/i);
+      const n = YZURFormula ? index : 0;
+      const cls = CONFIG.Dice.rolls[n];
+      return new cls(formula, data, options);
+    };
   }
 }
 
