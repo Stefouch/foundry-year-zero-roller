@@ -61,7 +61,8 @@ export class YearZeroDie extends Die {
    * @readonly
    */
   get isYearZeroDie() {
-    return this instanceof YearZeroDie;
+    // return this instanceof YearZeroDie;
+    return true;
   }
 
   /**
