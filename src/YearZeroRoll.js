@@ -18,11 +18,19 @@ export class YearZeroRoll extends Roll {
    * @param {string} data.game     The game used
    * @param {string} data.name     The name of the roll
    * @param {number} data.maxPush  The maximum number of times the roll can be pushed
+   * @param {string} options.game     The game used
+   * @param {string} options.name     The name of the roll
+   * @param {number} options.maxPush  The maximum number of times the roll can be pushed
    */
   constructor(formula, data = {}, options = {}) {
+    if (options.name == undefined) options.name = data.name;
+    if (options.game == undefined) options.game = data.game;
+    if (options.maxPush == undefined) options.maxPush = data.maxPush;
+
     super(formula, data, options);
+
     if (!this.game) this.game = CONFIG.YZUR.game ?? 'myz';
-    if (data.maxPush != undefined) this.maxPush = data.maxPush;
+    if (options.maxPush != undefined) this.maxPush = options.maxPush;
   }
 
   /* -------------------------------------------- */
@@ -32,23 +40,23 @@ export class YearZeroRoll extends Roll {
    * @type {string}
    * @readonly
    */
-  get game() { return this.data.game; }
-  set game(yzGame) { this.data.game = yzGame; }
+  get game() { return this.options.game; }
+  set game(yzGame) { this.options.game = yzGame; }
 
   /**
    * The name of the roll.
    * @type {string}
    * @readonly
    */
-  get name() { return this.data.name; }
-  set name(str) { this.data.name = str; }
+  get name() { return this.options.name; }
+  set name(str) { this.options.name = str; }
 
   /**
    * The maximum number of pushes.
    * @type {number}
    */
   set maxPush(n) {
-    this.data.maxPush = n;
+    this.options.maxPush = n;
     for (const t of this.terms) {
       if (t instanceof YearZeroDie) {
         t.maxPush = n;
@@ -56,7 +64,8 @@ export class YearZeroRoll extends Roll {
     }
   }
   get maxPush() {
-    return this.terms.reduce((max, t) => t instanceof YearZeroDie ? Math.max(max, t.maxPush) : max, 0);
+    // Note: Math.max(null, n) returns a number between [0, n[.
+    return this.terms.reduce((max, t) => t instanceof YearZeroDie ? Math.max(max, t.maxPush) : max, null);
   }
 
   /**
@@ -250,8 +259,6 @@ export class YearZeroRoll extends Roll {
   }
 
   /* -------------------------------------------- */
-  /*  YearZeroRoll Utility Methods                */
-  /* -------------------------------------------- */
 
   /**
    * Generates a roll based on the number of dice.
@@ -292,6 +299,8 @@ export class YearZeroRoll extends Roll {
   }
 
   /* -------------------------------------------- */
+  /*  YearZeroRoll Utility Methods                */
+  /* -------------------------------------------- */
 
   /**
    * Gets all the dice terms of a certain type or that match an object of values.
@@ -302,9 +311,9 @@ export class YearZeroRoll extends Roll {
     if (typeof search === 'string') return this.terms.filter(t => t.type === search);
     return this.terms.filter(t => {
       let f = true;
-      if (search.type ?? false) f = f && search.type === t.type;
-      if (search.number ?? false) f = f && search.number === t.number;
-      if (search.faces ?? false) f = f && search.faces === t.faces;
+      if (search.type != undefined) f = f && search.type === t.type;
+      if (search.number != undefined) f = f && search.number === t.number;
+      if (search.faces != undefined) f = f && search.faces === t.faces;
       if (search.options) {
         for (const key in search.options) {
           f = f && search.options[key] === t.options[key];
@@ -317,6 +326,45 @@ export class YearZeroRoll extends Roll {
       }
       return f;
     });
+  }
+
+  /* -------------------------------------------- */
+
+  /**
+   * Counts the values of a certain type in the roll.
+   * If `seed` is omitted, counts all the dice of a certain type.
+   * @param {DieTypeString} type  The type of the die
+   * @param {number}       [seed] The value to search, if any
+   * @param {string}       [comparison='='] The comparison to use against the seed: `>`, `<`, or `=`
+   * @returns {number} Total count
+   */
+  count(type, seed = null, comparison = '=') {
+    return this.terms.reduce((c, t) => {
+      if (t.type === type) {
+        if (t.results.length) {
+          for (const r of t.results) {
+            if (!r.active) continue;
+            if (seed != null) {
+              if (comparison === '>') { if (r.result > seed) c++; }
+              else if (comparison === '>=') { if (r.result >= seed) c++; }
+              else if (comparison === '<') { if (r.result < seed) c++; }
+              else if (comparison === '<=') { if (r.result <= seed) c++; }
+              else if (r.result === seed) { c++; }
+            }
+            else {
+              c++;
+            }
+          }
+        }
+        else if (seed != null) {
+          c += 0;
+        }
+        else {
+          c += t.number;
+        }
+      }
+      return c;
+    }, 0);
   }
 
   /* -------------------------------------------- */
@@ -336,7 +384,7 @@ export class YearZeroRoll extends Roll {
     if (!qty) return this;
     const search = { type, faces: range, options };
     if (qty < 0) return this.removeDice(-qty, search);
-    if (value ?? false) await this.roll({ async: true });
+    if (value != undefined && !this._evaluated) await this.roll({ async: true });
 
     let term = this.getTerms(search)[0];
     if (term) {
@@ -344,7 +392,8 @@ export class YearZeroRoll extends Roll {
         term.number++;
         if (this._evaluated) {
           term.roll();
-          if (value ?? false) {
+          // TODO missing term._evaluateModifiers() for this new result only
+          if (value != undefined) {
             term.results[term.results.length - 1].result = value;
           }
         }
@@ -356,22 +405,25 @@ export class YearZeroRoll extends Roll {
       term = new cls({
         number: qty,
         faces: range,
-        maxPush: this.maxPush,
+        maxPush: this.maxPush ?? 1,
         options,
       });
       if (this._evaluated) {
         await term.evaluate({ async: true });
-        if (value ?? false) {
+        if (value != undefined) {
           term.results.forEach(r => r.result = value);
         }
       }
-      // eslint-disable-next-line no-undef
-      this.terms.push(new OperatorTerm({ operator: type === 'neg' ? '-' : '+' }));
+      if (this.terms.length > 0) {
+        // eslint-disable-next-line no-undef
+        this.terms.push(new OperatorTerm({ operator: type === 'neg' ? '-' : '+' }));
+      }
       this.terms.push(term);
     }
-    // Adapts the formula accordingly.
+    // Updates the cache of the Roll.
     this._formula = this.constructor.getFormula(this.terms);
-    // Returns the roll entity.
+    if (this._evaluated) this._total = this._evaluateTotal();
+
     return this;
   }
 
@@ -379,11 +431,13 @@ export class YearZeroRoll extends Roll {
 
   /**
    * Removes a number of dice from the roll.
-   * @param {number}          [qty=1] The quantity to remove
+   * @param {number}           qty      The quantity to remove
    * @param {DieTypeString|{}} search   The type of dice to remove, or an object of values for comparison
+   * @param {boolean}         [discard] Whether the term should be marked as "discarded" instead of removed
+   * @param {boolean}         [disable] Whether the term should be marked as "active: false" instead of removed
    * @returns {YearZeroRoll} This roll
    */
-  removeDice(qty, search) {
+  removeDice(qty, search, { discard = false, disable = false } = {}) {
     if (!qty) return this;
 
     for (; qty > 0; qty--) {
@@ -401,50 +455,25 @@ export class YearZeroRoll extends Roll {
         else if (this._evaluated) {
           const index = term.results.findIndex(r => r.active);
           if (index < 0) break;
-          term.results.splice(index, 1);
+          if (discard || disable) {
+            if (discard) term.results[index].discarded = discard;
+            if (disable) term.results[index].active = !disable;
+          }
+          else {
+            term.results.splice(index, 1);
+          }
         }
       }
       else { break; }
     }
-    // Adapts the formula accordingly.
+    // Updates the cache of the Roll.
     this._formula = this.constructor.getFormula(this.terms);
-    // Returns the roll entity.
+    if (this._evaluated) {
+      if (this.terms.length) this._total = this._evaluateTotal();
+      else this._total = 0;
+    }
+
     return this;
-  }
-
-  /* -------------------------------------------- */
-
-  /**
-   * Counts the values of a certain type in the roll.
-   * If `seed` is omitted, counts all the dice of a certain type.
-   * @param {DieTypeString} type  The type of the die
-   * @param {number}       [seed] The value to search, if any
-   * @param {string}       [comparison='='] The comparison to use against the seed: `>`, `<`, or `=`
-   * @returns {number} Total count
-   */
-  count(type, seed, comparison = '=') {
-    return this.terms.reduce((c, t) => {
-      if (t.type === type) {
-        for (const r of t.results) {
-          if (!r.active) continue;
-          if (seed != null) {
-            if (comparison === '>') {
-              if (r.result > seed) c++;
-            }
-            else if (comparison === '<') {
-              if (r.result < seed) c++;
-            }
-            else if (r.result === seed) {
-              c++;
-            }
-          }
-          else {
-            c += t.number;
-          }
-        }
-      }
-      return c;
-    }, 0);
   }
 
   /* -------------------------------------------- */
@@ -508,27 +537,98 @@ export class YearZeroRoll extends Roll {
     if (!mod) return this;
 
     // TWILIGHT 2000
+    // --------------------------------------------
     if (this.game === 't2k') {
-      return this._modify(mod);
+      const diceMap = [null, 6, 8, 10, 12, Infinity];
+      const typesMap = ['d', 'd', 'c', 'b', 'a', 'a'];
+      const refactorRange = (range, n) => diceMap[diceMap.indexOf(range) + n];
+      const getTypeFromRange = (range) => typesMap[diceMap.indexOf(range)];
+
+      const _terms = this.getTerms('base');
+      const dice = _terms.flatMap(t => new Array(t.number).fill(t.faces));
+
+      // 1 — Modifies the dice ranges.
+      while (mod !== 0) {
+        let i;
+        // 1.1.1 — A positive modifier increases the lowest term.
+        if (mod > 0) {
+          i = dice.indexOf(Math.min(...dice));
+          dice[i] = refactorRange(dice[i], 1);
+          mod--;
+        }
+        // 1.1.2 — A negative modifier decreases the highest term.
+        else {
+          i = dice.indexOf(Math.max(...dice));
+          dice[i] = refactorRange(dice[i], -1);
+          mod++;
+        }
+        // 1.2 — Readjusts term faces.
+        if (dice[i] === Infinity) {
+          dice[i] = refactorRange(dice[i], -1);
+          if (dice.length < 2) {
+            dice.push(diceMap[1]);
+          }
+        }
+        else if (dice[i] === null) {
+          if (dice.length > 1) {
+            dice.splice(i, 1);
+          }
+          else {
+            dice[i] = refactorRange(dice[i], 1);
+          }
+        }
+        else if (dice[i] === undefined) {
+          throw new Error(`YZUR | YearZeroRoll#modify<T2K> | dice[${i}] is out of bounds (mod: ${mod})`);
+        }
+      }
+      // 2 — Filters out all the base terms.
+      //       This way, it will also remove leading operator terms.
+      this.removeDice(100, 'base');
+
+      // 3 — Reconstructs the base terms.
+      const skilled = _terms.length > 1 && dice.length > 1;
+      for (let index = 0; index < dice.length; index++) {
+        const ti = Math.min(index, skilled ? 1 : 0);
+        await this.addDice(1, getTypeFromRange(dice[index]), {
+          range: dice[index],
+          options: foundry.utils.deepClone(_terms[ti].options),
+        });
+      }
+      // Note: reconstructed terms are evaluated
+      // at the end of this method.
     }
     // MUTANT YEAR ZERO & FORBIDDEN LANDS
-    else if (['myz', 'fbl'].includes(this.type)) {
-      // 1 — Balances skill & neg dice.
-      while (this.count('skill') > 0 && this.count('neg') > 0) {
-        this.removeDice(1, 'skill');
-        this.removeDice(1, 'neg');
-      }
+    // --------------------------------------------
+    else if (['myz', 'fbl'].includes(this.game)) {
+      // Modifies skill & neg dice.
       const skill = this.count('skill');
       const neg = Math.max(0, -mod - skill);
       await this.addDice(mod, 'skill');
       if (neg > 0) await this.addDice(neg, 'neg');
+
+      // Balances skill & neg dice.
+      while (this.count('skill') > 0 && this.count('neg') > 0) {
+        this.removeDice(1, 'skill');
+        this.removeDice(1, 'neg');
+      }
     }
-    // ALL OTHER GAMES
+    // ALL OTHER GAMES (ALIEN RPG, CORIOLIS, VAESEN, TFTL, etc.)
+    // --------------------------------------------
     else {
       const skill = this.count('skill');
-      if (mod < 0) mod -= skill - 1 + mod; // Minimum of 1 skill die
+      if (mod < 0) mod = Math.max(-skill + 1, mod); // Minimum of 1 skill die
       await this.addDice(mod, 'skill');
     }
+
+    // --------------------------------------------
+
+    // Re-evaluates all terms that were left unevaluated.
+    if (this._evaluated) {
+      for (const t of this.terms) {
+        if (!t._evaluated) await t.evaluate();
+      }
+    }
+
     return this;
   }
 
@@ -677,7 +777,7 @@ export class YearZeroRoll extends Roll {
   /* -------------------------------------------- */
 
   /** @override */
-  getTooltip() {
+  async getTooltip() {
     const parts = this.dice.map(d => d.getTooltipData())
     // ==>
       .sort((a, b) => {
@@ -783,9 +883,10 @@ export class YearZeroRoll extends Roll {
   /**
    * Renders the infos of a Year Zero roll.
    * @param {string} [template] The path to the template
-   * @returns {Promise<HTMLElement>}
+   * @returns {Promise<string>}
+   * @async
    */
-  getRollInfos(template = null) {
+  async getRollInfos(template = null) {
     template = template ?? CONFIG.YZUR?.ROLL?.infosTemplate;
     const context = { roll: this };
     return renderTemplate(template, context);
@@ -849,20 +950,21 @@ export class YearZeroRoll extends Roll {
   /*  JSON                                        */
   /* -------------------------------------------- */
 
-  /** @override */
-  static fromData(data) {
-    const roll = super.fromData(data);
-    roll.data = data.data ?? {};
-    return roll;
-  }
+  // TODO clean
+  // /** @override */
+  // static fromData(data) {
+  //   const roll = super.fromData(data);
+  //   roll.data = data.data ?? {};
+  //   return roll;
+  // }
 
-  /** @override */
-  toJSON() {
-    return {
-      ...super.toJSON(),
-      data: this.data,
-    };
-  }
+  // /** @override */
+  // toJSON() {
+  //   return {
+  //     ...super.toJSON(),
+  //     data: this.data,
+  //   };
+  // }
 
   /**
    * Creates a copy of the roll.
