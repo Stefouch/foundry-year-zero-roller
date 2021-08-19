@@ -5,7 +5,7 @@
     <img alt="Foundry Version" src="https://img.shields.io/badge/dynamic/json?color=blue&label=Foundry&query=compatibleCoreVersion&url=https%3A%2F%2Fraw.githubusercontent.com%2FStefouch%2Ffoundry-year-zero-roller%2Fmaster%2Fsystem.json"/>
   </a>
   <a href="https://github.com/Stefouch/foundry-year-zero-roller/releases">
-    <img alt="Downloads" src="https://img.shields.io/github/downloads/Stefouch/foundry-year-zero-roller/latest/master.zip"/>
+    <img alt="Downloads" src="https://img.shields.io/github/downloads/Stefouch/foundry-year-zero-roller/latest/yzur.js"/>
   </a>
   <a href="https://github.com/Stefouch/foundry-year-zero-roller/graphs/commit-activity" target="_blank">
     <img alt="Maintenance" src="https://img.shields.io/badge/Maintained%3F-yes-green.svg"/>
