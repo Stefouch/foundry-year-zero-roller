@@ -305,7 +305,7 @@ Note: This is a core method from Foundry's `Roll` class that is overriden by the
 | chatOptions.user | string | `game.user.id` | The ID of the user that rendered this roll |
 | chatOptions.flavor | string | `null` | The flavor of the message |
 | chatOptions.template | string | `YearZeroRoll .CHAT_TEMPLATE` | The path to the template that renders the roll |
-| `✨` chatOptions.infosTemplate | string | `CONFIG.YZUR .ROLL .infosTemplate` | The path to the template that renders the infos box under the roll tooltip |
+| ✨ chatOptions.infosTemplate | string | `CONFIG.YZUR .ROLL .infosTemplate` | The path to the template that renders the infos box under the roll tooltip |
 | chatOptions.blind | boolean | `false` | Whether this is a blind roll |
 | chatOptions.isPrivate | boolean | `false` | Whether this roll is private (displays sensitive infos with `???` instead) |
 
@@ -328,7 +328,7 @@ Note: This is a core method from Foundry's `Roll` class that is overriden by the
 | :-- | :-- | :--: | :-- |
 | messageData | object | `{}` | The data object to use when creating the message |
 | messageData.user | string | `game.user.id` | The ID of the user that sends the message |
-| messageData.speaker | object | `✨` `ChatMessage .getSpeaker()` | The identified speaker data |
+| messageData.speaker | object | ✨ `ChatMessage .getSpeaker()` | The identified speaker data |
 | messageData.content | string | `this.total` | The HTML content of the message, overriden by the `roll.render()`'s returned content if left unchanged |
 | messageData.type | number | `CONST .CHAT_MESSAGE_TYPES .ROLL` | The type to use for the message from `CONST.CHAT_MESSAGE_TYPES` |
 | messageData.sound | string | `CONFIG .sounds.dice` | The path to the sound played with the message (WAV format) |
