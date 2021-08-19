@@ -17,6 +17,8 @@
         <li><a href="#yearzerorollpush">push</a></li>
         <li><a href="#yearzerorollmodify">modify</a></li>
         <li><a href="#yearzerorollgetrollinfos">getRollInfos</a></li>
+        <li><a href="#yearzerorollrender">render</a></li>
+        <li><a href="#yearzerorolltomessage">toMessage</a></li>
         <li><a href="#yearzerorollduplicate">duplicate</a></li>
       </ul>
     </td>
@@ -279,9 +281,58 @@ Applies a difficulty modifier to the roll.
 
 Renders the infos of a Year Zero roll.
 
+### Parameters
+
 | Name | Type | Default | Description |
 | :-- | :-- | :--: | :-- |
 | template | string | *default* | The path to the template |
+
+## YearZeroRoll.render
+
+```js
+/** @override */
+(async) render(chatOptions): Promise<string>
+```
+
+Renders a Roll instance to HTML.<br/>
+Note: This is a core method from Foundry's `Roll` class that is overriden by the `YearZeroRoll` class with extra features.
+
+### Parameters
+
+| Name | Type | Default | Description |
+| :-- | :-- | :--: | :-- |
+| chatOptions | object | `{}` | An object configuring the behavior of the resulting chat message, which is also passed to the template |
+| chatOptions.user | string | `game.user.id` | The ID of the user that rendered this roll |
+| chatOptions.flavor | string | `null` | The flavor of the message |
+| chatOptions.template | string | `YearZeroRoll .CHAT_TEMPLATE` | The path to the template that renders the roll |
+| chatOptions.infosTemplate | string | `CONFIG.YZUR .ROLL .infosTemplate` | The path to the template that renders the infos box under the roll tooltip |
+| chatOptions.blind | boolean | `false` | Whether this is a blind roll |
+| chatOptions.isPrivate | boolean | `false` | Whether this roll is private (displays sensitive infos with `???` instead) |
+
+## YearZeroRoll.toMessage
+
+```js
+/** @override */
+(async) toMessage(messageData, options): Promise<ChatMessage | ChatMessageData>
+```
+
+Transforms a Roll instance into a ChatMessage, displaying the roll result.<br/>
+This function can either create the ChatMessage directly, or return the data object that will be used to create.</br>
+Note: This is a core method from Foundry's `Roll` class that is overriden by the `YearZeroRoll` class with extra features.
+
+### Parameters
+
+| Name | Type | Default | Description |
+| :-- | :-- | :--: | :-- |
+| messageData | object | `{}` | The data object to use when creating the message |
+| messageData.user | string | `game.user.id` | The ID of the user that sends the message |
+| messageData.speaker | object | `ChatMessage .getSpeaker()` | The identified speaker data |
+| messageData.content | string | `this.total` | The HTML content of the message, overriden by the `roll.render()`'s returned content if left unchanged |
+| messageData.type | number | `CONST .CHAT_MESSAGE_TYPES .ROLL` | The type to use for the message from `CONST.CHAT_MESSAGE_TYPES` |
+| messageData.sound | string | `CONFIG .sounds.dice` | The path to the sound played with the message (WAV format) |
+| options | object | `{}` | Additional options which modify the created message |
+| options.rollMode | string | *default* | The template roll mode to use for the message from `CONFIG.Dice.rollModes` |
+| options.create | boolean | `true` | Whether to automatically create the chat message, or only return the prepared chatData object |
 
 ## YearZeroRoll.duplicate
 

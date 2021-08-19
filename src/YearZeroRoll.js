@@ -892,7 +892,23 @@ export class YearZeroRoll extends Roll {
 
   /* -------------------------------------------- */
 
-  /** @override */
+  /**
+   * Renders a Roll instance to HTML.
+   * @param {object}  [chatOptions]               An object configuring the behavior of the resulting chat message,
+   *   which is also passed to the template
+   * @param {string}  [chatOptions.user]          The ID of the user that rendered this roll
+   * @param {string}  [chatOptions.flavor]        The flavor of the message
+   * @param {string}  [chatOptions.template]      The path to the template
+   *   that renders the roll
+   * @param {string}  [chatOptions.infosTemplate] The path to the template
+   *   that renders the infos box under the roll tooltip
+   * @param {boolean} [chatOptions.blind]         Whether this is a blind roll
+   * @param {boolean} [chatOptions.isPrivate]     Whether this roll is private
+   *   (displays sensitive infos with `???` instead)
+   * @returns {Promise<string>}
+   * @async
+   * @override
+   */
   async render(chatOptions = {}) {
     if (CONFIG.debug.dice) console.warn(this);
 
@@ -905,7 +921,7 @@ export class YearZeroRoll extends Roll {
     const isPrivate = chatOptions.isPrivate;
 
     // Executes the roll, if needed.
-    if (!this._evaluated) await this.evaluate();
+    if (!this._evaluated) await this.evaluate({ async: true });
 
     // Defines chat data.
     const chatData = {
@@ -928,13 +944,31 @@ export class YearZeroRoll extends Roll {
 
   /* -------------------------------------------- */
 
-  /** @override */
+  /**
+   * Transform a Roll instance into a ChatMessage, displaying the roll result.
+   * This function can either create the ChatMessage directly, or return the data object that will be used to create.
+   * @param {object}  [messageData]         The data object to use when creating the message
+   * @param {string}  [messageData.user]    The ID of the user that sends the message
+   * @param {object}  [messageData.speaker] The identified speaker data
+   * @param {string}  [messageData.content] The HTML content of the message,
+   *   overriden by the `roll.render()`'s returned content if left unchanged
+   * @param {number}  [messageData.type=5]    The type to use for the message from `CONST.CHAT_MESSAGE_TYPES`
+   * @param {string}  [messageData.sound]   The path to the sound played with the message (WAV format)
+   * @param {options} [options]             Additional options which modify the created message.
+   * @param {string}  [options.rollMode]    The template roll mode to use for the message from CONFIG.Dice.rollModes
+   * @param {boolean} [options.create=true] Whether to automatically create the chat message,
+   *   or only return the prepared chatData object.
+   * @return {Promise<ChatMessage>} A promise which resolves to the created ChatMessage entity if create is true
+   *   or the Object of prepared chatData otherwise.
+   * @async
+   * @override
+   */
   async toMessage(messageData = {}, { rollMode = null, create = true } = {}) {
     messageData = foundry.utils.mergeObject({
       user: game.user.id,
       speaker: ChatMessage.getSpeaker(),
       // "content" is overwritten by ChatMessage.create() (called in super)
-      // with the HTML returned by roll.render(), but only if different of `this.total`.
+      // with the HTML returned by roll.render(), but only if content is left unchanged.
       // So you can overwrite it here with a custom content in messageData.
       content: this.total,
       type: CONST.CHAT_MESSAGE_TYPES.ROLL,
