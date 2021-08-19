@@ -958,7 +958,8 @@ export class YearZeroRoll extends Roll {
    * @param {string}  [options.rollMode]    The template roll mode to use for the message from CONFIG.Dice.rollModes
    * @param {boolean} [options.create=true] Whether to automatically create the chat message,
    *   or only return the prepared chatData object.
-   * @return {Promise<ChatMessage>} A promise which resolves to the created ChatMessage entity if create is true
+   * @return {Promise<ChatMessage|ChatMessageData>} A promise which resolves to the created ChatMessage entity
+   *   if create is true
    *   or the Object of prepared chatData otherwise.
    * @async
    * @override
