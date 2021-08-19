@@ -58,7 +58,7 @@
   </tr>
 </table>
 
-### Configuration
+### Global Constants (YZUR Configuration)
 
 <ul>
   <li><a href="#config-constants">Config Constants</a></li>
@@ -389,7 +389,7 @@ Roll modifier method that sets the max number of pushes.
 ## YearZeroDie.TYPE
 
 ```js
-TYPE :string
+TYPE: string
 ```
 
 A DieTypeString that defines the type of the die.
@@ -397,7 +397,7 @@ A DieTypeString that defines the type of the die.
 ## YearZeroDie.LOCKED_VALUES
 
 ```js
-LOCKED_VALUES :number[]
+LOCKED_VALUES: number[]
 ```
 
 An array of numbers that tells which roll results cannot be rerolled.
@@ -405,7 +405,7 @@ An array of numbers that tells which roll results cannot be rerolled.
 ## YearZeroDie.DENOMINATION
 
 ```js
-DENOMINATION :string
+DENOMINATION: string
 ```
 
 A single character that defines the denomination used to register this DiceTerm type in `CONFIG.Dice.terms`.
@@ -413,7 +413,7 @@ A single character that defines the denomination used to register this DiceTerm 
 ## YearZeroDie.SERIALIZE_ATTRIBUTES
 
 ```js
-SERIALIZE_ATTRIBUTES :string[]
+SERIALIZE_ATTRIBUTES: string[]
 ```
 
 An array of additional attributes which should be retained when the term is serialized. The `YearZeroDie` class adds the property `maxPush` to the list.
@@ -421,7 +421,7 @@ An array of additional attributes which should be retained when the term is seri
 ## YearZeroDie.MODIFIERS
 
 ```js
-MODIFIERS :object.<string, (string|function)>
+MODIFIERS: object.<string, (string|function)>
 ```
 
 An object of key-pairs that defines the named modifiers that can be applied for this particular DiceTerm type.
@@ -549,7 +549,7 @@ Registers a die in Foundry.
 ## YearZeroRollManager.DIE_TYPES_MAP
 
 ```js
-DIE_TYPES_MAP :object.<GameTypeString, DieTypeString[]>
+DIE_TYPES_MAP: object.<GameTypeString, DieTypeString[]>
 ```
 
 Die Types mapped with Games. Used by the register method to choose which dice to activate.
@@ -557,7 +557,7 @@ Die Types mapped with Games. Used by the register method to choose which dice to
 ## YearZeroRollManager.GAMES
 
 ```js
-GAMES :GameTypeString[]
+GAMES: GameTypeString[]
 ```
 
 List of GameTypeStrings.
