@@ -52,12 +52,17 @@
         <ul>
           <li><a href="#yearzerorollmanagerdie_types_map">DIE_TYPES_MAP</a></li>
           <li><a href="#yearzerorollmanagergames">GAMES</a></li>
-          <li><a href="#config-constants">Config Constants</a></li>
         </ul>
       </ul>
     </td>
   </tr>
 </table>
+
+### Configuration
+
+<ul>
+  <li><a href="#config-constants">Config Constants</a></li>
+</ul>
 
 # YearZeroRoll
 
