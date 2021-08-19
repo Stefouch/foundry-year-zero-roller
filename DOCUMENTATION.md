@@ -295,7 +295,7 @@ Renders the infos of a Year Zero roll.
 ```
 
 Renders a Roll instance to HTML.<br/>
-Note: This is a core method from Foundry's `Roll` class that is overriden by the `YearZeroRoll` class with extra features.
+Note: This is a core method from Foundry's `Roll` class that is overridden by the `YearZeroRoll` class with extra features.
 
 ### Parameters
 
@@ -320,7 +320,7 @@ Note: This is a core method from Foundry's `Roll` class that is overriden by the
 
 Transforms a Roll instance into a ChatMessage, displaying the roll result.<br/>
 This function can either create the ChatMessage directly, or return the data object that will be used to create.</br>
-Note: This is a core method from Foundry's `Roll` class that is overriden by the `YearZeroRoll` class with a single extra feature: the default speaker is defined.
+Note: This is a core method from Foundry's `Roll` class that is overridden by the `YearZeroRoll` class with a single extra feature: the default speaker is defined.
 
 ### Parameters
 
@@ -329,7 +329,7 @@ Note: This is a core method from Foundry's `Roll` class that is overriden by the
 | messageData | object | `{}` | The data object to use when creating the message |
 | messageData.user | string | `game.user.id` | The ID of the user that sends the message |
 | messageData.speaker | object | ✨ `ChatMessage .getSpeaker()` | The identified speaker data |
-| messageData.content | string | `this.total` | The HTML content of the message, overriden by the `roll.render()`'s returned content if left unchanged |
+| messageData.content | string | `this.total` | The HTML content of the message, overridden by the `roll.render()`'s returned content if left unchanged |
 | messageData.type | number | `CONST .CHAT_MESSAGE_TYPES .ROLL` | The type to use for the message from `CONST.CHAT_MESSAGE_TYPES` |
 | messageData.sound | string | `CONFIG .sounds.dice` | The path to the sound played with the message (WAV format) |
 | options | object | `{}` | Additional options which modify the created message |
