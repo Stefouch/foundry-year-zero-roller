@@ -896,7 +896,7 @@ export class YearZeroRoll extends Roll {
    * Renders a Roll instance to HTML.
    * @param {object}  [chatOptions]               An object configuring the behavior of the resulting chat message,
    *   which is also passed to the template
-   * @param {string}  [chatOptions.user]          The ID of the user that rendered this roll
+   * @param {string}  [chatOptions.user]          The ID of the user that renders the roll
    * @param {string}  [chatOptions.flavor]        The flavor of the message
    * @param {string}  [chatOptions.template]      The path to the template
    *   that renders the roll

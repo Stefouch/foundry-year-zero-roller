@@ -302,7 +302,7 @@ Note: This is a core method from Foundry's `Roll` class that is overridden by th
 | Name | Type | Default | Description |
 | :-- | :-- | :--: | :-- |
 | chatOptions | object | `{}` | An object configuring the behavior of the resulting chat message, which is also passed to the template |
-| chatOptions.user | string | `game.user.id` | The ID of the user that rendered this roll |
+| chatOptions.user | string | `game.user.id` | The ID of the user that renders the roll |
 | chatOptions.flavor | string | `null` | The flavor of the message |
 | chatOptions.template | string | `YearZeroRoll .CHAT_TEMPLATE` | The path to the template that renders the roll |
 | ✨ chatOptions.infosTemplate | string | `CONFIG.YZUR .ROLL .infosTemplate` | The path to the template that renders the infos box under the roll tooltip |
