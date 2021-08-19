@@ -210,7 +210,8 @@ If `seed` is omitted, counts all the dice of a certain type.
 (async) addDice(qty, type, data): Promise<YearZeroRoll>
 ```
 
-Adds a number of dice to the roll.<br/>
+Adds a number of dice to the roll.
+
 Note: If a negative quantity is passed, instead it removes that many dice.
 
 ### Parameters
@@ -294,7 +295,8 @@ Renders the infos of a Year Zero roll.
 (async) render(chatOptions): Promise<string>
 ```
 
-Renders a Roll instance to HTML.<br/>
+Renders a Roll instance to HTML.
+
 Note: This is a core method from Foundry's `Roll` class that is overridden by the `YearZeroRoll` class with extra features.
 
 ### Parameters
@@ -318,9 +320,11 @@ Note: This is a core method from Foundry's `Roll` class that is overridden by th
 (async) toMessage(messageData, options): Promise<ChatMessage | ChatMessageData>
 ```
 
-Transforms a Roll instance into a ChatMessage, displaying the roll result.<br/>
-This function can either create the ChatMessage directly, or return the data object that will be used to create.</br>
-Note: This is a core method from Foundry's `Roll` class that is overridden by the `YearZeroRoll` class with a single extra feature: the default speaker is defined.
+Transforms a Roll instance into a ChatMessage, displaying the roll result.
+
+This function can either create the ChatMessage directly, or return the data object that will be used to create.
+
+Note: This is a core method from Foundry's `Roll` class that is overridden by the `YearZeroRoll` class with a single extra feature: a default speaker is defined.
 
 ### Parameters
 

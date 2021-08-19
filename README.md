@@ -30,7 +30,7 @@ Features:
 - Support for all Year Zero games.
 - Custom Roll class with many extra getters for stunts, banes, traumas, gear damage, mishaps, ammo, etc.
 - Custom DiceTerm classes for each Year Zero dice.
-- Push support (except Alien atm).
+- Push support.
 - Custom roll template with push stack and push button.
 - Customisable settings.
 - Compatible with Foundry 0.8.8
@@ -271,6 +271,8 @@ DsN is supported but not configured. See the [API](https://gitlab.com/riccisi/fo
   <a href="https://stefouch.be" target="_blank">
     <img src="https://github.com/Stefouch/t2k4e/raw/master/assets/stefouch-banner.png" alt="Stefouch Gaming Lab" style="width: auto; height: auto; max-height: 100px;"/>
   </a>
+  <br/>
+  <span><i>Built by a fan, For the fans</i></span>
 </p>
 
 ### 👤 Stefouch
