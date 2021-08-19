@@ -1,39 +1,63 @@
 # YZUR Documentation
 
-- [YearZeroRoll](#yearzeroroll)
-  - [createFromDiceQuantities](#yearzerorollcreatefromdicequantities)
-  - [getTerms](#yearzerorollgetterms)
-  - [count](#yearzerorollcount)
-  - [addDice](#yearzerorolladddice)
-  - [removeDice](#yearzerorollremovedice)
-  - [push](#yearzerorollpush)
-  - [modify](#yearzerorollmodify)
-  - [getRollInfos](#yearzerorollgetrollinfos)
-  - [duplicate](#yearzerorollduplicate)
-- [YearZeroDie](#yearzerodie)
-  - [count](#yearzerodiecount)
-  - [push](#yearzerodiepush)
-  - Roll modifiers:
-    - [nopush](#yearzerodienopush)
-    - [setpush](#yearzerodiesetpush)
-  - Constants:
-    - [TYPE](#yearzerodietype)
-    - [LOCKED_VALUES](#yearzerodielocked_values)
-    - [DENOMINATION](#yearzerodiedenomination)
-    - [SERIALIZE_ATTRIBUTES](#yearzerodieserialize_attributes)
-    - [MODIFIERS](#yearzerodiemodifiers)
-- [YearZeroRollManager](#yearzerorollmanager)
-  - [register](#yearzerorollmanagerregister)
-  - [registerConfig](#yearzerorollmanagerregisterconfig)
-  - [registerRoll](#yearzerorollmanagerregisterroll)
-  - [registerDice](#yearzerorollmanagerregisterdice)
-  - [registerDie](#yearzerorollmanagerregisterdie)
-  - [_initialize](#yearzerorollmanager_initialize)
-  - [_overrideRollCreate](#yearzerorollmanager_overriderollcreate)
-  - Constants:
-    - [DIE_TYPES_MAP](#yearzerorollmanagerdie_types_map)
-    - [GAMES](#yearzerorollmanagergames)
-- [Config Constants](#config-constants)
+<table border="0">
+  <tr>
+    <th>[YearZeroRoll](#yearzeroroll)</th>
+    <th>[YearZeroDie](#yearzerodie)</th>
+    <th>[YearZeroRollManager](#yearzerorollmanager)</th>
+  </tr>
+  <tr>
+    <td>
+      <ul>
+        <li>[createFromDiceQuantities](#yearzerorollcreatefromdicequantities)</li>
+        <li>[getTerms](#yearzerorollgetterms)</li>
+        <li>[count](#yearzerorollcount)</li>
+        <li>[addDice](#yearzerorolladddice)</li>
+        <li>[removeDice](#yearzerorollremovedice)</li>
+        <li>[push](#yearzerorollpush)</li>
+        <li>[modify](#yearzerorollmodify)</li>
+        <li>[getRollInfos](#yearzerorollgetrollinfos)</li>
+        <li>[duplicate](#yearzerorollduplicate)</li>
+      </ul>
+    </td>
+    <td>
+      <ul>
+        <li>[count](#yearzerodiecount)</li>
+        <li>[push](#yearzerodiepush)</li>
+        <li>Roll modifiers:</li>
+        <ul>
+          <li>[nopush](#yearzerodienopush)</li>
+          <li>[setpush](#yearzerodiesetpush)</li>
+        </ul>
+        <li>Constants:</li>
+        <ul>
+          <li>[TYPE](#yearzerodietype)</li>
+          <li>[LOCKED_VALUES](#yearzerodielocked_values)</li>
+          <li>[DENOMINATION](#yearzerodiedenomination)</li>
+          <li>[SERIALIZE_ATTRIBUTES](#yearzerodieserialize_attributes)</li>
+          <li>[MODIFIERS](#yearzerodiemodifiers)</li>
+        </ul>
+      </ul>
+    </td>
+    <td>
+      <ul>
+        <li>[register](#yearzerorollmanagerregister)</li>
+        <li>[registerConfig](#yearzerorollmanagerregisterconfig)</li>
+        <li>[registerRoll](#yearzerorollmanagerregisterroll)</li>
+        <li>[registerDice](#yearzerorollmanagerregisterdice)</li>
+        <li>[registerDie](#yearzerorollmanagerregisterdie)</li>
+        <li>[_initialize](#yearzerorollmanager_initialize)</li>
+        <li>[_overrideRollCreate](#yearzerorollmanager_overriderollcreate)</li>
+        <li>Constants:</li>
+        <ul>
+          <li>[DIE_TYPES_MAP](#yearzerorollmanagerdie_types_map)</li>
+          <li>[GAMES](#yearzerorollmanagergames)</li>
+          <li>[Config Constants](#config-constants)</li>
+        </ul>
+      </ul>
+    </td>
+  </tr>
+</table>
 
 # YearZeroRoll
 
