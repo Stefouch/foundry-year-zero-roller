@@ -1,58 +1,58 @@
 # YZUR Documentation
 
-<table border="0">
+<table>
   <tr>
-    <th>[YearZeroRoll](#yearzeroroll)</th>
-    <th>[YearZeroDie](#yearzerodie)</th>
-    <th>[YearZeroRollManager](#yearzerorollmanager)</th>
+    <th><a href="#yearzeroroll">YearZeroRoll</a></th>
+    <th><a href="#yearzerodie">YearZeroDie</a></th>
+    <th><a href="#yearzerorollmanager">YearZeroRollManager</a></th>
   </tr>
   <tr>
     <td>
       <ul>
-        <li>[createFromDiceQuantities](#yearzerorollcreatefromdicequantities)</li>
-        <li>[getTerms](#yearzerorollgetterms)</li>
-        <li>[count](#yearzerorollcount)</li>
-        <li>[addDice](#yearzerorolladddice)</li>
-        <li>[removeDice](#yearzerorollremovedice)</li>
-        <li>[push](#yearzerorollpush)</li>
-        <li>[modify](#yearzerorollmodify)</li>
-        <li>[getRollInfos](#yearzerorollgetrollinfos)</li>
-        <li>[duplicate](#yearzerorollduplicate)</li>
+        <li><a href="#yearzerorollcreatefromdicequantities">createFromDiceQuantities</a></li>
+        <li><a href="#yearzerorollgetterms">getTerms</a></li>
+        <li><a href="#yearzerorollcount">count</a></li>
+        <li><a href="#yearzerorolladddice">addDice</a></li>
+        <li><a href="#yearzerorollremovedice">removeDice</a></li>
+        <li><a href="#yearzerorollpush">push</a></li>
+        <li><a href="#yearzerorollmodify">modify</a></li>
+        <li><a href="#yearzerorollgetrollinfos">getRollInfos</a></li>
+        <li><a href="#yearzerorollduplicate">duplicate</a></li>
       </ul>
     </td>
     <td>
       <ul>
-        <li>[count](#yearzerodiecount)</li>
-        <li>[push](#yearzerodiepush)</li>
+        <li><a href="#yearzerodiecount">count</a></li>
+        <li><a href="#yearzerodiepush">push</a></li>
         <li>Roll modifiers:</li>
         <ul>
-          <li>[nopush](#yearzerodienopush)</li>
-          <li>[setpush](#yearzerodiesetpush)</li>
+          <li><a href="#yearzerodienopush">nopush</a></li>
+          <li><a href="#yearzerodiesetpush">setpush</a></li>
         </ul>
         <li>Constants:</li>
         <ul>
-          <li>[TYPE](#yearzerodietype)</li>
-          <li>[LOCKED_VALUES](#yearzerodielocked_values)</li>
-          <li>[DENOMINATION](#yearzerodiedenomination)</li>
-          <li>[SERIALIZE_ATTRIBUTES](#yearzerodieserialize_attributes)</li>
-          <li>[MODIFIERS](#yearzerodiemodifiers)</li>
+          <li><a href="#yearzerodietype">TYPE</a></li>
+          <li><a href="#yearzerodielocked_values">LOCKED_VALUES</a></li>
+          <li><a href="#yearzerodiedenomination">DENOMINATION</a></li>
+          <li><a href="#yearzerodieserialize_attributes">SERIALIZE_ATTRIBUTES</a></li>
+          <li><a href="#yearzerodiemodifiers">MODIFIERS</a></li>
         </ul>
       </ul>
     </td>
     <td>
       <ul>
-        <li>[register](#yearzerorollmanagerregister)</li>
-        <li>[registerConfig](#yearzerorollmanagerregisterconfig)</li>
-        <li>[registerRoll](#yearzerorollmanagerregisterroll)</li>
-        <li>[registerDice](#yearzerorollmanagerregisterdice)</li>
-        <li>[registerDie](#yearzerorollmanagerregisterdie)</li>
-        <li>[_initialize](#yearzerorollmanager_initialize)</li>
-        <li>[_overrideRollCreate](#yearzerorollmanager_overriderollcreate)</li>
+        <li><a href="#yearzerorollmanagerregister">register</a></li>
+        <li><a href="#yearzerorollmanagerregisterconfig">registerConfig</a></li>
+        <li><a href="#yearzerorollmanagerregisterroll">registerRoll</a></li>
+        <li><a href="#yearzerorollmanagerregisterdice">registerDice</a></li>
+        <li><a href="#yearzerorollmanagerregisterdie">registerDie</a></li>
+        <li><a href="#yearzerorollmanager_initialize">_initialize</a></li>
+        <li><a href="#yearzerorollmanager_overriderollcreate">_overrideRollCreate</a></li>
         <li>Constants:</li>
         <ul>
-          <li>[DIE_TYPES_MAP](#yearzerorollmanagerdie_types_map)</li>
-          <li>[GAMES](#yearzerorollmanagergames)</li>
-          <li>[Config Constants](#config-constants)</li>
+          <li><a href="#yearzerorollmanagerdie_types_map">DIE_TYPES_MAP</a></li>
+          <li><a href="#yearzerorollmanagergames">GAMES</a></li>
+          <li><a href="#config-constants">Config Constants</a></li>
         </ul>
       </ul>
     </td>
