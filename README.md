@@ -272,7 +272,7 @@ DsN is supported but not configured. See the [API](https://gitlab.com/riccisi/fo
     <img src="https://github.com/Stefouch/t2k4e/raw/master/assets/stefouch-banner.png" alt="Stefouch Gaming Lab" style="width: auto; height: auto; max-height: 100px;"/>
   </a>
   <br/>
-  <span><i>Built by a fan, For the fans</i></span>
+  <span><i>Built by a fan, For the fans.</i></span>
 </p>
 
 ### 👤 Stefouch
