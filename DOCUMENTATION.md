@@ -18,7 +18,7 @@
         <li><a href="#yearzerorollpush">push</a></li>
         <li><a href="#yearzerorollgetrollinfos">getRollInfos</a></li>
         <li><a href="#yearzerorollduplicate">duplicate</a></li>
-        <li>Overridden Methods:</li>
+        <li>Overridden methods:</li>
         <ul>
           <li><a href="#yearzerorollcreate">create</a></li>
           <li><a href="#yearzerorollrender">render</a></li>
