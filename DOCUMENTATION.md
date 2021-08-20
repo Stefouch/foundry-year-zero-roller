@@ -648,12 +648,12 @@ List of GameTypeStrings.
 | Name | Type | Default | Description |
 | :-- | :-- | :--: | :-- |
 | YZUR.game | GameTypeString (string) | `""` | The name of the game used |
-| YZUR.CHAT.showInfos | boolean | true | Whether to show the roll infos template beneath the roll tooltip |
+| YZUR.CHAT.showInfos | boolean | `true` | Whether to show the roll infos template beneath the roll tooltip |
 | YZUR.CHAT.diceSorting | DieTypeString[] (string[]) | *default* | Defines the dice tooltips sorting order |
 | YZUR.ROLL.chatTemplate | string | *default* | The path to the roll message template |
 | YZUR.ROLL.tooltipTemplate | string | *default* | The path to the roll tooltip template |
 | YZUR.ROLL.infosTemplate | string | *default* | The path to the roll infos template |
-| YZUR.DICE.localizeDieTypes | boolean | true | Whether to localize the default die type flavor |
+| YZUR.DICE.localizeDieTypes | boolean | `true` | Whether to localize the default die type flavor |
 | YZUR.DICE.DIE_TYPES | object | *default* | Map of `{ DieTypeString: class }` pairs |
 | YZUR.DICE.DIE_TYPES_BY_CLASS | object | *default* | Map of `{ string: DieTypeString }` pairs |
 | YZUR.DICE.ICONS.getLabel | function | *default* | A customizable helper function for creating the labels of the die. Note: You must return a string or DsN will throw an error. |
