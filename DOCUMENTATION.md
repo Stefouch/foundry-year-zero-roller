@@ -14,12 +14,16 @@
         <li><a href="#yearzerorollcount">count</a></li>
         <li><a href="#yearzerorolladddice">addDice</a></li>
         <li><a href="#yearzerorollremovedice">removeDice</a></li>
-        <li><a href="#yearzerorollpush">push</a></li>
         <li><a href="#yearzerorollmodify">modify</a></li>
+        <li><a href="#yearzerorollpush">push</a></li>
         <li><a href="#yearzerorollgetrollinfos">getRollInfos</a></li>
-        <li><a href="#yearzerorollrender">render</a></li>
-        <li><a href="#yearzerorolltomessage">toMessage</a></li>
         <li><a href="#yearzerorollduplicate">duplicate</a></li>
+        <li>Overridden Methods:</li>
+        <ul>
+          <li><a href="#yearzerorollcreate">create</a></li>
+          <li><a href="#yearzerorollrender">render</a></li>
+          <li><a href="#yearzerorolltomessage">toMessage</a></li>
+        </ul>
       </ul>
     </td>
     <td>
@@ -87,10 +91,11 @@ new YearZeroRoll(formula, data, options)
 | formula | string | | The string formula to parse |
 | data | object | `{}` | The data object against which to parse attributes within the formula |
 | options | object | `{}` | Additional data which is preserved in the database |
-| options.game | string | *default* | The game used |
-| options.name | string | | The name of the roll |
-| options.maxPush | number | `1` | The maximum number of times the roll can be pushed |
+| ✨ options.game | string | `CONFIG .YZUR.game` \|&nbsp;`"myz"` | The game used |
+| ✨ options.name | string | | The name of the roll |
+| ✨ options.maxPush | number | `1` | The maximum number of times the roll can be pushed |
 
+<small><i>✨ Extra options not in the core Foundry's `Roll` class and added by the extend.</i></small>
 
 ## Additional Getters & Setters
 
@@ -100,8 +105,8 @@ The new `YearZeroRoll` class offers the following additional getters and setters
 
 | Name | Type | Default | Description |
 | :-- | :-- | :--: | :-- |
-| game | string | *default* | The code of the current game used. |
-| name | string | `null` | The name of the roll. |
+| game | string | | The code of the current game used. |
+| name | string | | The name of the roll. |
 | maxPush | number | `1` | The maximum number of pushes. |
 
 ### Read-only
@@ -131,6 +136,17 @@ If you need to count another specific result, use the `count(type, seed, compari
 
 Read more about the new methods and their documentation in the source code of the `yzur.js` library.
 
+## YearZeroRoll.create
+
+```js
+/** @override */
+(static) create(formula, data, options): YearZeroRoll
+```
+
+Creates a YearZeroRoll. Same as [`new YearZeroRoll(formula, data, options)`](#yearzeroroll).
+
+Note: This is a core method from Foundry's `Roll` class that is overridden by the `YearZeroRoll` class to always return a YearZeroRoll object, instead of using the first element found in `CONFIG.Dice.rolls[]`.
+
 ## YearZeroRoll.createFromDiceQuantities
 
 ```js
@@ -146,7 +162,7 @@ Generates a roll based on the number of dice.
 | dice | DiceQuantities (object) | `{}` | An object with quantities of dice |
 | options | object | `{}` | Additional options which configure the roll |
 | options.title | string | | The name of the roll |
-| options.yzGame | GameTypeString (string) | *default* | The game used |
+| options.yzGame | GameTypeString (string) | `CONFIG .YZUR.game` | The game used |
 | options.maxPush | number | `1` | The maximum number of pushes |
 | options.push | boolean | `false` | Whether to add a push modifier to the roll |
 
@@ -243,6 +259,20 @@ Removes a number of dice from the roll.
 | options.discard | boolean | `false` | Whether the term should be marked as "discarded" instead of removed |
 | options.disable | boolean | `false` | Whether the term should be marked as "active: false" instead of removed |
 
+## YearZeroRoll.modify
+
+```js
+(async) modify(mod): Promise<YearZeroRoll>
+```
+
+Applies a difficulty modifier to the roll.
+
+### Parameters
+
+| Name | Type | Default | Description |
+| :-- | :-- | :--: | :-- |
+| mod | number | `0` | Difficulty modifier (bonus or malus) |
+
 ## YearZeroRoll.push
 
 ```js
@@ -260,20 +290,6 @@ Pushes the roll, following the YZ rules.
 | options.maximize | boolean | `false` | Maximize the result, obtaining the largest possible value |
 | options.async | boolean | `false` | Evaluate the roll asynchronously, receiving a Promise as the returned value |
 
-## YearZeroRoll.modify
-
-```js
-(async) modify(mod): Promise<YearZeroRoll>
-```
-
-Applies a difficulty modifier to the roll.
-
-### Parameters
-
-| Name | Type | Default | Description |
-| :-- | :-- | :--: | :-- |
-| mod | number | `0` | Difficulty modifier (bonus or malus) |
-
 ## YearZeroRoll.getRollInfos
 
 ```js
@@ -286,7 +302,15 @@ Renders the infos of a Year Zero roll.
 
 | Name | Type | Default | Description |
 | :-- | :-- | :--: | :-- |
-| template | string | *default* | The path to the template |
+| template | string | `CONFIG.YZUR .ROLL.infosTemplate` | The path to the template |
+
+## YearZeroRoll.duplicate
+
+```js
+duplicate(): YearZeroRoll
+```
+
+Creates a deep clone copy of the roll.
 
 ## YearZeroRoll.render
 
@@ -337,18 +361,10 @@ Note: This is a core method from Foundry's `Roll` class that is overridden by th
 | messageData.type | number | `CONST .CHAT_MESSAGE_TYPES .ROLL` | The type to use for the message from `CONST.CHAT_MESSAGE_TYPES` |
 | messageData.sound | string | `CONFIG .sounds.dice` | The path to the sound played with the message (WAV format) |
 | options | object | `{}` | Additional options which modify the created message |
-| options.rollMode | string | *default* | The template roll mode to use for the message from `CONFIG.Dice.rollModes` |
+| options.rollMode | string | *default*<sup>1</sup> | The template roll mode to use for the message from `CONFIG.Dice.rollModes` |
 | options.create | boolean | `true` | Whether to automatically create the chat message, or only return the prepared chatData object |
 
-<small><i>✨ Extra feature added by the override.</i></small>
-
-## YearZeroRoll.duplicate
-
-```js
-duplicate(): YearZeroRoll
-```
-
-Creates a deep clone copy of the roll.
+<small><i>✨ Extra feature added by the override.</i><br/><i>1: `options.rollMode` default is `game.settings.get('core', 'rollMode')`</i>.</small>
 
 <p>&nbsp;</p>
 <hr/>
@@ -373,11 +389,13 @@ new YearZeroDie(termData)
 | termData | object | `{}` | Data used to create the Dice Term |
 | termData.number | number | `1` | The number of dice of this term to roll, before modifiers are applied |
 | termData.faces | number | `6` | The number of faces on each die of this type |
-| termData.maxPush | number | `1` | The maximum number of times this term can be pushed |
+| ✨ termData.maxPush | number | `1` | The maximum number of times this term can be pushed |
 | termData.modifiers | string[] | |  An array of modifiers applied to the results |
 | termData.results | DiceTermResult[] (object[]) | | An optional array of pre-cast results for the term |
 | termData.options | object | `{}` | Additional options that modify the term |
 | termData.options .flavor | string | | Optional flavor text which modifies and describes this term |
+
+<small><i>✨ Extra parameter not in the core Foundry's `Roll` class and added by the extend.</i></small>
 
 ## Additional Getters & Setters
 
