@@ -534,9 +534,15 @@ export class YearZeroRoll extends Roll {
   async modify(mod = 0) {
     if (!mod) return this;
 
+    // BLADE RUNNER RPG
+    // --------------------------------------------
+    if (this.game === 'br') {
+      // TODO
+    }
+
     // TWILIGHT 2000
     // --------------------------------------------
-    if (this.game === 't2k') {
+    else if (this.game === 't2k') {
       const diceMap = [null, 6, 8, 10, 12, Infinity];
       const typesMap = ['d', 'd', 'c', 'b', 'a', 'a'];
       const refactorRange = (range, n) => diceMap[diceMap.indexOf(range) + n];

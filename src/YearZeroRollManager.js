@@ -15,6 +15,7 @@ import { DieTypeError, GameTypeError } from './errors.js';
  * - `tales`: Tales From the Loop & Things From the Flood
  * - `vae`: Vaesen
  * - `t2k`: Twilight 2000
+ * - `br`: Blade Runner RPG
  * @typedef {string} GameTypeString
  */
 
@@ -28,12 +29,12 @@ import { DieTypeError, GameTypeError } from './errors.js';
  * - `artoD8`: D8 Artifact Die (locked on 6+, multiple successes)
  * - `artoD10`: D10 Artifact Die (locked on 6+, multiple successes)
  * - `artoD12`: D12 Artifact Die (locked on 6+, multiple successes)
- * - `a`: T2K D12 Die (locked on 1 and 6+, multiple successes)
- * - `b`: T2K D10 Die (locked on 1 and 6+, multiple successes)
- * - `c`: T2K D8 Die (locked on 1 and 6+)
- * - `d`: T2K D6 Die (locked on 1 and 6+)
+ * - `a`: T2K/BR D12 Die (locked on 1 and 6+, multiple successes)
+ * - `b`: T2K/BR D10 Die (locked on 1 and 6+, multiple successes)
+ * - `c`: T2K/BR D8 Die (locked on 1 and 6+)
+ * - `d`: T2K/BR D6 Die (locked on 1 and 6+)
  * - `ammo`: T2K Ammo Die (locked on 1 and 6, not success but hit)
- * - `loc`: Location Die
+ * - `loc`: Hit Location Die
  * @typedef {string} DieTypeString
  */
 
@@ -53,10 +54,10 @@ import { DieTypeError, GameTypeError } from './errors.js';
  * @property {?number}  artoD8   The quantity of artoD8 dice
  * @property {?number}  artoD10  The quantity of artoD10 dice
  * @property {?number}  artoD12  The quantity of artoD12 dice
- * @property {?number}  a        The quantity of T2K D12 dice
- * @property {?number}  b        The quantity of T2K D10 dice
- * @property {?number}  c        The quantity of T2K D8 dice
- * @property {?number}  d        The quantity of T2K D6 dice
+ * @property {?number}  a        The quantity of T2K/BR D12 dice
+ * @property {?number}  b        The quantity of T2K/BR D10 dice
+ * @property {?number}  c        The quantity of T2K/BR D8 dice
+ * @property {?number}  d        The quantity of T2K/BR D6 dice
  * @property {?number}  ammo     The quantity of ammo dice
  * @property {?number}  loc      The quantity of location dice
  */
@@ -229,6 +230,8 @@ YearZeroRollManager.DIE_TYPES_MAP = {
   'vae': ['skill'],
   // Twilight 2000
   't2k': ['a', 'b', 'c', 'd', 'ammo', 'loc'],
+  // Blade Runner
+  'br': ['a', 'b', 'c', 'd'],
 };
 
 /** @type {GameTypeString[]} */
