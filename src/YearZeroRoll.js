@@ -11,7 +11,7 @@ import { GameTypeError } from './errors.js';
  * Custom Roll class for Year Zero games.
  * @extends {Roll} The Foundry Roll class
  */
-export class YearZeroRoll extends Roll {
+export default class YearZeroRoll extends Roll {
   /**
    * @param {string} formula  The string formula to parse
    * @param {Object} data     The data object against which to parse attributes within the formula
@@ -534,15 +534,9 @@ export class YearZeroRoll extends Roll {
   async modify(mod = 0) {
     if (!mod) return this;
 
-    // BLADE RUNNER RPG
+    // TWILIGHT 2000 & BLADE RUNNER
     // --------------------------------------------
-    if (this.game === 'br') {
-      // TODO
-    }
-
-    // TWILIGHT 2000
-    // --------------------------------------------
-    else if (this.game === 't2k') {
+    else if (this.game === 't2k' || this.game === 'br') {
       const diceMap = [null, 6, 8, 10, 12, Infinity];
       const typesMap = ['d', 'd', 'c', 'b', 'a', 'a'];
       const refactorRange = (range, n) => diceMap[diceMap.indexOf(range) + n];
@@ -551,38 +545,60 @@ export class YearZeroRoll extends Roll {
       const _terms = this.getTerms('base');
       const dice = _terms.flatMap(t => new Array(t.number).fill(t.faces));
 
-      // 1 — Modifies the dice ranges.
-      while (mod !== 0) {
-        let i;
-        // 1.1.1 — A positive modifier increases the lowest term.
+      // BLADE RUNNER
+      if (this.game === 'br') {
+        // Gets the lowest term.
+        const lowest = Math.min(...dice);
+
+        // A positive modifier means advantage.
+        // An advantage adds a third base die, same value as lowest.
         if (mod > 0) {
-          i = dice.indexOf(Math.min(...dice));
-          dice[i] = refactorRange(dice[i], 1);
-          mod--;
+          dice.push(lowest);
         }
-        // 1.1.2 — A negative modifier decreases the highest term.
-        else {
-          i = dice.indexOf(Math.max(...dice));
-          dice[i] = refactorRange(dice[i], -1);
-          mod++;
+        // A negative modifier means disadvantage.
+        // A disadvantage removes the lowest die.
+        else if (mod < 0) {
+          const i = dice.indexOf(lowest);
+          dice.splice(i, 1);
         }
-        // 1.2 — Readjusts term faces.
-        if (dice[i] === Infinity) {
-          dice[i] = refactorRange(dice[i], -1);
-          if (dice.length < 2) {
-            dice.push(diceMap[1]);
-          }
-        }
-        else if (dice[i] === null) {
-          if (dice.length > 1) {
-            dice.splice(i, 1);
-          }
-          else {
+        mod = 0;
+      }
+
+      // TWILIGHT 2000
+      else {
+        // 1 — Modifies the dice ranges.
+        while (mod !== 0) {
+          let i;
+          // 1.1.1 — A positive modifier increases the lowest term.
+          if (mod > 0) {
+            i = dice.indexOf(Math.min(...dice));
             dice[i] = refactorRange(dice[i], 1);
+            mod--;
           }
-        }
-        else if (dice[i] === undefined) {
-          throw new Error(`YZUR | YearZeroRoll#modify<T2K> | dice[${i}] is out of bounds (mod: ${mod})`);
+          // 1.1.2 — A negative modifier decreases the highest term.
+          else {
+            i = dice.indexOf(Math.max(...dice));
+            dice[i] = refactorRange(dice[i], -1);
+            mod++;
+          }
+          // 1.2 — Readjusts term faces.
+          if (dice[i] === Infinity) {
+            dice[i] = refactorRange(dice[i], -1);
+            if (dice.length < 2) {
+              dice.push(diceMap[1]);
+            }
+          }
+          else if (dice[i] === null) {
+            if (dice.length > 1) {
+              dice.splice(i, 1);
+            }
+            else {
+              dice[i] = refactorRange(dice[i], 1);
+            }
+          }
+          else if (dice[i] === undefined) {
+            throw new Error(`YZUR | YearZeroRoll#modify<T2K> | dice[${i}] is out of bounds (mod: ${mod})`);
+          }
         }
       }
       // 2 — Filters out all the base terms.
@@ -794,63 +810,6 @@ export class YearZeroRoll extends Roll {
         return at - bt;
       });
     // <==
-    // TODO clean this commented-out code at next Foundry version.
-    // const parts = this.dice.map(d => {
-    //   const cls = d.constructor;
-    //   return {
-    //     formula: d.formula,
-    //     total: d.total,
-    //     faces: d.faces,
-    //     // ==>
-    //     // // flavor: d.options.flavor,
-    //     flavor: d.options.flavor || (
-    //       CONFIG.YZUR?.DICE?.localizeDieTypes
-    //         ? game.i18n.localize(`YZUR.DIETYPES.${cls.name}`)
-    //         : null
-    //     ),
-    //     number: d.number,
-    //     // // rolls: d.results.map(r => {
-    //     rolls: d.results.map((r, i) => {
-    //       // <==
-    //       const hasSuccess = r.success !== undefined;
-    //       const hasFailure = r.failure !== undefined;
-    //       // ==>
-    //       // // const isMax = r.result === d.faces;
-    //       // // const isMin = r.result === 1;
-    //       let isMax = false, isMin = false;
-    //       if (d.type === 'neg') {
-    //         isMax = false;
-    //         isMin = r.result === 6;
-    //       }
-    //       else {
-    //         isMax = r.result === d.faces || r.count >= 1;
-    //         isMin = r.result === 1 && d.type !== 'skill' && d.type !== 'loc';
-    //       }
-    //       // <==
-    //       return {
-    //         result: cls.getResultLabel(r.result),
-    //         // ==>
-    //         row: r.indexPush,
-    //         col: r.indexResult,
-    //         // <==
-    //         classes: [
-    //           cls.name.toLowerCase(),
-    //           'd' + d.faces,
-    //           r.success ? 'success' : null,
-    //           r.failure ? 'failure' : null,
-    //           r.rerolled ? 'rerolled' : null,
-    //           r.exploded ? 'exploded' : null,
-    //           r.discarded ? 'discarded' : null,
-    //           // ==>
-    //           r.pushed ? 'pushed' : null,
-    //           // <==
-    //           !(hasSuccess || hasFailure) && isMin ? 'min' : null,
-    //           !(hasSuccess || hasFailure) && isMax ? 'max' : null,
-    //         ].filter(c => c).join(' '),
-    //       };
-    //     }),
-    //   };
-    // });
     // START MODIFIED PART ==>
     if (this.pushed) {
       // Converts "parts.rolls" into a matrix.
@@ -988,22 +947,6 @@ export class YearZeroRoll extends Roll {
   /* -------------------------------------------- */
   /*  JSON                                        */
   /* -------------------------------------------- */
-
-  // TODO clean
-  // /** @override */
-  // static fromData(data) {
-  //   const roll = super.fromData(data);
-  //   roll.data = data.data ?? {};
-  //   return roll;
-  // }
-
-  // /** @override */
-  // toJSON() {
-  //   return {
-  //     ...super.toJSON(),
-  //     data: this.data,
-  //   };
-  // }
 
   /**
    * Creates a deep clone copy of the roll.
