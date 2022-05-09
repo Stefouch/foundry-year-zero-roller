@@ -28,7 +28,7 @@
  */
 
 import YearZeroRollManager from './YearZeroRollManager.js';
-import { YearZeroRoll } from './YearZeroRoll.js';
+import YearZeroRoll from './YearZeroRoll.js';
 import * as YearZeroDice from './YearZeroDice.js';
 import YZUR from './constants.js';
 import * as YzurErrors from './errors.js';
