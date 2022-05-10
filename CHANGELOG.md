@@ -4,7 +4,12 @@ All notable changes to this project will be documented in this file.
 <br/>and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [4.0.0] - Unreleased
-> Work in progress
+> :warning: **BREAKING CHANGE**
+> Accessing the classes might have changed.
+
+### Added
+- Blade Runner RPG support.
+- `isPrivate` in chat data for the roll template.
 
 ## [3.0.0] - 2021-08-19
 > :warning: **BREAKING CHANGE**
