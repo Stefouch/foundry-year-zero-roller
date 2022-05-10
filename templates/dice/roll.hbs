@@ -7,7 +7,7 @@
       <div class="dice-result">
         <div class="dice-formula">{{formula}}</div>
         {{{tooltip}}}
-        {{#if t2k}}
+        {{#if (and t2k (not isPrivate))}}
         <h4 class="dice-total">{{baseSuccessQty}}{{#if ammoSpent}}&nbsp;({{hitCount}}){{/if}}</h4>
         {{else}}
         <h4 class="dice-total">{{total}}</h4>
