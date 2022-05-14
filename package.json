@@ -6,6 +6,7 @@
   "scripts": {
     "build": "gulp build",
     "bump": "gulp bump --release",
+    "release": "gulp release",
     "update": "npm outdated && npm update",
     "watch": "gulp watch"
   },
