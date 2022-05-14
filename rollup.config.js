@@ -14,7 +14,7 @@ module.exports = {
         banner: {
           commentStyle: 'regular',
           content: {
-            file: './src/LICENCE_BANNER',
+            file: './src/LICENSE_BANNER',
             encoding: 'utf-8',
           },
           data() {
