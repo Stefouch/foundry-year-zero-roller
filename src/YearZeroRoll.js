@@ -400,7 +400,7 @@ export default class YearZeroRoll extends Roll {
     }
     // If the DieTerm doesn't exist, creates it.
     else {
-      const cls = YZUR.DICE.DIE_TYPES[type];
+      const cls = CONFIG.YZUR.DICE.DIE_TYPES[type];
       term = new cls({
         number: qty,
         faces: range,
