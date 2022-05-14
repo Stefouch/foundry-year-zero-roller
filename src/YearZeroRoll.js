@@ -266,10 +266,10 @@ export default class YearZeroRoll extends Roll {
    * @param {string}         [title]      The name of the roll
    * @param {GameTypeString} [yzGame]     The game used
    * @param {number}         [maxPush=1]  The maximum number of pushes
-   * @param {boolean}        [push=false] Whether to add a push modifier to the roll
-   * @override
+   * @returns {YearZeroRoll}
+   * @static
    */
-  static createFromDiceQuantities(dice = {}, { title, yzGame = null, maxPush = 1, push = false } = {}) {
+  static forge(dice = {}, { title, yzGame = null, maxPush = 1, push = false } = {}) {
     // Checks the game.
     yzGame = yzGame ?? CONFIG.YZUR?.game;
     if (!YearZeroRollManager.GAMES.includes(yzGame)) throw new GameTypeError(yzGame);
@@ -295,6 +295,14 @@ export default class YearZeroRoll extends Roll {
     const roll = new YearZeroRoll(formula, { name: title, game: yzGame, maxPush });
     if (CONFIG.debug.dice) console.log(roll);
     return roll;
+  }
+
+  /** @deprecated */
+  // eslint-disable-next-line no-unused-vars
+  static createFromDiceQuantities(dice = {}, { title, yzGame = null, maxPush = 1, push = false } = {}) {
+    // eslint-disable-next-line max-len
+    console.warn('YZUR | createFromDiceQuantities() is deprecated and will be removed in a future release. Use forge()instead.');
+    return YearZeroRoll.forge(dice, { title, yzGame, maxPush });
   }
 
   /* -------------------------------------------- */
@@ -636,7 +644,10 @@ export default class YearZeroRoll extends Roll {
     // --------------------------------------------
     else {
       const skill = this.count('skill');
-      if (mod < 0) mod = Math.max(-skill + 1, mod); // Minimum of 1 skill die
+      if (mod < 0) {
+        // Minimum of 1 skill die.
+        mod = Math.max(-skill + 1, mod);
+      }
       await this.addDice(mod, 'skill');
     }
 
