@@ -486,7 +486,7 @@ LocationDie.LOCKED_VALUES = [1, 2, 3, 4, 5, 6];
  * BladeRunner Die: 1 cannot be re-rolled.
  * @extends {ArtifactDie} But LOCKED_VALUES are not the same
  */
- export class BladeRunnerDie extends ArtifactDie {
+export class BladeRunnerDie extends ArtifactDie {
   /** @override */
   getResultLabel(result) {
     return CONFIG.YZUR.DICE.ICONS.getLabel('base', result.result);
@@ -530,4 +530,4 @@ export class D12BladeRunnerDie extends BladeRunnerDie {
   }
 }
 D12BladeRunnerDie.DENOMINATION = '12';
-D10BladeRunnerDie.LOCKED_VALUES = [1, 10, 11, 12];
+D12BladeRunnerDie.LOCKED_VALUES = [1, 10, 11, 12];
