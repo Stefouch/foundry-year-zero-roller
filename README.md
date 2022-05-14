@@ -25,30 +25,30 @@ This is a collection of helper methods and classes for rolling **Year Zero Engin
 
 Features:
 
-- Simple integration: add the `yzur.js` and the `/templates` in your project and initialize them in your main init script.
-- Documented methods.
-- Support for all Year Zero games.
+- Simple integration: add the `yzur.js` and the `/templates` in your project and initialize them in your main init script
+- Documented methods
+- Support for all Year Zero games
 - Custom Roll class with many extra getters for stunts, banes, traumas, gear damage, mishaps, ammo, etc.
-- Custom DiceTerm classes for each Year Zero dice.
-- Push support.
-- Custom roll template with push stack and push button.
-- Customisable settings.
-- Compatible with Foundry 0.8.8
+- Custom DiceTerm classes for each Year Zero dice
+- Push support
+- Custom roll template with push stack and push button
+- Customisable settings
+- Compatible with Foundry 0.8.8 and V9
 - Compatible with Dice So Nice!
 
 Not included:
 
-- Roll dialog.
-- Chat Message push button listener (you have to create one and call the roll.push() method, see example below).
-- Dice So Nice configuration.
+- Roll dialog
+- Chat Message push button listener (you have to create one and call the roll.push() method, see example below)
+- Dice So Nice configuration
 
 # How to Set Up
 
-1. Copy the following files and folders in your Foundry system:
+1. Copy the `yzur.js` library (see releases) in your Foundry system (e.g. in a 'lib' folder).
+
+2. (optional) Copy the templates in your Foundry system:
 
 ```css
-lib/
-  yzur.js
 templates/
   dice/
     infos.hbs
@@ -59,7 +59,7 @@ templates/
 2. In your main script, import the library:
 
 ```js
-import { YearZeroRollManager } from './dist/yzur.js';
+import { YearZeroRollManager } from './lib/yzur.js';
 ```
 
 3. In your init hook, initialize the dice with the `.register()` method.<br/>
@@ -86,7 +86,7 @@ Hooks.once('init', function() {
 
 Use the `YearZeroRoll` class, which extends the default Foundry's Roll class.
 
-Either create your own formula with it, or use the `.createFromDiceQuantities()` static method.
+Either create your own formula with it, or use the `.forge()` static method.
 
 ```js
 import { YearZeroRoll } from './lib/yzur.js';
@@ -109,7 +109,7 @@ let roll;
 roll = Roll.create('<my_formula>', { yzur: true });
 roll = YearZeroRoll.create('<my_formula>');
 roll = new YearZeroRoll('<my_formula>', data, options);
-roll = YearZeroRoll.createFromDiceQuantities(dice);
+roll = YearZeroRoll.forge(dice);
 
 // Roll the roll, same methods as usual
 await roll.roll({ async: true });
@@ -121,7 +121,7 @@ await roll.toMessage();
 The `.modify(n)` method allows you to add a difficulty modifier to the roll.
 
 ```js
-let roll = YearZeroRoll.createFromDiceQuantities(dice);
+let roll = YearZeroRoll.forge(dice);
 
 // Modify the roll.
 let modifier = -1;
@@ -145,7 +145,7 @@ roll.removeDice(1, 'skill');
 ## Push
 
 ```js
-let roll = YearZeroRoll.createFromDiceQuantities(dice);
+let roll = YearZeroRoll.forge(dice);
 
 // Push the roll.
 await roll.push({ async: true });
@@ -217,11 +217,12 @@ Read The Fucking Manual here: [DOCUMENTATION](./DOCUMENTATION.md).
 | Game | Code | Dice & Denominations |
 | :-- | :-- | :-- |
 | Alien RPG | `alien` | `skill: s`<br/>`stress: z` |
+| Blade Runner RPG | `br` | `brD12: 12`<br/>`brD10: 10`<br/>`brD8: 8`<br/>`brD6: 6` |
 | Coriolis: The Third Horizon | `cor` | `skill: s` |
 | Forbidden Lands | `fbl` | `base: b`<br/>`skill: s`<br/>`gear: g`<br/>`neg: n`<br/>`artoD8: 8`<br/>`artoD10: 10`<br/>`artoD12: 12` |
 | Mutant: Year Zero | `myz` | `base: b`<br/>`skill: s`<br/>`gear: g`<br/>`neg: n` |
 | Tales From the Loop | `tales` | `skill: s` |
-| Twilight 2000 (4th Edition) | `t2k` | `a: a`<br/>`b: b`<br/>`c: c`<br/>`d: d`<br/>`ammo: m`<br/>`loc: l` |
+| Twilight 2000 (4th Edition) | `t2k` | `a: 12`<br/>`b: 10`<br/>`c: 8`<br/>`d: 6`<br/>`ammo: m`<br/>`loc: l` |
 | Vaesen | `vae` | `skill: s` |
 
 ### Examples of commands in the chat

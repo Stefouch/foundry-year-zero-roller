@@ -35,6 +35,10 @@ const YZUR = {
       'd': YearZeroDice.D6TwilightDie,
       'ammo': YearZeroDice.AmmoDie,
       'loc': YearZeroDice.LocationDie,
+      'brD12': YearZeroDice.D12BladeRunnerDie,
+      'brD10': YearZeroDice.D10BladeRunnerDie,
+      'brD8': YearZeroDice.D8BladeRunnerDie,
+      'brD6': YearZeroDice.D6BladeRunnerDie,
     },
     ICONS: {
       /**
@@ -209,6 +213,22 @@ const YZUR = {
           '4': 'T',
           '5': 'A',
           '6': 'H',
+        },
+      },
+      br: {
+        base: {
+          '1': '🦄',
+          '2': 2,
+          '3': 3,
+          '4': 4,
+          '5': 5,
+          '6': 6,
+          '7': 7,
+          '8': 8,
+          '9': 9,
+          '10': 10,
+          '11': 11,
+          '12': 12,
         },
       },
     },

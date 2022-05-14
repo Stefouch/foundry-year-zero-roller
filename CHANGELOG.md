@@ -3,6 +3,30 @@ All notable changes to this project will be documented in this file.
 <br/>The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 <br/>and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0] - Unreleased
+> :warning: **BREAKING CHANGE**
+> Importing the module has changed (reverted back to previous).
+
+```js
+before:   import YZUR      from './dist/yzur.js';
+after:    import * as YZUR from './dist/yzur.js';
+```
+
+### Added
+- Blade Runner RPG support.
+- `isPrivate` in chat data for the roll template.
+
+### Changed
+- `YearZeroRoll#createFromDiceQuantities()` renamed to `forge()`. *(That function name was really too long.)*
+
+### Removed
+- YzurErrors removed from main export.
+- `push` property in `YearZeroRoll#createFromDiceQuantities()`. *(Was useless.)*
+
+### Fixed
+- Some minor fixes.
+- Updated the README and DOCUMENTATION help files.
+
 ## [3.0.0] - 2021-08-19
 > :warning: **BREAKING CHANGE**
 > The YZUR library is now compiled with rollup. Accessing the classes might have changed.

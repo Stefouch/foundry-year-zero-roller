@@ -1,4 +1,4 @@
-import { YearZeroRoll } from './YearZeroRoll.js';
+import YearZeroRoll from './YearZeroRoll.js';
 import YZUR from './constants.js';
 import { DieTypeError, GameTypeError } from './errors.js';
 
@@ -15,6 +15,7 @@ import { DieTypeError, GameTypeError } from './errors.js';
  * - `tales`: Tales From the Loop & Things From the Flood
  * - `vae`: Vaesen
  * - `t2k`: Twilight 2000
+ * - `br`: Blade Runner RPG
  * @typedef {string} GameTypeString
  */
 
@@ -28,12 +29,16 @@ import { DieTypeError, GameTypeError } from './errors.js';
  * - `artoD8`: D8 Artifact Die (locked on 6+, multiple successes)
  * - `artoD10`: D10 Artifact Die (locked on 6+, multiple successes)
  * - `artoD12`: D12 Artifact Die (locked on 6+, multiple successes)
- * - `a`: T2K D12 Die (locked on 1 and 6+, multiple successes)
- * - `b`: T2K D10 Die (locked on 1 and 6+, multiple successes)
- * - `c`: T2K D8 Die (locked on 1 and 6+)
- * - `d`: T2K D6 Die (locked on 1 and 6+)
- * - `ammo`: T2K Ammo Die (locked on 1 and 6, not success but hit)
- * - `loc`: Location Die
+ * - `a`: Twilight 2000's D12 Die (locked on 1 and 6+, multiple successes)
+ * - `b`: Twilight 2000's D10 Die (locked on 1 and 6+, multiple successes)
+ * - `c`: Twilight 2000's D8 Die (locked on 1 and 6+)
+ * - `d`: Twilight 2000's D6 Die (locked on 1 and 6+)
+ * - `ammo`: Twilight 2000's Ammo Die (locked on 1 and 6, not success but hit)
+ * - `loc`: Twilight 2000's Location Die
+ * - `brD12`: Blade Runner's D12 Die (locked on 1 and 10+)
+ * - `brD10`: Blade Runner's D10 Die (locked on 1 and 10)
+ * - `brD8`: Blade Runner's D8 Die (locked on 1 and 6+)
+ * - `brD6`: Blade Runner's D6 Die (locked on 1 and 6)
  * @typedef {string} DieTypeString
  */
 
@@ -53,12 +58,16 @@ import { DieTypeError, GameTypeError } from './errors.js';
  * @property {?number}  artoD8   The quantity of artoD8 dice
  * @property {?number}  artoD10  The quantity of artoD10 dice
  * @property {?number}  artoD12  The quantity of artoD12 dice
- * @property {?number}  a        The quantity of T2K D12 dice
- * @property {?number}  b        The quantity of T2K D10 dice
- * @property {?number}  c        The quantity of T2K D8 dice
- * @property {?number}  d        The quantity of T2K D6 dice
- * @property {?number}  ammo     The quantity of ammo dice
- * @property {?number}  loc      The quantity of location dice
+ * @property {?number}  a        The quantity of Twilight 2000's D12 dice
+ * @property {?number}  b        The quantity of Twilight 2000's D10 dice
+ * @property {?number}  c        The quantity of Twilight 2000's D8 dice
+ * @property {?number}  d        The quantity of Twilight 2000's D6 dice
+ * @property {?number}  ammo     The quantity of Twilight 2000's ammo dice
+ * @property {?number}  loc      The quantity of Twilight 2000's location dice (usually, one)
+ * @property {?number}  brD12    The quantity of Blade Runner's D12 dice
+ * @property {?number}  brD10    The quantity of Blade Runner's D10 dice
+ * @property {?number}  brD8     The quantity of Blade Runner's D8 dice
+ * @property {?number}  brD6     The quantity of Blade Runner's D6 dice
  */
 
 
@@ -90,17 +99,18 @@ export default class YearZeroRollManager {
    * 
    * You must call this method in `Hooks.once('init')`.
    * 
-   * @param {GameTypeString}  yzGame  The game used (for the choice of die types to register).
-   * @param {object}         [config] Custom config to merge with the initial config.
+   * @param {GameTypeString} yzGame  The game used (for the choice of die types to register).
+   * @param {object}        [config] Custom config to merge with the initial config.
+   * @param {object}        [data]   Additional data.
    * @static
    */
-  static register(yzGame, config) {
+  static register(yzGame, config, data = {}) {
     // Registers the config.
     YearZeroRollManager.registerConfig(config);
     // Registers the YZ game.
     YearZeroRollManager._initialize(yzGame);
     // Registers the dice.
-    YearZeroRollManager.registerDice(yzGame);
+    YearZeroRollManager.registerDice(yzGame, data?.index);
     console.log('YZUR | Registration complete!');
   }
 
@@ -116,10 +126,11 @@ export default class YearZeroRollManager {
 
   /**
    * Registers all the Year Zero Dice.
-   * @param {?GameTypeString} yzGame The game used (for the choice of die types to register)
+   * @param {GameTypeString} [yzGame] The game used (for the choice of die types to register)
+   * @param {number}         [i=0]    Index of the registration
    * @static
    */
-  static registerDice(yzGame) {
+  static registerDice(yzGame, i) {
     // Registers all the dice if `game` is omitted.
     if (!yzGame) {
       throw new SyntaxError('YZUR | A game must be specified for the registration.');
@@ -133,7 +144,7 @@ export default class YearZeroRollManager {
     for (const type of diceTypes) YearZeroRollManager.registerDie(type);
 
     // Finally, registers our custom Roll class for Year Zero games.
-    YearZeroRollManager.registerRoll();
+    YearZeroRollManager.registerRoll(undefined, i);
   }
 
   /**
@@ -193,6 +204,15 @@ export default class YearZeroRollManager {
     console.log(`YZUR | The name of the Year Zero game is: "${yzGame}".`);
   }
 
+  /**
+   * Overrides the default Foundry Roll prototype to inject our own create() function. 
+   * When creating a roll, the Roll prototype will now check if the formula has a YZE pattern. 
+   * If so, it uses our method, otherwise it returns to the Foundry defaults.
+   * @param {number} [index=1] What index of our own Roll class in the Foundry CONFIG.Dice.rolls array.
+   * @returns {YearZerRoll|Roll}
+   * @private
+   * @static
+   */
   static _overrideRollCreate(index = 1) {
     Roll.prototype.constructor.create = function(formula, data = {}, options = {}) {
       const YZURFormula = data.yzur
@@ -229,6 +249,8 @@ YearZeroRollManager.DIE_TYPES_MAP = {
   'vae': ['skill'],
   // Twilight 2000
   't2k': ['a', 'b', 'c', 'd', 'ammo', 'loc'],
+  // Blade Runner
+  'br': ['brD12', 'brD10', 'brD8', 'brD6'],
 };
 
 /** @type {GameTypeString[]} */

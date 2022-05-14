@@ -9,7 +9,7 @@
   <tr>
     <td>
       <ul>
-        <li><a href="#yearzerorollcreatefromdicequantities">createFromDiceQuantities</a></li>
+        <li><a href="#yearzerorollforge">forge</a></li>
         <li><a href="#yearzerorollgetterms">getTerms</a></li>
         <li><a href="#yearzerorollcount">count</a></li>
         <li><a href="#yearzerorolladddice">addDice</a></li>
@@ -147,10 +147,10 @@ Creates a YearZeroRoll. Same as [`new YearZeroRoll(formula, data, options)`](#ye
 
 Note: This is a core method from Foundry's `Roll` class that is overridden by the `YearZeroRoll` class to always return a YearZeroRoll object, instead of using the first element found in `CONFIG.Dice.rolls[]`.
 
-## YearZeroRoll.createFromDiceQuantities
+## YearZeroRoll.forge
 
 ```js
-(static) createFromDiceQuantities(dice, options): YearZeroRoll
+(static) forge(dice, options): YearZeroRoll
 ```
 
 Generates a roll based on the number of dice.
@@ -164,7 +164,6 @@ Generates a roll based on the number of dice.
 | options.title | string | | The name of the roll |
 | options.yzGame | GameTypeString (string) | `CONFIG .YZUR.game` | The game used |
 | options.maxPush | number | `1` | The maximum number of pushes |
-| options.push | boolean | `false` | Whether to add a push modifier to the roll |
 
 ## YearZeroRoll.getTerms
 
@@ -364,7 +363,7 @@ Note: This is a core method from Foundry's `Roll` class that is overridden by th
 | options.rollMode | string | *default*<sup>1</sup> | The template roll mode to use for the message from `CONFIG.Dice.rollModes` |
 | options.create | boolean | `true` | Whether to automatically create the chat message, or only return the prepared chatData object |
 
-<small><i>✨ Extra feature added by the override.</i><br/><i>1: `options.rollMode` default is `game.settings.get('core', 'rollMode')`</i>.</small>
+<small><i>✨ Extra feature added by the override.</i><br/><i>1: `options.rollMode`'s default is `game.settings.get('core', 'rollMode')`</i>.</small>
 
 <p>&nbsp;</p>
 <hr/>

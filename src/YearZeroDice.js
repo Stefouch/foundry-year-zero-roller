@@ -479,3 +479,55 @@ export class LocationDie extends YearZeroDie {
 LocationDie.TYPE = 'loc';
 LocationDie.DENOMINATION = 'l';
 LocationDie.LOCKED_VALUES = [1, 2, 3, 4, 5, 6];
+
+/* -------------------------------------------- */
+
+/**
+ * BladeRunner Die: 1 cannot be re-rolled.
+ * @extends {ArtifactDie} But LOCKED_VALUES are not the same
+ */
+export class BladeRunnerDie extends ArtifactDie {
+  /** @override */
+  getResultLabel(result) {
+    return CONFIG.YZUR.DICE.ICONS.getLabel('base', result.result);
+  }
+}
+BladeRunnerDie.TYPE = 'base';
+BladeRunnerDie.SUCCESS_TABLE = [null, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2];
+BladeRunnerDie.LOCKED_VALUES = [1];
+
+export class D6BladeRunnerDie extends BladeRunnerDie {
+  constructor(termData = {}) {
+    termData.faces = 6;
+    super(termData);
+  }
+}
+D6BladeRunnerDie.DENOMINATION = '6';
+D6BladeRunnerDie.LOCKED_VALUES = [1, 6];
+
+export class D8BladeRunnerDie extends BladeRunnerDie {
+  constructor(termData = {}) {
+    termData.faces = 8;
+    super(termData);
+  }
+}
+D8BladeRunnerDie.DENOMINATION = '8';
+D8BladeRunnerDie.LOCKED_VALUES = [1, 6, 7, 8];
+
+export class D10BladeRunnerDie extends BladeRunnerDie {
+  constructor(termData = {}) {
+    termData.faces = 10;
+    super(termData);
+  }
+}
+D10BladeRunnerDie.DENOMINATION = '10';
+D10BladeRunnerDie.LOCKED_VALUES = [1, 10];
+
+export class D12BladeRunnerDie extends BladeRunnerDie {
+  constructor(termData = {}) {
+    termData.faces = 12;
+    super(termData);
+  }
+}
+D12BladeRunnerDie.DENOMINATION = '12';
+D12BladeRunnerDie.LOCKED_VALUES = [1, 10, 11, 12];

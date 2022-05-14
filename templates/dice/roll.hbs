@@ -1,4 +1,4 @@
-<div class="t2k4e chat-card">
+<div class="yzur chat-card">
   <div class="card-content">
     <div class="dice-roll">
       {{#if flavor}}
@@ -7,7 +7,7 @@
       <div class="dice-result">
         <div class="dice-formula">{{formula}}</div>
         {{{tooltip}}}
-        {{#if t2k}}
+        {{#if (and t2k (not isPrivate))}}
         <h4 class="dice-total">{{baseSuccessQty}}{{#if ammoSpent}}&nbsp;({{hitCount}}){{/if}}</h4>
         {{else}}
         <h4 class="dice-total">{{total}}</h4>
