@@ -99,9 +99,9 @@ export default class YearZeroRollManager {
    * 
    * You must call this method in `Hooks.once('init')`.
    * 
-   * @param {GameTypeString}  yzGame  The game used (for the choice of die types to register).
-   * @param {object}         [config] Custom config to merge with the initial config.
-   * @param {object}         [data]   Additional data to transfer.
+   * @param {GameTypeString} yzGame  The game used (for the choice of die types to register).
+   * @param {object}        [config] Custom config to merge with the initial config.
+   * @param {object}        [data]   Additional data.
    * @static
    */
   static register(yzGame, config, data = {}) {
@@ -110,7 +110,7 @@ export default class YearZeroRollManager {
     // Registers the YZ game.
     YearZeroRollManager._initialize(yzGame);
     // Registers the dice.
-    YearZeroRollManager.registerDice(yzGame, data.index);
+    YearZeroRollManager.registerDice(yzGame, data?.index);
     console.log('YZUR | Registration complete!');
   }
 
