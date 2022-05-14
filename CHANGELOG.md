@@ -5,11 +5,27 @@ All notable changes to this project will be documented in this file.
 
 ## [4.0.0] - Unreleased
 > :warning: **BREAKING CHANGE**
-> Accessing the classes might have changed.
+> Importing the module has changed (reverted back to previous).
+
+```js
+before:   import YZUR      from './dist/yzur.js';
+after:    import * as YZUR from './dist/yzur.js';
+```
 
 ### Added
 - Blade Runner RPG support.
 - `isPrivate` in chat data for the roll template.
+
+### Changed
+- `YearZeroRoll#createFromDiceQuantities()` renamed to `forge()`. *(That function name was really too long.)*
+
+### Removed
+- YzurErrors removed from main export.
+- `push` property in `YearZeroRoll#createFromDiceQuantities()`. *(Was useless.)*
+
+### Fixed
+- Some minor fixes.
+- Updated the README and DOCUMENTATION help files.
 
 ## [3.0.0] - 2021-08-19
 > :warning: **BREAKING CHANGE**
