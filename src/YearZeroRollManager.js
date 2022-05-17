@@ -49,7 +49,7 @@ import { DieTypeError, GameTypeError } from './errors.js';
 
 /**
  * An object with quantities of dice.
- * @typedef {Object<DieTypeString, number>} DiceQuantities
+ * @typedef {Object.<DieTypeString, number>} DiceQuantities
  * @property {?number}  base     The quantity of base dice
  * @property {?number}  skill    The quantity of skill dice
  * @property {?number}  gear     The quantity of gear dice
@@ -100,8 +100,8 @@ export default class YearZeroRollManager {
    * You must call this method in `Hooks.once('init')`.
    * 
    * @param {GameTypeString} yzGame  The game used (for the choice of die types to register).
-   * @param {object}        [config] Custom config to merge with the initial config.
-   * @param {object}        [data]   Additional data.
+   * @param {Object}        [config] Custom config to merge with the initial config.
+   * @param {Object}        [data]   Additional data.
    * @static
    */
   static register(yzGame, config, data = {}) {
@@ -231,7 +231,7 @@ export default class YearZeroRollManager {
 /**
  * Die Types mapped with Games.
  * Used by the register method to choose which dice to activate.
- * @type {Object<GameTypeString, DieTypeString[]>}
+ * @type {Object.<GameTypeString, DieTypeString[]>}
  * @constant
  */
 YearZeroRollManager.DIE_TYPES_MAP = {

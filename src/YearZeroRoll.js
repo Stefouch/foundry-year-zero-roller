@@ -383,8 +383,8 @@ export default class YearZeroRoll extends Roll {
    * @param {DieTypeString} type     The type of dice to add
    * @param {number}       [range=6] The number of faces of the die
    * @param {number}       [value]   The predefined value for the new dice
-   * @param {object}       [options] Additional options that modify the term
-   * @returns {YearZeroRoll} This roll
+   * @param {Object}       [options] Additional options that modify the term
+   * @returns {Promise.<YearZeroRoll>} This roll
    * @async
    */
   async addDice(qty, type, { range = 6, value = null, options } = {}) {
@@ -510,9 +510,10 @@ export default class YearZeroRoll extends Roll {
 
   /**
    * Pushes the roll, following the YZ rules.
-   * @param {object} [options={}] Options which inform how the Roll is evaluated
+   * @param {Object} [options={}] Options which inform how the Roll is evaluated
    * @param {boolean} [options.async=false] Evaluate the roll asynchronously, receiving a Promise as the returned value
-   * @returns {YearZeroRoll} The roll instance, pushed
+   * @returns {Promise.<YearZeroRoll>} The roll instance, pushed
+   * @async
    */
   async push({ async } = {}) {
     if (!this._evaluated) await this.evaluate({ async });
@@ -537,7 +538,8 @@ export default class YearZeroRoll extends Roll {
   /**
    * Applies a difficulty modifier to the roll.
    * @param {number} mod Difficulty modifier (bonus or malus)
-   * @returns {YearZeroRoll} This roll, modified
+   * @returns {Promise.<YearZeroRoll>} This roll, modified
+   * @async
    */
   async modify(mod = 0) {
     if (!mod) return this;
@@ -717,7 +719,7 @@ export default class YearZeroRoll extends Roll {
   /**
    * Renders the infos of a Year Zero roll.
    * @param {string} [template] The path to the template
-   * @returns {Promise<string>}
+   * @returns {Promise.<string>}
    * @async
    */
   async getRollInfos(template = null) {
@@ -730,7 +732,7 @@ export default class YearZeroRoll extends Roll {
 
   /**
    * Renders a Roll instance to HTML.
-   * @param {object}  [chatOptions]               An object configuring the behavior of the resulting chat message,
+   * @param {Object}  [chatOptions]               An object configuring the behavior of the resulting chat message,
    *   which is also passed to the template
    * @param {string}  [chatOptions.user]          The ID of the user that renders the roll
    * @param {string}  [chatOptions.flavor]        The flavor of the message
@@ -741,7 +743,7 @@ export default class YearZeroRoll extends Roll {
    * @param {boolean} [chatOptions.blind]         Whether this is a blind roll
    * @param {boolean} [chatOptions.isPrivate]     Whether this roll is private
    *   (displays sensitive infos with `???` instead)
-   * @returns {Promise<string>}
+   * @returns {Promise.<string>}
    * @async
    * @override
    */
@@ -784,9 +786,9 @@ export default class YearZeroRoll extends Roll {
   /**
    * Transform a Roll instance into a ChatMessage, displaying the roll result.
    * This function can either create the ChatMessage directly, or return the data object that will be used to create.
-   * @param {object}  [messageData]         The data object to use when creating the message
+   * @param {Object}  [messageData]         The data object to use when creating the message
    * @param {string}  [messageData.user]    The ID of the user that sends the message
-   * @param {object}  [messageData.speaker] The identified speaker data
+   * @param {Object}  [messageData.speaker] The identified speaker data
    * @param {string}  [messageData.content] The HTML content of the message,
    *   overriden by the `roll.render()`'s returned content if left unchanged
    * @param {number}  [messageData.type=5]    The type to use for the message from `CONST.CHAT_MESSAGE_TYPES`
@@ -795,7 +797,7 @@ export default class YearZeroRoll extends Roll {
    * @param {string}  [options.rollMode]    The template roll mode to use for the message from CONFIG.Dice.rollModes
    * @param {boolean} [options.create=true] Whether to automatically create the chat message,
    *   or only return the prepared chatData object.
-   * @return {Promise<ChatMessage|ChatMessageData>} A promise which resolves to the created ChatMessage entity
+   * @return {Promise.<ChatMessage|ChatMessageData>} A promise which resolves to the created ChatMessage entity
    *   if create is true
    *   or the Object of prepared chatData otherwise.
    * @async

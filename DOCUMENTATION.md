@@ -89,8 +89,8 @@ new YearZeroRoll(formula, data, options)
 | Name | Type | Default | Description |
 | :-- | :-- | :--: | :-- |
 | formula | string | | The string formula to parse |
-| data | object | `{}` | The data object against which to parse attributes within the formula |
-| options | object | `{}` | Additional data which is preserved in the database |
+| data | Object | `{}` | The data object against which to parse attributes within the formula |
+| options | Object | `{}` | Additional data which is preserved in the database |
 | ✨ options.game | string | `CONFIG .YZUR.game` \|&nbsp;`"myz"` | The game used |
 | ✨ options.name | string | | The name of the roll |
 | ✨ options.maxPush | number | `1` | The maximum number of times the roll can be pushed |
@@ -159,11 +159,11 @@ Generates a roll based on the number of dice.
 
 | Name | Type | Default | Description |
 | :-- | :-- | :--: | :-- |
-| dice | DiceQuantities (object) | `{}` | An object with quantities of dice |
 | options | object | `{}` | Additional options which configure the roll |
 | options.title | string | | The name of the roll |
 | options.yzGame | GameTypeString (string) | `CONFIG .YZUR.game` | The game used |
 | options.maxPush | number | `1` | The maximum number of pushes |
+| dice | DiceQuantities (Object) | `{}` | An object with quantities of dice |
 
 ## YearZeroRoll.getTerms
 
@@ -177,7 +177,7 @@ Gets all the dice terms of a certain type or that match an object of values.
 
 | Name | Type | Default | Description |
 | :-- | :-- | :--: | :-- |
-| search | DieTypeString (string) \|&nbsp;object | | Die type to search or an object with comparison values |
+| search | DieTypeString (string) \|&nbsp;Object | | Die type to search or an object with comparison values |
 
 ### Example of Comparison
 
@@ -235,10 +235,10 @@ Note: If a negative quantity is passed, instead it removes that many dice.
 | :-- | :-- | :--: | :-- |
 | qty | number | | The quantity to add |
 | type | DieTypeString (string) | | The type of dice to add |
-| data | object | `{}` | Additional data which defines the new dice |
+| data | Object | `{}` | Additional data which defines the new dice |
 | data.range | number | `6` | The number of faces of the die |
 | data.value | number | | The predefined value for the new dice |
-| data.options | object | | Additional options that modify the term |
+| data.options | Object | | Additional options that modify the term |
 
 ## YearZeroRoll.removeDice
 
@@ -253,8 +253,8 @@ Removes a number of dice from the roll.
 | Name | Type | Default | Description |
 | :-- | :-- | :--: | :-- |
 | qty | number | | The quantity to remove |
-| search | DieTypeString (string) \|&nbsp;object | | The type of dice to remove, or an object of values for comparison<br/>See [YearZeroRoll#getTerms](#yearzerorollgetterms) |
-| options | object | `{}` | Additional options for the dice removal |
+| search | DieTypeString (string) \|&nbsp;Object | | The type of dice to remove, or an object of values for comparison<br/>See [YearZeroRoll#getTerms](#yearzerorollgetterms) |
+| options | Object | `{}` | Additional options for the dice removal |
 | options.discard | boolean | `false` | Whether the term should be marked as "discarded" instead of removed |
 | options.disable | boolean | `false` | Whether the term should be marked as "active: false" instead of removed |
 
@@ -284,7 +284,7 @@ Pushes the roll, following the YZ rules.
 
 | Name | Type | Default | Description |
 | :-- | :-- | :--: | :-- |
-| options | object | `{}` | Options which inform how the Roll is evaluated |
+| options | Object | `{}` | Options which inform how the Roll is evaluated |
 | options.minimize | boolean | `false` | Minimize the result, obtaining the smallest possible value |
 | options.maximize | boolean | `false` | Maximize the result, obtaining the largest possible value |
 | options.async | boolean | `false` | Evaluate the roll asynchronously, receiving a Promise as the returned value |
@@ -326,7 +326,7 @@ Note: This is a core method from Foundry's `Roll` class that is overridden by th
 
 | Name | Type | Default | Description |
 | :-- | :-- | :--: | :-- |
-| chatOptions | object | `{}` | An object configuring the behavior of the resulting chat message, which is also passed to the template |
+| chatOptions | Object | `{}` | An object configuring the behavior of the resulting chat message, which is also passed to the template |
 | chatOptions.user | string | `game.user.id` | The ID of the user that renders the roll |
 | chatOptions.flavor | string | `null` | The flavor of the message |
 | chatOptions.template | string | `YearZeroRoll .CHAT_TEMPLATE` | The path to the template that renders the roll |
@@ -353,13 +353,13 @@ Note: This is a core method from Foundry's `Roll` class that is overridden by th
 
 | Name | Type | Default | Description |
 | :-- | :-- | :--: | :-- |
-| messageData | object | `{}` | The data object to use when creating the message |
+| messageData | Object | `{}` | The data object to use when creating the message |
 | messageData.user | string | `game.user.id` | The ID of the user that sends the message |
-| messageData.speaker | object | ✨ `ChatMessage .getSpeaker()` | The identified speaker data |
+| messageData.speaker | Object | ✨ `ChatMessage .getSpeaker()` | The identified speaker data |
 | messageData.content | string | `this.total` | The HTML content of the message, overridden by the `roll.render()`'s returned content if left unchanged |
 | messageData.type | number | `CONST .CHAT_MESSAGE_TYPES .ROLL` | The type to use for the message from `CONST.CHAT_MESSAGE_TYPES` |
 | messageData.sound | string | `CONFIG .sounds.dice` | The path to the sound played with the message (WAV format) |
-| options | object | `{}` | Additional options which modify the created message |
+| options | Object | `{}` | Additional options which modify the created message |
 | options.rollMode | string | *default*<sup>1</sup> | The template roll mode to use for the message from `CONFIG.Dice.rollModes` |
 | options.create | boolean | `true` | Whether to automatically create the chat message, or only return the prepared chatData object |
 
@@ -385,13 +385,13 @@ new YearZeroDie(termData)
 
 | Name | Type | Default | Description |
 | :-- | :-- | :--: | :-- |
-| termData | object | `{}` | Data used to create the Dice Term |
+| termData | Object | `{}` | Data used to create the Dice Term |
 | termData.number | number | `1` | The number of dice of this term to roll, before modifiers are applied |
 | termData.faces | number | `6` | The number of faces on each die of this type |
 | ✨ termData.maxPush | number | `1` | The maximum number of times this term can be pushed |
 | termData.modifiers | string[] | |  An array of modifiers applied to the results |
-| termData.results | DiceTermResult[] (object[]) | | An optional array of pre-cast results for the term |
-| termData.options | object | `{}` | Additional options that modify the term |
+| termData.results | DiceTermResult[] (Object[]) | | An optional array of pre-cast results for the term |
+| termData.options | Object | `{}` | Additional options that modify the term |
 | termData.options .flavor | string | | Optional flavor text which modifies and describes this term |
 
 <small><i>✨ Extra parameter not in the core Foundry's `Roll` class and added by the extend.</i></small>
@@ -497,7 +497,7 @@ An array of additional attributes which should be retained when the term is seri
 ## YearZeroDie.MODIFIERS
 
 ```js
-MODIFIERS: object.<string, (string|function)>
+MODIFIERS: Object.<string, (string|function)>
 ```
 
 An object of key-pairs that defines the named modifiers that can be applied for this particular DiceTerm type.
@@ -539,7 +539,7 @@ Registers the Year Zero dice for the specified game. You must call this method i
 | Name | Type | Default | Description |
 | :-- | :-- | :--: | :-- |
 | yzGame | GameTypeString (string) | | The game used (for the choice of die types to register) |
-| config | object | | Custom config to merge with the initial config |
+| config | Object | | Custom config to merge with the initial config |
 
 ## YearZeroRollManager.registerConfig
 
@@ -553,7 +553,7 @@ Registers the Year Zero Universal Roller config. See [Config](#config-constants)
 
 | Name | Type | Default | Description |
 | :-- | :-- | :--: | :-- |
-| config | object | | Custom config to merge with the initial config |
+| config | Object | | Custom config to merge with the initial config |
 
 ## YearZeroRollManager.registerRoll
 
@@ -625,7 +625,7 @@ Registers a die in Foundry.
 ## YearZeroRollManager.DIE_TYPES_MAP
 
 ```js
-DIE_TYPES_MAP: object.<GameTypeString, DieTypeString[]>
+DIE_TYPES_MAP: Object.<GameTypeString, DieTypeString[]>
 ```
 
 Die Types mapped with Games. Used by the register method to choose which dice to activate.
@@ -653,7 +653,7 @@ List of GameTypeStrings.
 | YZUR.ROLL.tooltipTemplate | string | *default* | The path to the roll tooltip template |
 | YZUR.ROLL.infosTemplate | string | *default* | The path to the roll infos template |
 | YZUR.DICE.localizeDieTypes | boolean | `true` | Whether to localize the default die type flavor |
-| YZUR.DICE.DIE_TYPES | object | *default* | Map of `{ DieTypeString: class }` pairs |
-| YZUR.DICE.DIE_TYPES_BY_CLASS | object | *default* | Map of `{ string: DieTypeString }` pairs |
+| YZUR.DICE.DIE_TYPES | Object | *default* | Map of `{ DieTypeString: class }` pairs |
+| YZUR.DICE.DIE_TYPES_BY_CLASS | Object | *default* | Map of `{ string: DieTypeString }` pairs |
 | YZUR.DICE.ICONS.getLabel | function | *default* | A customizable helper function for creating the labels of the die. Note: You must return a string or DsN will throw an error. |
-| YZUR.DICE.ICONS.{{yzGame}} | object | *default* | Icons labels |
+| YZUR.DICE.ICONS.{{yzGame}} | Object | *default* | Icons labels |
