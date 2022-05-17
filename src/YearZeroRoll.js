@@ -172,6 +172,7 @@ export default class YearZeroRoll extends Roll {
    * Tells if the roll is a mishap (double 1's).
    * @type {boolean}
    * @readonly
+   * @deprecated
    */
   get mishap() {
     // if (this.game !== 't2k') return false;
