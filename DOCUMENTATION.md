@@ -150,7 +150,7 @@ Note: This is a core method from Foundry's `Roll` class that is overridden by th
 ## YearZeroRoll.forge
 
 ```js
-(static) forge(dice, options): YearZeroRoll
+(static) forge(dice, data, options): YearZeroRoll
 ```
 
 Generates a roll based on the number of dice.
@@ -159,11 +159,12 @@ Generates a roll based on the number of dice.
 
 | Name | Type | Default | Description |
 | :-- | :-- | :--: | :-- |
-| options | object | `{}` | Additional options which configure the roll |
-| options.title | string | | The name of the roll |
-| options.yzGame | GameTypeString (string) | `CONFIG .YZUR.game` | The game used |
-| options.maxPush | number | `1` | The maximum number of pushes |
 | dice | DiceQuantities (Object) | `{}` | An object with quantities of dice |
+| data | Object | `{}` | Additional data which configures the roll |
+| data.title | string | | The name of the roll |
+| data.yzGame | GameTypeString (string) | `CONFIG .YZUR.game` | The game used |
+| data.maxPush | number | `1` | The maximum number of pushes |
+| options | Object | `{}` | Additional data which is preserved in the database |
 
 ## YearZeroRoll.getTerms
 

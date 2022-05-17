@@ -262,14 +262,15 @@ export default class YearZeroRoll extends Roll {
 
   /**
    * Generates a roll based on the number of dice.
-   * @param {DiceQuantities}  dice        An object with quantities of dice
-   * @param {string}         [title]      The name of the roll
-   * @param {GameTypeString} [yzGame]     The game used
-   * @param {number}         [maxPush=1]  The maximum number of pushes
+   * @param {DiceQuantities}  dice       An object with quantities of dice
+   * @param {string}         [title]     The name of the roll
+   * @param {GameTypeString} [yzGame]    The game used
+   * @param {number}         [maxPush=1] The maximum number of pushes
+   * @param {Object}         [options]   Additional data which is preserved in the database
    * @returns {YearZeroRoll}
    * @static
    */
-  static forge(dice = {}, { title, yzGame = null, maxPush = 1, push = false } = {}) {
+  static forge(dice = {}, { title, yzGame = null, maxPush = 1, push = false } = {}, options = {}) {
     // Checks the game.
     yzGame = yzGame ?? CONFIG.YZUR?.game;
     if (!YearZeroRollManager.GAMES.includes(yzGame)) throw new GameTypeError(yzGame);
@@ -292,7 +293,7 @@ export default class YearZeroRoll extends Roll {
     }
 
     // Creates the roll.
-    const roll = new YearZeroRoll(formula, { name: title, game: yzGame, maxPush });
+    const roll = new YearZeroRoll(formula, { name: title, game: yzGame, maxPush }, options);
     if (CONFIG.debug.dice) console.log(roll);
     return roll;
   }
