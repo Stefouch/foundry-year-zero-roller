@@ -128,7 +128,7 @@ async function bumpVersion(cb) {
     console.log(`  Updated: manifest ${manifest.name}`);
 
     if (changelog) {
-      const pad = (s) => s < 10 ? '0' + s : s;
+      const pad = s => s < 10 ? '0' + s : s;
       const d = new Date(Date.now());
       const date = [pad(d.getFullYear()), pad(d.getMonth() + 1), pad(d.getDate())].join('-');
       const rgx = /^## \[.*\].*$/m;
