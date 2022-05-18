@@ -42,35 +42,6 @@ import { DieTypeError, GameTypeError } from './errors.js';
  * @typedef {string} DieTypeString
  */
 
-/**
- * Defines a YZ die's denomination.
- * @typedef {string} DieDeno
- */
-
-/**
- * An object with quantities of dice.
- * @typedef {Object.<DieTypeString, number>} DiceQuantities
- * @property {?number}  base     The quantity of base dice
- * @property {?number}  skill    The quantity of skill dice
- * @property {?number}  gear     The quantity of gear dice
- * @property {?number}  neg      The quantity of negative dice
- * @property {?number}  stress   The quantity of stress dice
- * @property {?number}  artoD8   The quantity of artoD8 dice
- * @property {?number}  artoD10  The quantity of artoD10 dice
- * @property {?number}  artoD12  The quantity of artoD12 dice
- * @property {?number}  a        The quantity of Twilight 2000's D12 dice
- * @property {?number}  b        The quantity of Twilight 2000's D10 dice
- * @property {?number}  c        The quantity of Twilight 2000's D8 dice
- * @property {?number}  d        The quantity of Twilight 2000's D6 dice
- * @property {?number}  ammo     The quantity of Twilight 2000's ammo dice
- * @property {?number}  loc      The quantity of Twilight 2000's location dice (usually, one)
- * @property {?number}  brD12    The quantity of Blade Runner's D12 dice
- * @property {?number}  brD10    The quantity of Blade Runner's D10 dice
- * @property {?number}  brD8     The quantity of Blade Runner's D8 dice
- * @property {?number}  brD6     The quantity of Blade Runner's D6 dice
- */
-
-
 /* -------------------------------------------- */
 /*  Custom Dice Registration                    */
 /* -------------------------------------------- */
@@ -88,7 +59,7 @@ import { DieTypeError, GameTypeError } from './errors.js';
  * @example
  * import { YearZeroRollManager } from './lib/yzur.js';
  * Hooks.once('init', function() {
- *   YearZeroRollManager.register('yourgame', { options });
+ *   YearZeroRollManager.register('yourgame', config, options);
  *   ...
  * });
  * 
@@ -99,25 +70,26 @@ export default class YearZeroRollManager {
    * 
    * You must call this method in `Hooks.once('init')`.
    * 
-   * @param {GameTypeString} yzGame  The game used (for the choice of die types to register).
-   * @param {Object}        [config] Custom config to merge with the initial config.
-   * @param {Object}        [data]   Additional data.
+   * @param {GameTypeString} yzGame  The game used (for the choice of die types to register)
+   * @param {Object}        [config] Custom config to merge with the initial config
+   * @param {Object} [options]       Additional options
+   * @param {number} [options.index] Index of the registration
    * @static
    */
-  static register(yzGame, config, data = {}) {
+  static register(yzGame, config, options = {}) {
     // Registers the config.
     YearZeroRollManager.registerConfig(config);
     // Registers the YZ game.
     YearZeroRollManager._initialize(yzGame);
     // Registers the dice.
-    YearZeroRollManager.registerDice(yzGame, data?.index);
+    YearZeroRollManager.registerDice(yzGame, options?.index);
     console.log('YZUR | Registration complete!');
   }
 
   /**
    * Registers the Year Zero Universal Roller config.
    * *(See the config details at the very bottom of this file.)*
-   * @param {string} [config] Custom config to merge with the initial config.
+   * @param {string} [config] Custom config to merge with the initial config
    * @static
    */
   static registerConfig(config) {
@@ -214,12 +186,14 @@ export default class YearZeroRollManager {
    * @static
    */
   static _overrideRollCreate(index = 1) {
-    Roll.prototype.constructor.create = function(formula, data = {}, options = {}) {
-      const YZURFormula = data.yzur
-        ?? data.game
+    Roll.prototype.constructor.create = function (formula, data = {}, options = {}) {
+      const isYZURFormula = data.game
         ?? data.maxPush
+        ?? options.yzur
+        ?? options.game
+        ?? options.maxPush
         ?? formula.match(/\d*d(:?[bsngzml]|6|8|10|12)/i);
-      const n = YZURFormula ? index : 0;
+      const n = isYZURFormula ? index : 0;
       const cls = CONFIG.Dice.rolls[n];
       return new cls(formula, data, options);
     };
@@ -233,6 +207,7 @@ export default class YearZeroRollManager {
  * Used by the register method to choose which dice to activate.
  * @type {Object.<GameTypeString, DieTypeString[]>}
  * @constant
+ * @enum
  */
 YearZeroRollManager.DIE_TYPES_MAP = {
   // Mutant Year Zero
@@ -253,5 +228,5 @@ YearZeroRollManager.DIE_TYPES_MAP = {
   'br': ['brD12', 'brD10', 'brD8', 'brD6'],
 };
 
-/** @type {GameTypeString[]} */
+/** @type {GameTypeString[]} @enum */
 YearZeroRollManager.GAMES = Object.keys(YearZeroRollManager.DIE_TYPES_MAP);

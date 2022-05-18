@@ -13,14 +13,16 @@ import { GameTypeError } from './errors.js';
  */
 export default class YearZeroRoll extends Roll {
   /**
-   * @param {string} formula  The string formula to parse
-   * @param {Object} data     The data object against which to parse attributes within the formula
-   * @param {string} data.game     The game used
-   * @param {string} data.name     The name of the roll
-   * @param {number} data.maxPush  The maximum number of times the roll can be pushed
-   * @param {string} options.game     The game used
-   * @param {string} options.name     The name of the roll
-   * @param {number} options.maxPush  The maximum number of times the roll can be pushed
+   * @param {string}  formula  The string formula to parse
+   * @param {Object}  [data]         The data object against which to parse attributes within the formula
+   * @param {string}  [data.game]    The game used
+   * @param {string}  [data.name]    The name of the roll
+   * @param {number}  [data.maxPush] The maximum number of times the roll can be pushed
+   * @param {Object}  [options]         Additional data which is preserved in the database
+   * @param {string}  [options.game]    The game used
+   * @param {string}  [options.name]    The name of the roll
+   * @param {number}  [options.maxPush] The maximum number of times the roll can be pushed
+   * @param {boolean} [options.yzur]    Specify this one if you have issues to recognize a YearZeroRoll
    */
   constructor(formula, data = {}, options = {}) {
     if (options.name == undefined) options.name = data.name;
@@ -263,29 +265,54 @@ export default class YearZeroRoll extends Roll {
 
   /**
    * Generates a roll based on the number of dice.
-   * @param {DiceQuantities}  dice       An object with quantities of dice
-   * @param {string}         [title]     The name of the roll
-   * @param {GameTypeString} [yzGame]    The game used
-   * @param {number}         [maxPush=1] The maximum number of pushes
-   * @param {Object}         [options]   Additional data which is preserved in the database
+   * @param {TermBlok|TermBlok[]}  dice       An array of objects that define the dice
+   * @param {string}              [title]     The name of the roll
+   * @param {GameTypeString}      [yzGame]    The game used
+   * @param {number}              [maxPush=1] The maximum number of pushes
+   * @param {Object}              [options]   Additional data which is preserved in the database
    * @returns {YearZeroRoll}
    * @static
    */
-  static forge(dice = {}, { title, yzGame = null, maxPush = 1, push = false } = {}, options = {}) {
+  static forge(dice = [], { title, yzGame = null, maxPush = 1 } = {}, options = {}) {
     // Checks the game.
-    yzGame = yzGame ?? CONFIG.YZUR?.game;
+    yzGame = yzGame ?? options.game ?? CONFIG.YZUR?.game;
     if (!YearZeroRollManager.GAMES.includes(yzGame)) throw new GameTypeError(yzGame);
+
+    // Converts old format DiceQuantities.
+    // ? Was: {Object.<DieTypeString, number>}
+    // ! This is temporary support. @deprecated
+    const isOldFormat = !Array.isArray(dice) && typeof dice === 'object' && !Object.keys().includes('term');
+    if (isOldFormat) {
+      // eslint-disable-next-line max-len
+      console.warn(`${YearZeroRoll.name} | You are using an old "DiceQuanties" format which is deprecated and could be removed in a future release. Please refer to ".forge()" for the newer format.`);
+      const _dice = [];
+      for (const [type, n] of Object.entries(dice)) {
+        if (n <= 0) continue;
+        let deno = CONFIG.YZUR.DICE.DIE_TYPES[type].DENOMINATION;
+        const cls = CONFIG.Dice.terms[deno];
+        deno = cls.DENOMINATION;
+        _dice.push({ term: deno, number: n });
+      }
+      dice = _dice;
+    }
+
+    // Converts to an array.
+    if (!Array.isArray(dice)) dice = [dice];
 
     // Builds the formula.
     const out = [];
-    for (const [type, n] of Object.entries(dice)) {
-      if (n <= 0) continue;
-      let deno = CONFIG.YZUR.DICE.DIE_TYPES[type].DENOMINATION;
-      const cls = CONFIG.Dice.terms[deno];
-      deno = cls.DENOMINATION;
-      const str = `${n}d${deno}${push ? 'p' : ''}`;
-      out.push(str);
+    for (const d of dice) {
+      out.push(YearZeroRoll._getTermFormulaFromBlok(d));
     }
+    // TODO clean
+    // for (const [type, n] of Object.entries(dice)) {
+    //   if (n <= 0) continue;
+    //   let deno = CONFIG.YZUR.DICE.DIE_TYPES[type].DENOMINATION;
+    //   const cls = CONFIG.Dice.terms[deno];
+    //   deno = cls.DENOMINATION;
+    //   const str = `${n}d${deno}${push ? 'p' : ''}`;
+    //   out.push(str);
+    // }
     let formula = out.join(' + ');
 
     if (!YearZeroRoll.validate(formula)) {
@@ -294,10 +321,15 @@ export default class YearZeroRoll extends Roll {
     }
 
     // Creates the roll.
-    const roll = new YearZeroRoll(formula, { name: title, game: yzGame, maxPush }, options);
+    if (options.name == undefined) options.name = title;
+    if (options.game == undefined) options.game = yzGame;
+    if (options.maxPush == undefined) options.maxPush = maxPush;
+    const roll = YearZeroRoll.create(formula, {}, options);
     if (CONFIG.debug.dice) console.log(roll);
     return roll;
   }
+
+  /* -------------------------------------------- */
 
   /** @deprecated */
   // eslint-disable-next-line no-unused-vars
@@ -305,6 +337,37 @@ export default class YearZeroRoll extends Roll {
     // eslint-disable-next-line max-len
     console.warn('YZUR | createFromDiceQuantities() is deprecated and will be removed in a future release. Use forge()instead.');
     return YearZeroRoll.forge(dice, { title, yzGame, maxPush });
+  }
+
+  /* -------------------------------------------- */
+
+  /**
+   * Creates a roll formula based on a TermBlok.
+   * @see YearZeroRoll.generateTermFormula
+   * @param {TermBlok} termBlok
+   * @returns {string}
+   * @private
+   * @static
+   */
+  static _getTermFormulaFromBlok(termBlok) {
+    const { term, number, flavor, maxPush } = termBlok;
+    return YearZeroRoll.generateTermFormula(term, number, flavor, maxPush);
+  }
+
+  /**
+   * Creates a roll formula based on number of dice.
+   * @param {number}  number   The quantity of those dice
+   * @param {DieDeno} term     The denomination of the dice to create
+   * @param {string} [flavor]  (optional) Any flavor tied to those dice
+   * @param {number} [maxPush] (optional) Special maxPush modifier but only for the those dice
+   * @returns {string}
+   * @static
+   */
+  static generateTermFormula(number, term, flavor = '', maxPush = null) {
+    let f = `${number}d${term}`;
+    if (typeof maxPush === 'number') f += `p${maxPush}`;
+    if (flavor) f += `[${flavor}]`;
+    return f;
   }
 
   /* -------------------------------------------- */
@@ -552,7 +615,7 @@ export default class YearZeroRoll extends Roll {
       const diceMap = [null, 6, 8, 10, 12, Infinity];
       const typesMap = ['d', 'd', 'c', 'b', 'a', 'a'];
       const refactorRange = (range, n) => diceMap[diceMap.indexOf(range) + n];
-      const getTypeFromRange = (range) => typesMap[diceMap.indexOf(range)];
+      const getTypeFromRange = range => typesMap[diceMap.indexOf(range)];
 
       const _terms = this.getTerms('base');
       const dice = _terms.flatMap(t => new Array(t.number).fill(t.faces));
@@ -832,3 +895,21 @@ export default class YearZeroRoll extends Roll {
     return this.constructor.fromData(this.toJSON());
   }
 }
+
+/* -------------------------------------------- */
+/*  Definitions                                 */
+/* -------------------------------------------- */
+
+/**
+ * Defines a YZ die's denomination.
+ * @typedef {string} DieDeno
+ */
+
+/**
+ * An object that is used to define a YearZero DieTerm.
+ * @typedef  {Object}  TermBlok
+ * @property {DieDeno} term     The denomination of the dice to create
+ * @property {number}  number   The quantity of those dice
+ * @property {string} [flavor]  (optional) Any flavor tied to those dice
+ * @property {number} [maxPush] (optional) Special maxPush modifier but only for the those dice
+ */
