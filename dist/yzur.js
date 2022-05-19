@@ -1,11 +1,14 @@
 /**
  * ===============================================================================
+ * 
  * # YZUR:
- * #   YEAR ZERO UNIVERSAL DICE ROLLER FOR THE FOUNDRY VTT
+ * 
+ * # YEAR ZERO UNIVERSAL DICE ROLLER FOR THE FOUNDRY VTT
+ * 
  * ===============================================================================
  * Author: @Stefouch
- * Version: 4.0.0     for:     Foundry VTT V9
- * Date: 2022-05-16
+ * Version: 4.0.0 for: Foundry VTT V9
+ * Date: 2022-05-19
  * License: MIT
  * ===============================================================================
  * Content:
@@ -23,7 +26,7 @@
  * 
  * - CONFIG.YZUR.game: The name of the game stored in the Foundry config.
  * 
- * - CONFIG.YZUR.DICE.ICONS.{..}: The dice labels stored in the Foundry config.
+ * - CONFIG.YZUR.Icons.{..}: The dice labels stored in the Foundry config.
  * 
  * ===============================================================================
  */
@@ -32,6 +35,11 @@
 /*  Custom Dice classes                         */
 /* -------------------------------------------- */
 
+/**
+ * Custom Die class for Year Zero games.
+ * @extends {Die} The Foundry Die class
+ * @category MAIN
+ */
 class YearZeroDie extends Die {
   constructor(termData = {}) {
     termData.faces = termData.faces || 6;
@@ -128,7 +136,14 @@ class YearZeroDie extends Die {
 
   /* -------------------------------------------- */
 
-  /** @override */
+  /** 
+   * Rolls the DiceTerm by mapping a random uniform draw against the faces of the dice term.
+   * @param {Object}  [options={}]             Options which modify how a random result is produced
+   * @param {boolean} [options.minimize=false] Minimize the result, obtaining the smallest possible value
+   * @param {boolean} [options.maximize=false] Maximize the result, obtaining the smallest possible value
+   * @returns {YearZeroDieTermResult} The produced result
+   * @override
+   */
   roll(options = {}) {
     // Modifies the result.
     const roll = super.roll(options);
@@ -229,17 +244,27 @@ class YearZeroDie extends Die {
   /*  Dice Term Methods                           */
   /* -------------------------------------------- */
 
-  /** @override */
+  /** 
+   * Returns a string used as the label for each rolled result.
+   * @param {YearZeroDieTermResult} result The rolled result
+   * @returns {string} The result label
+   * @override
+   */
   getResultLabel(result) {
     // Do not forget to stringify the label because
     // numbers return an error with DiceSoNice!
-    return CONFIG.YZUR.DICE.ICONS.getLabel(
+    return CONFIG.YZUR.Icons.getLabel(
       this.constructor.TYPE,
       result.result,
     );
   }
 
-  /** @override */
+  /**
+   * Gets the CSS classes that should be used to display each rolled result.
+   * @param {YearZeroDieTermResult} result The rolled result
+   * @returns {string[]} The desired classes
+   * @override
+   */
   getResultCSS(result) {
     // This is copy-pasted from the source code,
     // with modified parts between ==> arrows <==.
@@ -284,7 +309,11 @@ class YearZeroDie extends Die {
     ];
   }
 
-  /** @override */
+  /** 
+   * Renders the tooltip HTML for a Roll instance.
+   * @returns {Object} The data object used to render the default tooltip template for this DiceTerm
+   * @override
+   */
   getTooltipData() {
     // This is copy-pasted from the source code,
     // with modified parts between ==> arrows <==.
@@ -306,7 +335,7 @@ class YearZeroDie extends Die {
       //* Adds a default flavor for the die.
       // flavor: this.flavor,
       flavor: this.options.flavor ?? (
-        CONFIG.YZUR?.DICE?.localizeDieTypes
+        CONFIG.YZUR?.Dice?.localizeDieTypes
           ? game.i18n.localize(`YZUR.DIETYPES.${this.constructor.name}`)
           : null
       ),
@@ -325,8 +354,31 @@ class YearZeroDie extends Die {
     };
   }
 }
+
+/**
+ * The type of the die.
+ * @type {string}
+ * @constant
+ * @static
+ */
 YearZeroDie.TYPE = 'blank';
+
+/**
+ * An array of values that disallow the die to be pushed.
+ * @type {number[]}
+ * @constant
+ * @static
+ */
 YearZeroDie.LOCKED_VALUES = [6];
+
+/**
+ * An array of additional attributes which should be retained when the term is serialized.
+ * Addition: **maxPush**
+ * @type {string[]}
+ * @constant
+ * @static
+ * @inheritdoc
+ */
 YearZeroDie.SERIALIZE_ATTRIBUTES.push('maxPush');
 
 /** @inheritdoc */
@@ -343,6 +395,7 @@ YearZeroDie.MODIFIERS = foundry.utils.mergeObject(
 /**
  * Base Die: 1 & 6 cannot be re-rolled.
  * @extends {YearZeroDie}
+ * @category OTHER DICE
  */
 class BaseDie extends YearZeroDie {}
 BaseDie.TYPE = 'base';
@@ -352,6 +405,7 @@ BaseDie.LOCKED_VALUES = [1, 6];
 /**
  * Skill Die: 6 cannot be re-rolled.
  * @extends {YearZeroDie}
+ * @category OTHER DICE
  */
 class SkillDie extends YearZeroDie {}
 SkillDie.TYPE = 'skill';
@@ -360,6 +414,7 @@ SkillDie.DENOMINATION = 's';
 /**
  * Gear Die: 1 & 6 cannot be re-rolled.
  * @extends {YearZeroDie}
+ * @category OTHER DICE
  */
 class GearDie extends YearZeroDie {}
 GearDie.TYPE = 'gear';
@@ -369,6 +424,7 @@ GearDie.LOCKED_VALUES = [1, 6];
 /**
  * Negative Die: 6 cannot be re-rolled.
  * @extends {SkillDie}
+ * @category OTHER DICE
  */
 class NegativeDie extends SkillDie {}
 NegativeDie.TYPE = 'neg';
@@ -379,6 +435,7 @@ NegativeDie.DENOMINATION = 'n';
 /**
  * Stress Die: 1 & 6 cannot be re-rolled.
  * @extends {YearZeroDie}
+ * @category OTHER DICE
  */
 class StressDie extends YearZeroDie {}
 StressDie.TYPE = 'stress';
@@ -390,11 +447,12 @@ StressDie.LOCKED_VALUES = [1, 6];
 /**
  * Artifact Die: 6+ cannot be re-rolled.
  * @extends {SkillDie}
+ * @category OTHER DICE
  */
 class ArtifactDie extends SkillDie {
   /** @override */
   getResultLabel(result) {
-    return CONFIG.YZUR.DICE.ICONS.getLabel(
+    return CONFIG.YZUR.Icons.getLabel(
       `d${this.constructor.DENOMINATION}`,
       result.result,
     );
@@ -433,11 +491,12 @@ D12ArtifactDie.DENOMINATION = '12';
 /**
  * Twilight Die: 1 & 6+ cannot be re-rolled.
  * @extends {ArtifactDie} But LOCKED_VALUES are not the same
+ * @category OTHER DICE
  */
 class TwilightDie extends ArtifactDie {
   /** @override */
   getResultLabel(result) {
-    return CONFIG.YZUR.DICE.ICONS.getLabel('base', result.result);
+    return CONFIG.YZUR.Icons.getLabel('base', result.result);
   }
 }
 TwilightDie.TYPE = 'base';
@@ -478,6 +537,10 @@ D12TwilightDie.DENOMINATION = '12';
 
 /* -------------------------------------------- */
 
+/**
+ * Ammunition Die for Twilight 2000.
+ * @extends {YearZeroDie}
+ */
 class AmmoDie extends YearZeroDie {
   constructor(termData = {}) {
     termData.faces = 6;
@@ -490,6 +553,10 @@ AmmoDie.LOCKED_VALUES = [1, 6];
 
 /* -------------------------------------------- */
 
+/**
+ * Location/Hit Die for Twilight 2000.
+ * @extends {YearZeroDie}
+ */
 class LocationDie extends YearZeroDie {
   constructor(termData = {}) {
     termData.faces = 6;
@@ -515,11 +582,12 @@ LocationDie.LOCKED_VALUES = [1, 2, 3, 4, 5, 6];
 /**
  * BladeRunner Die: 1 cannot be re-rolled.
  * @extends {ArtifactDie} But LOCKED_VALUES are not the same
+ * @category OTHER DICE
  */
 class BladeRunnerDie extends ArtifactDie {
   /** @override */
   getResultLabel(result) {
-    return CONFIG.YZUR.DICE.ICONS.getLabel('base', result.result);
+    return CONFIG.YZUR.Icons.getLabel('base', result.result);
   }
 }
 BladeRunnerDie.TYPE = 'base';
@@ -562,6 +630,31 @@ class D12BladeRunnerDie extends BladeRunnerDie {
 D12BladeRunnerDie.DENOMINATION = '12';
 D12BladeRunnerDie.LOCKED_VALUES = [1, 10, 11, 12];
 
+/* -------------------------------------------- */
+/*  Definitions                                 */
+/* -------------------------------------------- */
+
+/**
+ * Result of a rolled YearZero DieTerm.
+ * @typedef {Object} YearZeroDieTermResult
+ * @property {!number} result      The numeric result
+ * @property {boolean} active      Is this result active, contributing to the total?
+ * @property {number}  count       A value that the result counts as, otherwise the result is not used directly as
+ * @property {boolean} success     Does this result denote a success?
+ * @property {boolean} failure     Does this result denote a failure?
+ * @property {boolean} discarded   Was this result discarded?
+ * @property {boolean} rerolled    Was this result rerolled?
+ * @property {boolean} exploded    Was this result exploded?
+ * @property {boolean} pushed      ✨ Was this result pushed?
+ * @property {boolean} hidden      ✨ Hides the die for DsN
+ * @property {number}  indexResult ✨ Index of the result, and column position in the chat tooltip
+ * @property {number}  indexPush   ✨ Index of the push, and row position in the chat tooltip
+ */
+
+/**
+ * 
+ */
+
 var YearZeroDice = /*#__PURE__*/Object.freeze({
   __proto__: null,
   YearZeroDie: YearZeroDie,
@@ -590,18 +683,44 @@ var YearZeroDice = /*#__PURE__*/Object.freeze({
 
 /* -------------------------------------------- */
 
+/**
+ * All constants used by YZUR which are stored in Foundry's `CONFIG.YZUR`.
+ * @constant
+ * @property {!string} game The identifier for the game
+ * @property {Object}         Chat                 Options for the chat
+ * @property {boolean}       [Chat.showInfos=true] Whether to show the additional information under the roll result
+ * @property {DieTypeString} [Chat.diceSorting=['base', 'skill', 'neg', 'gear', 'arto', 'loc', 'ammo']]
+ *   Defines the default order
+ * @property {Object}  Roll                 Options for the YearZeroRoll class
+ * @property {!string} Roll.chatTemplate    Path to the chat template
+ * @property {!string} Roll.tooltipTemplate Path to the tooltip template
+ * @property {!string} Roll.infosTemplate   Path to the infos template
+ * @property {Object}   Dice   Options for the YearZeroDie class
+ * @property {boolean} [Dice.localizeDieTypes=true]
+ *   Whether to localize the type of the die
+ * @property {Object.<DieTypeString, class>}  Dice.DIE_TYPES
+ *   An enumeration of YearZeroDie classes
+ * @property {Object.<string, DieTypeString>} Dice.DIE_TYPES_BY_CLASS
+ *   An enumeration of YearZeroDie types sorted by their class names
+ * @property {Object}    Icons    Options for the icons and what's on the die faces
+ * @property {function} [Icons.getLabel=getLabel( type: DieTypeString, result: number )] 
+ *   A customizable helper function for creating the labels of the die.
+ *   Note: You must return a string or DsN will throw an error.
+ * @property {Object.<DieTypeString, Object.<string, string|number>>} Icons.yzGame
+ *   Defines the labels for your dice. Change `yzGame` with the game identifier
+ */
 const YZUR = {
   game: '',
-  CHAT: {
+  Chat: {
     showInfos: true,
     diceSorting: ['base', 'skill', 'neg', 'gear', 'arto', 'loc', 'ammo'],
   },
-  ROLL: {
+  Roll: {
     chatTemplate: 'templates/dice/roll.html',
     tooltipTemplate: 'templates/dice/tooltip.html',
     infosTemplate: 'templates/dice/infos.hbs',
   },
-  DICE: {
+  Dice: {
     localizeDieTypes: true,
     DIE_TYPES: {
       'base': BaseDie,
@@ -623,205 +742,227 @@ const YZUR = {
       'brD8': D8BladeRunnerDie,
       'brD6': D6BladeRunnerDie,
     },
-    ICONS: {
-      /**
-       * A customizable helper function for creating the labels of the die.
-       * Note: You must return a string or DsN will throw an error.
-       * @param {DieTypeString} type
-       * @param {number} result
-       * @returns {string}
-       */
-      getLabel: function(type, result) {
-        const arto = ['d8', 'd10', 'd12'];
-        if (arto.includes(type)) type = 'arto';
-        return String(this[CONFIG.YZUR.game][type][result]);
+  },
+  Icons: {
+    /**
+     * A customizable helper function for creating the labels of the die.
+     * Note: You must return a string or DsN will throw an error.
+     * @param {DieTypeString} type
+     * @param {number} result
+     * @returns {string}
+     */
+    getLabel: function (type, result) {
+      const arto = ['d8', 'd10', 'd12'];
+      if (arto.includes(type)) type = 'arto';
+      return String(CONFIG.YZUR.Icons[CONFIG.YZUR.game][type][result]);
+    },
+    myz: {
+      base: {
+        '1': '☣',
+        '2': 2,
+        '3': 3,
+        '4': 4,
+        '5': 5,
+        '6': '☢',
       },
-      myz: {
-        base: {
-          '1': '☣',
-          '2': 2,
-          '3': 3,
-          '4': 4,
-          '5': 5,
-          '6': '☢',
-        },
-        skill: {
-          '1': 1,
-          '2': 2,
-          '3': 3,
-          '4': 4,
-          '5': 5,
-          '6': '☢',
-        },
-        neg: {
-          '1': 1,
-          '2': 2,
-          '3': 3,
-          '4': 4,
-          '5': 5,
-          '6': '➖',
-        },
-        gear: {
-          '1': '💥',
-          '2': 2,
-          '3': 3,
-          '4': 4,
-          '5': 5,
-          '6': '☢',
-        },
+      skill: {
+        '1': 1,
+        '2': 2,
+        '3': 3,
+        '4': 4,
+        '5': 5,
+        '6': '☢',
       },
-      fbl: {
-        base: {
-          '1': '☠',
-          '2': 2,
-          '3': 3,
-          '4': 4,
-          '5': 5,
-          '6': '⚔️',
-        },
-        skill: {
-          '1': 1,
-          '2': 2,
-          '3': 3,
-          '4': 4,
-          '5': 5,
-          '6': '⚔️',
-        },
-        neg: {
-          '1': 1,
-          '2': 2,
-          '3': 3,
-          '4': 4,
-          '5': 5,
-          '6': '➖',
-        },
-        gear: {
-          '1': '💥',
-          '2': 2,
-          '3': 3,
-          '4': 4,
-          '5': 5,
-          '6': '⚔️',
-        },
-        arto: {
-          '1': 1,
-          '2': 2,
-          '3': 3,
-          '4': 4,
-          '5': 5,
-          '6': 6,
-          '7': 7,
-          '8': 8,
-          '9': 9,
-          '10': 10,
-          '11': 11,
-          '12': 12,
-        },
+      neg: {
+        '1': 1,
+        '2': 2,
+        '3': 3,
+        '4': 4,
+        '5': 5,
+        '6': '➖',
       },
-      alien: {
-        skill: {
-          '1': 1,
-          '2': 2,
-          '3': 3,
-          '4': 4,
-          '5': 5,
-          '6': '💠', // '❇',
-        },
-        stress: {
-          '1': '😱', // '⚠',
-          '2': 2,
-          '3': 3,
-          '4': 4,
-          '5': 5,
-          '6': '💠',
-        },
+      gear: {
+        '1': '💥',
+        '2': 2,
+        '3': 3,
+        '4': 4,
+        '5': 5,
+        '6': '☢',
       },
-      tales: {
-        skill: {
-          '1': 1,
-          '2': 2,
-          '3': 3,
-          '4': 4,
-          '5': 5,
-          '6': '⚛️', // '👑',
-        },
+    },
+    fbl: {
+      base: {
+        '1': '☠',
+        '2': 2,
+        '3': 3,
+        '4': 4,
+        '5': 5,
+        '6': '⚔️',
       },
-      cor: {
-        skill: {
-          '1': 1,
-          '2': 2,
-          '3': 3,
-          '4': 4,
-          '5': 5,
-          '6': '🐞',
-        },
+      skill: {
+        '1': 1,
+        '2': 2,
+        '3': 3,
+        '4': 4,
+        '5': 5,
+        '6': '⚔️',
       },
-      vae: {
-        skill: {
-          '1': 1,
-          '2': 2,
-          '3': 3,
-          '4': 4,
-          '5': 5,
-          '6': '🦋',
-        },
+      neg: {
+        '1': 1,
+        '2': 2,
+        '3': 3,
+        '4': 4,
+        '5': 5,
+        '6': '➖',
       },
-      t2k: {
-        base: {
-          '1': '💥',
-          '2': 2,
-          '3': 3,
-          '4': 4,
-          '5': 5,
-          '6': 6,
-          '7': 7,
-          '8': 8,
-          '9': 9,
-          '10': 10,
-          '11': 11,
-          '12': 12,
-        },
-        ammo: {
-          '1': '💥',
-          '2': 2,
-          '3': 3,
-          '4': 4,
-          '5': 5,
-          '6': '🎯',
-        },
-        loc: {
-          '1': 'L',
-          '2': 'T',
-          '3': 'T',
-          '4': 'T',
-          '5': 'A',
-          '6': 'H',
-        },
+      gear: {
+        '1': '💥',
+        '2': 2,
+        '3': 3,
+        '4': 4,
+        '5': 5,
+        '6': '⚔️',
       },
-      br: {
-        base: {
-          '1': '🦄',
-          '2': 2,
-          '3': 3,
-          '4': 4,
-          '5': 5,
-          '6': 6,
-          '7': 7,
-          '8': 8,
-          '9': 9,
-          '10': 10,
-          '11': 11,
-          '12': 12,
-        },
+      arto: {
+        '1': 1,
+        '2': 2,
+        '3': 3,
+        '4': 4,
+        '5': 5,
+        '6': 6,
+        '7': 7,
+        '8': 8,
+        '9': 9,
+        '10': 10,
+        '11': 11,
+        '12': 12,
+      },
+    },
+    alien: {
+      skill: {
+        '1': 1,
+        '2': 2,
+        '3': 3,
+        '4': 4,
+        '5': 5,
+        '6': '💠', // '❇',
+      },
+      stress: {
+        '1': '😱', // '⚠',
+        '2': 2,
+        '3': 3,
+        '4': 4,
+        '5': 5,
+        '6': '💠',
+      },
+    },
+    tales: {
+      skill: {
+        '1': 1,
+        '2': 2,
+        '3': 3,
+        '4': 4,
+        '5': 5,
+        '6': '⚛️', // '👑',
+      },
+    },
+    cor: {
+      skill: {
+        '1': 1,
+        '2': 2,
+        '3': 3,
+        '4': 4,
+        '5': 5,
+        '6': '🐞',
+      },
+    },
+    vae: {
+      skill: {
+        '1': 1,
+        '2': 2,
+        '3': 3,
+        '4': 4,
+        '5': 5,
+        '6': '🦋',
+      },
+    },
+    t2k: {
+      base: {
+        '1': '💥',
+        '2': 2,
+        '3': 3,
+        '4': 4,
+        '5': 5,
+        '6': 6,
+        '7': 7,
+        '8': 8,
+        '9': 9,
+        '10': 10,
+        '11': 11,
+        '12': 12,
+      },
+      ammo: {
+        '1': '💥',
+        '2': 2,
+        '3': 3,
+        '4': 4,
+        '5': 5,
+        '6': '🎯',
+      },
+      loc: {
+        '1': 'L',
+        '2': 'T',
+        '3': 'T',
+        '4': 'T',
+        '5': 'A',
+        '6': 'H',
+      },
+    },
+    br: {
+      base: {
+        '1': '🦄',
+        '2': 2,
+        '3': 3,
+        '4': 4,
+        '5': 5,
+        '6': 6,
+        '7': 7,
+        '8': 8,
+        '9': 9,
+        '10': 10,
+        '11': 11,
+        '12': 12,
       },
     },
   },
 };
 
-YZUR.DICE.DIE_TYPES_BY_CLASS = Object.entries(YZUR.DICE.DIE_TYPES).reduce((dieTypes, [type, cls]) => {
+YZUR.Dice.DIE_TYPES_BY_CLASS = Object.entries(YZUR.Dice.DIE_TYPES).reduce((dieTypes, [type, cls]) => {
   dieTypes[cls.name] = type;
   return dieTypes;
 }, {});
+
+// For compatibility with version 4.0.0
+// TODO remove at version 5.0
+Object.defineProperties(YZUR, 'CHAT', { get: () => depreYZUR('Chat') });
+Object.defineProperties(YZUR, 'ROLL', { get: () => depreYZUR('Roll') });
+Object.defineProperties(YZUR, 'DICE', {
+  get: () => {
+    depreYZUR('Dice');
+    return {
+      get localizeDieTypes() { return YZUR.Dice.localizeDieTypes; },
+      get DIE_TYPES() { return YZUR.Dice.DIE_TYPES; },
+      get DIE_TYPES_BY_CLASS() { return YZUR.Dice.DIE_TYPES_BY_CLASS; },
+      get ICONS() { return depreYZUR('Icons', 'DICE.ICONS'); },
+    };
+  },
+});
+
+const depreYZUR = (key, text) => {
+  console.error(`YZUR | "YZUR.${text ?? key.toUpperCase()}" is deprecated. Use "YZUR.${key}" instead.`);
+  if (key in YZUR) return YZUR[key];
+  return null;
+};
 
 /* -------------------------------------------- */
 
@@ -834,7 +975,7 @@ class GameTypeError extends TypeError {
 
 class DieTypeError extends TypeError {
   constructor(msg) {
-    super(`Unknown die type: "${msg}". Allowed types are: ${Object.keys(CONFIG.YZUR.DICE.DIE_TYPES).join(', ')}.`);
+    super(`Unknown die type: "${msg}". Allowed types are: ${Object.keys(CONFIG.YZUR.Dice.DIE_TYPES).join(', ')}.`);
     this.name = 'YZUR | DieType Error';
   }
 }
@@ -852,17 +993,20 @@ class DieTypeError extends TypeError {
 /**
  * Custom Roll class for Year Zero games.
  * @extends {Roll} The Foundry Roll class
+ * @category MAIN
  */
 class YearZeroRoll extends Roll {
   /**
-   * @param {string} formula  The string formula to parse
-   * @param {Object} data     The data object against which to parse attributes within the formula
-   * @param {string} data.game     The game used
-   * @param {string} data.name     The name of the roll
-   * @param {number} data.maxPush  The maximum number of times the roll can be pushed
-   * @param {string} options.game     The game used
-   * @param {string} options.name     The name of the roll
-   * @param {number} options.maxPush  The maximum number of times the roll can be pushed
+   * @param {string} formula The string formula to parse
+   * @param {Object}         [data]         The data object against which to parse attributes within the formula
+   * @param {GameTypeString} [data.game]    The game used
+   * @param {string}         [data.name]    The name of the roll
+   * @param {number}         [data.maxPush] The maximum number of times the roll can be pushed
+   * @param {Object}         [options]         Additional data which is preserved in the database
+   * @param {GameTypeString} [options.game]    The game used
+   * @param {string}         [options.name]    The name of the roll
+   * @param {number}         [options.maxPush] The maximum number of times the roll can be pushed
+   * @param {boolean}        [options.yzur]    Specify this one if you have issues to recognize a YearZeroRoll
    */
   constructor(formula, data = {}, options = {}) {
     if (options.name == undefined) options.name = data.name;
@@ -1014,6 +1158,7 @@ class YearZeroRoll extends Roll {
    * Tells if the roll is a mishap (double 1's).
    * @type {boolean}
    * @readonly
+   * @deprecated
    */
   get mishap() {
     // if (this.game !== 't2k') return false;
@@ -1104,28 +1249,54 @@ class YearZeroRoll extends Roll {
 
   /**
    * Generates a roll based on the number of dice.
-   * @param {DiceQuantities}  dice        An object with quantities of dice
-   * @param {string}         [title]      The name of the roll
-   * @param {GameTypeString} [yzGame]     The game used
-   * @param {number}         [maxPush=1]  The maximum number of pushes
+   * @param {TermBlok|TermBlok[]}  dice       An array of objects that define the dice
+   * @param {string}              [title]     The name of the roll
+   * @param {GameTypeString}      [yzGame]    The game used
+   * @param {number}              [maxPush=1] The maximum number of pushes
+   * @param {Object}              [options]   Additional data which is preserved in the database
    * @returns {YearZeroRoll}
    * @static
    */
-  static forge(dice = {}, { title, yzGame = null, maxPush = 1, push = false } = {}) {
+  static forge(dice = [], { title, yzGame = null, maxPush = 1 } = {}, options = {}) {
     // Checks the game.
-    yzGame = yzGame ?? CONFIG.YZUR?.game;
+    yzGame = yzGame ?? options.game ?? CONFIG.YZUR?.game;
     if (!YearZeroRollManager.GAMES.includes(yzGame)) throw new GameTypeError(yzGame);
+
+    // Converts old format DiceQuantities.
+    // ? Was: {Object.<DieTypeString, number>}
+    // ! This is temporary support. @deprecated
+    const isOldFormat = !Array.isArray(dice) && typeof dice === 'object' && !Object.keys().includes('term');
+    if (isOldFormat) {
+      // eslint-disable-next-line max-len
+      console.warn(`${YearZeroRoll.name} | You are using an old "DiceQuanties" format which is deprecated and could be removed in a future release. Please refer to ".forge()" for the newer format.`);
+      const _dice = [];
+      for (const [type, n] of Object.entries(dice)) {
+        if (n <= 0) continue;
+        let deno = CONFIG.YZUR.Dice.DIE_TYPES[type].DENOMINATION;
+        const cls = CONFIG.Dice.terms[deno];
+        deno = cls.DENOMINATION;
+        _dice.push({ term: deno, number: n });
+      }
+      dice = _dice;
+    }
+
+    // Converts to an array.
+    if (!Array.isArray(dice)) dice = [dice];
 
     // Builds the formula.
     const out = [];
-    for (const [type, n] of Object.entries(dice)) {
-      if (n <= 0) continue;
-      let deno = CONFIG.YZUR.DICE.DIE_TYPES[type].DENOMINATION;
-      const cls = CONFIG.Dice.terms[deno];
-      deno = cls.DENOMINATION;
-      const str = `${n}d${deno}${push ? 'p' : ''}`;
-      out.push(str);
+    for (const d of dice) {
+      out.push(YearZeroRoll._getTermFormulaFromBlok(d));
     }
+    // TODO clean
+    // for (const [type, n] of Object.entries(dice)) {
+    //   if (n <= 0) continue;
+    //   let deno = CONFIG.YZUR.Dice.DIE_TYPES[type].DENOMINATION;
+    //   const cls = CONFIG.Dice.terms[deno];
+    //   deno = cls.DENOMINATION;
+    //   const str = `${n}d${deno}${push ? 'p' : ''}`;
+    //   out.push(str);
+    // }
     let formula = out.join(' + ');
 
     if (!YearZeroRoll.validate(formula)) {
@@ -1134,17 +1305,53 @@ class YearZeroRoll extends Roll {
     }
 
     // Creates the roll.
-    const roll = new YearZeroRoll(formula, { name: title, game: yzGame, maxPush });
+    if (options.name == undefined) options.name = title;
+    if (options.game == undefined) options.game = yzGame;
+    if (options.maxPush == undefined) options.maxPush = maxPush;
+    const roll = YearZeroRoll.create(formula, {}, options);
     if (CONFIG.debug.dice) console.log(roll);
     return roll;
   }
+
+  /* -------------------------------------------- */
 
   /** @deprecated */
   // eslint-disable-next-line no-unused-vars
   static createFromDiceQuantities(dice = {}, { title, yzGame = null, maxPush = 1, push = false } = {}) {
     // eslint-disable-next-line max-len
-    console.warn('YZUR | createFromDiceQuantities() is deprecated and will be removed in a future release. Use forge()instead.');
+    console.warn('YZUR | createFromDiceQuantities() is deprecated and will be removed in a future release. Use forge() instead.');
     return YearZeroRoll.forge(dice, { title, yzGame, maxPush });
+  }
+
+  /* -------------------------------------------- */
+
+  /**
+   * Creates a roll formula based on a TermBlok.
+   * @see YearZeroRoll.generateTermFormula
+   * @param {TermBlok} termBlok
+   * @returns {string}
+   * @private
+   * @static
+   */
+  static _getTermFormulaFromBlok(termBlok) {
+    const { term, number, flavor, maxPush } = termBlok;
+    return YearZeroRoll.generateTermFormula(term, number, flavor, maxPush);
+  }
+
+  /**
+   * Creates a roll formula based on number of dice.
+   * @param {number}  number   The quantity of those dice
+   * @param {DieDeno} term     The denomination of the dice to create
+   * @param {string} [flavor]  (optional) Any flavor tied to those dice
+   * @param {number} [maxPush] (optional) Special maxPush modifier but only for the those dice
+   * @returns {string}
+   * @static
+   */
+  static generateTermFormula(number, term, flavor = '', maxPush = null) {
+    let f = `${number}d${term}`;
+    if (typeof maxPush === 'number') f += `p${maxPush}`;
+    if (flavor) f += `[${flavor}]`;
+    return f;
   }
 
   /* -------------------------------------------- */
@@ -1155,6 +1362,26 @@ class YearZeroRoll extends Roll {
    * Gets all the dice terms of a certain type or that match an object of values.
    * @param {DieTypeString|{}} search Die type to search or an object with comparison values
    * @returns {YearZeroDie[]|DiceTerm[]}
+   * 
+   * @example
+   * // Gets all terms with the type "skill".
+   * let terms = getTerms('skill');
+   * 
+   * // Gets all terms that have exactly these specifications (it follows the structure of a DiceTerm).
+   * let terms = getTerms({
+   *   type: 'skill',
+   *   number: 1,
+   *   faces: 6,
+   *   options: {
+   *     flavor: 'Attack',
+   *     // ...etc...
+   *   },
+   *   results: {
+   *     result: 3,
+   *     active: true,
+   *     // ...etc...
+   *   },
+   * });
    */
   getTerms(search) {
     if (typeof search === 'string') return this.terms.filter(t => t.type === search);
@@ -1225,8 +1452,8 @@ class YearZeroRoll extends Roll {
    * @param {DieTypeString} type     The type of dice to add
    * @param {number}       [range=6] The number of faces of the die
    * @param {number}       [value]   The predefined value for the new dice
-   * @param {object}       [options] Additional options that modify the term
-   * @returns {YearZeroRoll} This roll
+   * @param {Object}       [options] Additional options that modify the term
+   * @returns {Promise.<YearZeroRoll>} This roll
    * @async
    */
   async addDice(qty, type, { range = 6, value = null, options } = {}) {
@@ -1250,7 +1477,7 @@ class YearZeroRoll extends Roll {
     }
     // If the DieTerm doesn't exist, creates it.
     else {
-      const cls = CONFIG.YZUR.DICE.DIE_TYPES[type];
+      const cls = CONFIG.YZUR.Dice.DIE_TYPES[type];
       term = new cls({
         number: qty,
         faces: range,
@@ -1333,13 +1560,13 @@ class YearZeroRoll extends Roll {
    * @deprecated Useless now
    */
   // TODO Why did I put a todo tag here?
-  // TODO remove
+  // TODO remove in version 5.0
   getDiceQuantities() {
     console.warn('YZUR | getDiceQuantities() is deprecated and will be removed in a future release.');
     return this.terms.reduce((dice, t) => {
       if (t instanceof YearZeroDie) {
         const clsName = t.constructor.name;
-        const type = CONFIG.YZUR.DICE.DIE_TYPES_BY_CLASS[clsName];
+        const type = CONFIG.YZUR.Dice.DIE_TYPES_BY_CLASS[clsName];
         if (type) dice[type] = t.number;
       }
       return dice;
@@ -1352,9 +1579,10 @@ class YearZeroRoll extends Roll {
 
   /**
    * Pushes the roll, following the YZ rules.
-   * @param {object} [options={}] Options which inform how the Roll is evaluated
+   * @param {Object}  [options={}]          Options which inform how the Roll is evaluated
    * @param {boolean} [options.async=false] Evaluate the roll asynchronously, receiving a Promise as the returned value
-   * @returns {YearZeroRoll} The roll instance, pushed
+   * @returns {Promise.<YearZeroRoll>} The roll instance, pushed
+   * @async
    */
   async push({ async } = {}) {
     if (!this._evaluated) await this.evaluate({ async });
@@ -1379,7 +1607,8 @@ class YearZeroRoll extends Roll {
   /**
    * Applies a difficulty modifier to the roll.
    * @param {number} mod Difficulty modifier (bonus or malus)
-   * @returns {YearZeroRoll} This roll, modified
+   * @returns {Promise.<YearZeroRoll>} This roll, modified
+   * @async
    */
   async modify(mod = 0) {
     if (!mod) return this;
@@ -1390,7 +1619,7 @@ class YearZeroRoll extends Roll {
       const diceMap = [null, 6, 8, 10, 12, Infinity];
       const typesMap = ['d', 'd', 'c', 'b', 'a', 'a'];
       const refactorRange = (range, n) => diceMap[diceMap.indexOf(range) + n];
-      const getTypeFromRange = (range) => typesMap[diceMap.indexOf(range)];
+      const getTypeFromRange = range => typesMap[diceMap.indexOf(range)];
 
       const _terms = this.getTerms('base');
       const dice = _terms.flatMap(t => new Array(t.number).fill(t.faces));
@@ -1514,8 +1743,8 @@ class YearZeroRoll extends Roll {
     const parts = this.dice.map(d => d.getTooltipData())
     // ==>
       .sort((a, b) => {
-        const sorts = CONFIG?.YZUR?.CHAT?.diceSorting
-          || YZUR.CHAT.diceSorting
+        const sorts = CONFIG?.YZUR?.Chat?.diceSorting
+          || YZUR.Chat.diceSorting
           || [];
         if (!sorts.length) return 0;
         const at = sorts.indexOf(a.type);
@@ -1559,11 +1788,11 @@ class YearZeroRoll extends Roll {
   /**
    * Renders the infos of a Year Zero roll.
    * @param {string} [template] The path to the template
-   * @returns {Promise<string>}
+   * @returns {Promise.<string>}
    * @async
    */
   async getRollInfos(template = null) {
-    template = template ?? CONFIG.YZUR?.ROLL?.infosTemplate;
+    template = template ?? CONFIG.YZUR?.Roll?.infosTemplate;
     const context = { roll: this };
     return renderTemplate(template, context);
   }
@@ -1572,7 +1801,7 @@ class YearZeroRoll extends Roll {
 
   /**
    * Renders a Roll instance to HTML.
-   * @param {object}  [chatOptions]               An object configuring the behavior of the resulting chat message,
+   * @param {Object}  [chatOptions]               An object configuring the behavior of the resulting chat message,
    *   which is also passed to the template
    * @param {string}  [chatOptions.user]          The ID of the user that renders the roll
    * @param {string}  [chatOptions.flavor]        The flavor of the message
@@ -1583,7 +1812,7 @@ class YearZeroRoll extends Roll {
    * @param {boolean} [chatOptions.blind]         Whether this is a blind roll
    * @param {boolean} [chatOptions.isPrivate]     Whether this roll is private
    *   (displays sensitive infos with `???` instead)
-   * @returns {Promise<string>}
+   * @returns {Promise.<string>}
    * @async
    * @override
    */
@@ -1609,7 +1838,7 @@ class YearZeroRoll extends Roll {
       tooltip: isPrivate ? '' : await this.getTooltip(),
       total: isPrivate ? '?' : Math.round(this.total * 100) / 100,
       success: isPrivate ? '?' : this.successCount,
-      showInfos: isPrivate ? false : CONFIG.YZUR?.CHAT?.showInfos,
+      showInfos: isPrivate ? false : CONFIG.YZUR?.Chat?.showInfos,
       infos: isPrivate ? null : await this.getRollInfos(chatOptions.infosTemplate),
       pushable: isPrivate ? false : this.pushable,
       options: chatOptions,
@@ -1626,9 +1855,9 @@ class YearZeroRoll extends Roll {
   /**
    * Transform a Roll instance into a ChatMessage, displaying the roll result.
    * This function can either create the ChatMessage directly, or return the data object that will be used to create.
-   * @param {object}  [messageData]         The data object to use when creating the message
+   * @param {Object}  [messageData]         The data object to use when creating the message
    * @param {string}  [messageData.user]    The ID of the user that sends the message
-   * @param {object}  [messageData.speaker] The identified speaker data
+   * @param {Object}  [messageData.speaker] The identified speaker data
    * @param {string}  [messageData.content] The HTML content of the message,
    *   overriden by the `roll.render()`'s returned content if left unchanged
    * @param {number}  [messageData.type=5]    The type to use for the message from `CONST.CHAT_MESSAGE_TYPES`
@@ -1637,7 +1866,7 @@ class YearZeroRoll extends Roll {
    * @param {string}  [options.rollMode]    The template roll mode to use for the message from CONFIG.Dice.rollModes
    * @param {boolean} [options.create=true] Whether to automatically create the chat message,
    *   or only return the prepared chatData object.
-   * @return {Promise<ChatMessage|ChatMessageData>} A promise which resolves to the created ChatMessage entity
+   * @return {Promise.<ChatMessage|ChatMessageData>} A promise which resolves to the created ChatMessage entity
    *   if create is true
    *   or the Object of prepared chatData otherwise.
    * @async
@@ -1670,6 +1899,24 @@ class YearZeroRoll extends Roll {
     return this.constructor.fromData(this.toJSON());
   }
 }
+
+/* -------------------------------------------- */
+/*  Definitions                                 */
+/* -------------------------------------------- */
+
+/**
+ * Defines a YZ die's denomination.
+ * @typedef {string} DieDeno
+ */
+
+/**
+ * An object that is used to define a YearZero DieTerm.
+ * @typedef  {Object}  TermBlok
+ * @property {DieDeno} term     The denomination of the dice to create
+ * @property {number}  number   The quantity of those dice
+ * @property {string} [flavor]  (optional) Any flavor tied to those dice
+ * @property {number} [maxPush] (optional) Special maxPush modifier but only for the those dice
+ */
 
 /* -------------------------------------------- */
 /*  Definitions                                 */
@@ -1711,35 +1958,6 @@ class YearZeroRoll extends Roll {
  * @typedef {string} DieTypeString
  */
 
-/**
- * Defines a YZ die's denomination.
- * @typedef {string} DieDeno
- */
-
-/**
- * An object with quantities of dice.
- * @typedef {Object<DieTypeString, number>} DiceQuantities
- * @property {?number}  base     The quantity of base dice
- * @property {?number}  skill    The quantity of skill dice
- * @property {?number}  gear     The quantity of gear dice
- * @property {?number}  neg      The quantity of negative dice
- * @property {?number}  stress   The quantity of stress dice
- * @property {?number}  artoD8   The quantity of artoD8 dice
- * @property {?number}  artoD10  The quantity of artoD10 dice
- * @property {?number}  artoD12  The quantity of artoD12 dice
- * @property {?number}  a        The quantity of Twilight 2000's D12 dice
- * @property {?number}  b        The quantity of Twilight 2000's D10 dice
- * @property {?number}  c        The quantity of Twilight 2000's D8 dice
- * @property {?number}  d        The quantity of Twilight 2000's D6 dice
- * @property {?number}  ammo     The quantity of Twilight 2000's ammo dice
- * @property {?number}  loc      The quantity of Twilight 2000's location dice (usually, one)
- * @property {?number}  brD12    The quantity of Blade Runner's D12 dice
- * @property {?number}  brD10    The quantity of Blade Runner's D10 dice
- * @property {?number}  brD8     The quantity of Blade Runner's D8 dice
- * @property {?number}  brD6     The quantity of Blade Runner's D6 dice
- */
-
-
 /* -------------------------------------------- */
 /*  Custom Dice Registration                    */
 /* -------------------------------------------- */
@@ -1757,7 +1975,7 @@ class YearZeroRoll extends Roll {
  * @example
  * import { YearZeroRollManager } from './lib/yzur.js';
  * Hooks.once('init', function() {
- *   YearZeroRollManager.register('yourgame', { options });
+ *   YearZeroRollManager.register('yourgame', config, options);
  *   ...
  * });
  * 
@@ -1768,25 +1986,26 @@ class YearZeroRollManager {
    * 
    * You must call this method in `Hooks.once('init')`.
    * 
-   * @param {GameTypeString} yzGame  The game used (for the choice of die types to register).
-   * @param {object}        [config] Custom config to merge with the initial config.
-   * @param {object}        [data]   Additional data.
+   * @param {GameTypeString} yzGame  The game used (for the choice of die types to register)
+   * @param {Object}        [config] Custom config to merge with the initial config
+   * @param {Object} [options]       Additional options
+   * @param {number} [options.index] Index of the registration
    * @static
    */
-  static register(yzGame, config, data = {}) {
+  static register(yzGame, config, options = {}) {
     // Registers the config.
     YearZeroRollManager.registerConfig(config);
     // Registers the YZ game.
     YearZeroRollManager._initialize(yzGame);
     // Registers the dice.
-    YearZeroRollManager.registerDice(yzGame, data?.index);
+    YearZeroRollManager.registerDice(yzGame, options?.index);
     console.log('YZUR | Registration complete!');
   }
 
   /**
    * Registers the Year Zero Universal Roller config.
    * *(See the config details at the very bottom of this file.)*
-   * @param {string} [config] Custom config to merge with the initial config.
+   * @param {string} [config] Custom config to merge with the initial config
    * @static
    */
   static registerConfig(config) {
@@ -1824,9 +2043,9 @@ class YearZeroRollManager {
    */
   static registerRoll(cls = YearZeroRoll, i = 0) {
     CONFIG.Dice.rolls[i] = cls;
-    CONFIG.Dice.rolls[i].CHAT_TEMPLATE = CONFIG.YZUR.ROLL.chatTemplate;
-    CONFIG.Dice.rolls[i].TOOLTIP_TEMPLATE = CONFIG.YZUR.ROLL.tooltipTemplate;
-    CONFIG.YZUR.ROLL.index = i;
+    CONFIG.Dice.rolls[i].CHAT_TEMPLATE = CONFIG.YZUR.Roll.chatTemplate;
+    CONFIG.Dice.rolls[i].TOOLTIP_TEMPLATE = CONFIG.YZUR.Roll.tooltipTemplate;
+    CONFIG.YZUR.Roll.index = i;
     if (i > 0) YearZeroRollManager._overrideRollCreate(i);
   }
 
@@ -1836,7 +2055,7 @@ class YearZeroRollManager {
    * @static
    */
   static registerDie(type) {
-    const cls = CONFIG.YZUR.DICE.DIE_TYPES[type];
+    const cls = CONFIG.YZUR.Dice.DIE_TYPES[type];
     if (!cls) throw new DieTypeError(type);
 
     const deno = cls.DENOMINATION;
@@ -1883,12 +2102,14 @@ class YearZeroRollManager {
    * @static
    */
   static _overrideRollCreate(index = 1) {
-    Roll.prototype.constructor.create = function(formula, data = {}, options = {}) {
-      const YZURFormula = data.yzur
-        ?? data.game
+    Roll.prototype.constructor.create = function (formula, data = {}, options = {}) {
+      const isYZURFormula = data.game
         ?? data.maxPush
+        ?? options.yzur
+        ?? options.game
+        ?? options.maxPush
         ?? formula.match(/\d*d(:?[bsngzml]|6|8|10|12)/i);
-      const n = YZURFormula ? index : 0;
+      const n = isYZURFormula ? index : 0;
       const cls = CONFIG.Dice.rolls[n];
       return new cls(formula, data, options);
     };
@@ -1900,7 +2121,7 @@ class YearZeroRollManager {
 /**
  * Die Types mapped with Games.
  * Used by the register method to choose which dice to activate.
- * @type {Object<GameTypeString, DieTypeString[]>}
+ * @enum {DieTypeString[]}
  * @constant
  */
 YearZeroRollManager.DIE_TYPES_MAP = {
@@ -1922,7 +2143,11 @@ YearZeroRollManager.DIE_TYPES_MAP = {
   'br': ['brD12', 'brD10', 'brD8', 'brD6'],
 };
 
-/** @type {GameTypeString[]} */
+/**
+ * List of identifiers for the games.
+ * @enum {GameTypeString}
+ * @constant
+ */
 YearZeroRollManager.GAMES = Object.keys(YearZeroRollManager.DIE_TYPES_MAP);
 
 export { YZUR, YearZeroDice, YearZeroRoll, YearZeroRollManager };
