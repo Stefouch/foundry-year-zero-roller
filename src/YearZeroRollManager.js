@@ -127,9 +127,9 @@ export default class YearZeroRollManager {
    */
   static registerRoll(cls = YearZeroRoll, i = 0) {
     CONFIG.Dice.rolls[i] = cls;
-    CONFIG.Dice.rolls[i].CHAT_TEMPLATE = CONFIG.YZUR.ROLL.chatTemplate;
-    CONFIG.Dice.rolls[i].TOOLTIP_TEMPLATE = CONFIG.YZUR.ROLL.tooltipTemplate;
-    CONFIG.YZUR.ROLL.index = i;
+    CONFIG.Dice.rolls[i].CHAT_TEMPLATE = CONFIG.YZUR.Roll.chatTemplate;
+    CONFIG.Dice.rolls[i].TOOLTIP_TEMPLATE = CONFIG.YZUR.Roll.tooltipTemplate;
+    CONFIG.YZUR.Roll.index = i;
     if (i > 0) YearZeroRollManager._overrideRollCreate(i);
   }
 
@@ -139,7 +139,7 @@ export default class YearZeroRollManager {
    * @static
    */
   static registerDie(type) {
-    const cls = CONFIG.YZUR.DICE.DIE_TYPES[type];
+    const cls = CONFIG.YZUR.Dice.DIE_TYPES[type];
     if (!cls) throw new DieTypeError(type);
 
     const deno = cls.DENOMINATION;

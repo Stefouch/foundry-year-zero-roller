@@ -14,16 +14,16 @@ import { GameTypeError } from './errors.js';
  */
 export default class YearZeroRoll extends Roll {
   /**
-   * @param {string}  formula  The string formula to parse
-   * @param {Object}  [data]         The data object against which to parse attributes within the formula
-   * @param {string}  [data.game]    The game used
-   * @param {string}  [data.name]    The name of the roll
-   * @param {number}  [data.maxPush] The maximum number of times the roll can be pushed
-   * @param {Object}  [options]         Additional data which is preserved in the database
-   * @param {string}  [options.game]    The game used
-   * @param {string}  [options.name]    The name of the roll
-   * @param {number}  [options.maxPush] The maximum number of times the roll can be pushed
-   * @param {boolean} [options.yzur]    Specify this one if you have issues to recognize a YearZeroRoll
+   * @param {string} formula The string formula to parse
+   * @param {Object}         [data]         The data object against which to parse attributes within the formula
+   * @param {GameTypeString} [data.game]    The game used
+   * @param {string}         [data.name]    The name of the roll
+   * @param {number}         [data.maxPush] The maximum number of times the roll can be pushed
+   * @param {Object}         [options]         Additional data which is preserved in the database
+   * @param {GameTypeString} [options.game]    The game used
+   * @param {string}         [options.name]    The name of the roll
+   * @param {number}         [options.maxPush] The maximum number of times the roll can be pushed
+   * @param {boolean}        [options.yzur]    Specify this one if you have issues to recognize a YearZeroRoll
    */
   constructor(formula, data = {}, options = {}) {
     if (options.name == undefined) options.name = data.name;
@@ -289,7 +289,7 @@ export default class YearZeroRoll extends Roll {
       const _dice = [];
       for (const [type, n] of Object.entries(dice)) {
         if (n <= 0) continue;
-        let deno = CONFIG.YZUR.DICE.DIE_TYPES[type].DENOMINATION;
+        let deno = CONFIG.YZUR.Dice.DIE_TYPES[type].DENOMINATION;
         const cls = CONFIG.Dice.terms[deno];
         deno = cls.DENOMINATION;
         _dice.push({ term: deno, number: n });
@@ -308,7 +308,7 @@ export default class YearZeroRoll extends Roll {
     // TODO clean
     // for (const [type, n] of Object.entries(dice)) {
     //   if (n <= 0) continue;
-    //   let deno = CONFIG.YZUR.DICE.DIE_TYPES[type].DENOMINATION;
+    //   let deno = CONFIG.YZUR.Dice.DIE_TYPES[type].DENOMINATION;
     //   const cls = CONFIG.Dice.terms[deno];
     //   deno = cls.DENOMINATION;
     //   const str = `${n}d${deno}${push ? 'p' : ''}`;
@@ -336,7 +336,7 @@ export default class YearZeroRoll extends Roll {
   // eslint-disable-next-line no-unused-vars
   static createFromDiceQuantities(dice = {}, { title, yzGame = null, maxPush = 1, push = false } = {}) {
     // eslint-disable-next-line max-len
-    console.warn('YZUR | createFromDiceQuantities() is deprecated and will be removed in a future release. Use forge()instead.');
+    console.warn('YZUR | createFromDiceQuantities() is deprecated and will be removed in a future release. Use forge() instead.');
     return YearZeroRoll.forge(dice, { title, yzGame, maxPush });
   }
 
@@ -379,6 +379,26 @@ export default class YearZeroRoll extends Roll {
    * Gets all the dice terms of a certain type or that match an object of values.
    * @param {DieTypeString|{}} search Die type to search or an object with comparison values
    * @returns {YearZeroDie[]|DiceTerm[]}
+   * 
+   * @example
+   * // Gets all terms with the type "skill".
+   * let terms = getTerms('skill');
+   * 
+   * // Gets all terms that have exactly these specifications (it follows the structure of a DiceTerm).
+   * let terms = getTerms({
+   *   type: 'skill',
+   *   number: 1,
+   *   faces: 6,
+   *   options: {
+   *     flavor: 'Attack',
+   *     // ...etc...
+   *   },
+   *   results: {
+   *     result: 3,
+   *     active: true,
+   *     // ...etc...
+   *   },
+   * });
    */
   getTerms(search) {
     if (typeof search === 'string') return this.terms.filter(t => t.type === search);
@@ -474,7 +494,7 @@ export default class YearZeroRoll extends Roll {
     }
     // If the DieTerm doesn't exist, creates it.
     else {
-      const cls = CONFIG.YZUR.DICE.DIE_TYPES[type];
+      const cls = CONFIG.YZUR.Dice.DIE_TYPES[type];
       term = new cls({
         number: qty,
         faces: range,
@@ -557,13 +577,13 @@ export default class YearZeroRoll extends Roll {
    * @deprecated Useless now
    */
   // TODO Why did I put a todo tag here?
-  // TODO remove
+  // TODO remove in version 5.0
   getDiceQuantities() {
     console.warn('YZUR | getDiceQuantities() is deprecated and will be removed in a future release.');
     return this.terms.reduce((dice, t) => {
       if (t instanceof YearZeroDie) {
         const clsName = t.constructor.name;
-        const type = CONFIG.YZUR.DICE.DIE_TYPES_BY_CLASS[clsName];
+        const type = CONFIG.YZUR.Dice.DIE_TYPES_BY_CLASS[clsName];
         if (type) dice[type] = t.number;
       }
       return dice;
@@ -576,7 +596,7 @@ export default class YearZeroRoll extends Roll {
 
   /**
    * Pushes the roll, following the YZ rules.
-   * @param {Object} [options={}] Options which inform how the Roll is evaluated
+   * @param {Object}  [options={}]          Options which inform how the Roll is evaluated
    * @param {boolean} [options.async=false] Evaluate the roll asynchronously, receiving a Promise as the returned value
    * @returns {Promise.<YearZeroRoll>} The roll instance, pushed
    * @async
@@ -740,8 +760,8 @@ export default class YearZeroRoll extends Roll {
     const parts = this.dice.map(d => d.getTooltipData())
     // ==>
       .sort((a, b) => {
-        const sorts = CONFIG?.YZUR?.CHAT?.diceSorting
-          || YZUR.CHAT.diceSorting
+        const sorts = CONFIG?.YZUR?.Chat?.diceSorting
+          || YZUR.Chat.diceSorting
           || [];
         if (!sorts.length) return 0;
         const at = sorts.indexOf(a.type);
@@ -789,7 +809,7 @@ export default class YearZeroRoll extends Roll {
    * @async
    */
   async getRollInfos(template = null) {
-    template = template ?? CONFIG.YZUR?.ROLL?.infosTemplate;
+    template = template ?? CONFIG.YZUR?.Roll?.infosTemplate;
     const context = { roll: this };
     return renderTemplate(template, context);
   }
@@ -835,7 +855,7 @@ export default class YearZeroRoll extends Roll {
       tooltip: isPrivate ? '' : await this.getTooltip(),
       total: isPrivate ? '?' : Math.round(this.total * 100) / 100,
       success: isPrivate ? '?' : this.successCount,
-      showInfos: isPrivate ? false : CONFIG.YZUR?.CHAT?.showInfos,
+      showInfos: isPrivate ? false : CONFIG.YZUR?.Chat?.showInfos,
       infos: isPrivate ? null : await this.getRollInfos(chatOptions.infosTemplate),
       pushable: isPrivate ? false : this.pushable,
       options: chatOptions,

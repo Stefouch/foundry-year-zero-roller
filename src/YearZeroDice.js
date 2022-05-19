@@ -103,7 +103,14 @@ export class YearZeroDie extends Die {
 
   /* -------------------------------------------- */
 
-  /** @override */
+  /** 
+   * Rolls the DiceTerm by mapping a random uniform draw against the faces of the dice term.
+   * @param {Object}  [options={}]             Options which modify how a random result is produced
+   * @param {boolean} [options.minimize=false] Minimize the result, obtaining the smallest possible value
+   * @param {boolean} [options.maximize=false] Maximize the result, obtaining the smallest possible value
+   * @returns {YearZeroDieTermResult} The produced result
+   * @override
+   */
   roll(options = {}) {
     // Modifies the result.
     const roll = super.roll(options);
@@ -204,17 +211,27 @@ export class YearZeroDie extends Die {
   /*  Dice Term Methods                           */
   /* -------------------------------------------- */
 
-  /** @override */
+  /** 
+   * Returns a string used as the label for each rolled result.
+   * @param {YearZeroDieTermResult} result The rolled result
+   * @returns {string} The result label
+   * @override
+   */
   getResultLabel(result) {
     // Do not forget to stringify the label because
     // numbers return an error with DiceSoNice!
-    return CONFIG.YZUR.DICE.ICONS.getLabel(
+    return CONFIG.YZUR.Icons.getLabel(
       this.constructor.TYPE,
       result.result,
     );
   }
 
-  /** @override */
+  /**
+   * Gets the CSS classes that should be used to display each rolled result.
+   * @param {YearZeroDieTermResult} result The rolled result
+   * @returns {string[]} The desired classes
+   * @override
+   */
   getResultCSS(result) {
     // This is copy-pasted from the source code,
     // with modified parts between ==> arrows <==.
@@ -259,7 +276,11 @@ export class YearZeroDie extends Die {
     ];
   }
 
-  /** @override */
+  /** 
+   * Renders the tooltip HTML for a Roll instance.
+   * @returns {Object} The data object used to render the default tooltip template for this DiceTerm
+   * @override
+   */
   getTooltipData() {
     // This is copy-pasted from the source code,
     // with modified parts between ==> arrows <==.
@@ -281,7 +302,7 @@ export class YearZeroDie extends Die {
       //* Adds a default flavor for the die.
       // flavor: this.flavor,
       flavor: this.options.flavor ?? (
-        CONFIG.YZUR?.DICE?.localizeDieTypes
+        CONFIG.YZUR?.Dice?.localizeDieTypes
           ? game.i18n.localize(`YZUR.DIETYPES.${this.constructor.name}`)
           : null
       ),
@@ -300,8 +321,31 @@ export class YearZeroDie extends Die {
     };
   }
 }
+
+/**
+ * The type of the die.
+ * @type {string}
+ * @constant
+ * @static
+ */
 YearZeroDie.TYPE = 'blank';
+
+/**
+ * An array of values that disallow the die to be pushed.
+ * @type {number[]}
+ * @constant
+ * @static
+ */
 YearZeroDie.LOCKED_VALUES = [6];
+
+/**
+ * An array of additional attributes which should be retained when the term is serialized.
+ * Addition: **maxPush**
+ * @type {string[]}
+ * @constant
+ * @static
+ * @inheritdoc
+ */
 YearZeroDie.SERIALIZE_ATTRIBUTES.push('maxPush');
 
 /** @inheritdoc */
@@ -375,7 +419,7 @@ StressDie.LOCKED_VALUES = [1, 6];
 export class ArtifactDie extends SkillDie {
   /** @override */
   getResultLabel(result) {
-    return CONFIG.YZUR.DICE.ICONS.getLabel(
+    return CONFIG.YZUR.Icons.getLabel(
       `d${this.constructor.DENOMINATION}`,
       result.result,
     );
@@ -419,7 +463,7 @@ D12ArtifactDie.DENOMINATION = '12';
 export class TwilightDie extends ArtifactDie {
   /** @override */
   getResultLabel(result) {
-    return CONFIG.YZUR.DICE.ICONS.getLabel('base', result.result);
+    return CONFIG.YZUR.Icons.getLabel('base', result.result);
   }
 }
 TwilightDie.TYPE = 'base';
@@ -460,6 +504,10 @@ D12TwilightDie.DENOMINATION = '12';
 
 /* -------------------------------------------- */
 
+/**
+ * Ammunition Die for Twilight 2000.
+ * @extends {YearZeroDie}
+ */
 export class AmmoDie extends YearZeroDie {
   constructor(termData = {}) {
     termData.faces = 6;
@@ -472,6 +520,10 @@ AmmoDie.LOCKED_VALUES = [1, 6];
 
 /* -------------------------------------------- */
 
+/**
+ * Location/Hit Die for Twilight 2000.
+ * @extends {YearZeroDie}
+ */
 export class LocationDie extends YearZeroDie {
   constructor(termData = {}) {
     termData.faces = 6;
@@ -502,7 +554,7 @@ LocationDie.LOCKED_VALUES = [1, 2, 3, 4, 5, 6];
 export class BladeRunnerDie extends ArtifactDie {
   /** @override */
   getResultLabel(result) {
-    return CONFIG.YZUR.DICE.ICONS.getLabel('base', result.result);
+    return CONFIG.YZUR.Icons.getLabel('base', result.result);
   }
 }
 BladeRunnerDie.TYPE = 'base';
@@ -544,3 +596,28 @@ export class D12BladeRunnerDie extends BladeRunnerDie {
 }
 D12BladeRunnerDie.DENOMINATION = '12';
 D12BladeRunnerDie.LOCKED_VALUES = [1, 10, 11, 12];
+
+/* -------------------------------------------- */
+/*  Definitions                                 */
+/* -------------------------------------------- */
+
+/**
+ * Result of a rolled YearZero DieTerm.
+ * @typedef {Object} YearZeroDieTermResult
+ * @property {!number} result      The numeric result
+ * @property {boolean} active      Is this result active, contributing to the total?
+ * @property {number}  count       A value that the result counts as, otherwise the result is not used directly as
+ * @property {boolean} success     Does this result denote a success?
+ * @property {boolean} failure     Does this result denote a failure?
+ * @property {boolean} discarded   Was this result discarded?
+ * @property {boolean} rerolled    Was this result rerolled?
+ * @property {boolean} exploded    Was this result exploded?
+ * @property {boolean} pushed      ✨ Was this result pushed?
+ * @property {boolean} hidden      ✨ Hides the die for DsN
+ * @property {number}  indexResult ✨ Index of the result, and column position in the chat tooltip
+ * @property {number}  indexPush   ✨ Index of the push, and row position in the chat tooltip
+ */
+
+/**
+ * 
+ */

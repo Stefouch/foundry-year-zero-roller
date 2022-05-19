@@ -13,7 +13,7 @@ export class GameTypeError extends TypeError {
 
 export class DieTypeError extends TypeError {
   constructor(msg) {
-    super(`Unknown die type: "${msg}". Allowed types are: ${Object.keys(CONFIG.YZUR.DICE.DIE_TYPES).join(', ')}.`);
+    super(`Unknown die type: "${msg}". Allowed types are: ${Object.keys(CONFIG.YZUR.Dice.DIE_TYPES).join(', ')}.`);
     this.name = 'YZUR | DieType Error';
   }
 }
