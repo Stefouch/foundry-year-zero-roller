@@ -10,6 +10,7 @@ import { GameTypeError } from './errors.js';
 /**
  * Custom Roll class for Year Zero games.
  * @extends {Roll} The Foundry Roll class
+ * @category MAIN
  */
 export default class YearZeroRoll extends Roll {
   /**

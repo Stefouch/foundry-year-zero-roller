@@ -7,6 +7,32 @@
 
 import * as YearZeroDice from './YearZeroDice.js';
 
+/**
+ * All constants used by YZUR which are stored in Foundry's `CONFIG.YZUR`.
+ * @constant
+ * @property {!string} game The identifier for the game
+ * @property {Object}         CHAT                 Options for the chat
+ * @property {boolean}       [CHAT.showInfos=true] Whether to show the additional information under the roll result
+ * @property {DieTypeString} [CHAT.diceSorting=['base', 'skill', 'neg', 'gear', 'arto', 'loc', 'ammo']]
+ *   Defines the default order
+ * @property {Object}  ROLL                 Options for the YearZeroRoll class
+ * @property {!string} ROLL.chatTemplate    Path to the chat template
+ * @property {!string} ROLL.tooltipTemplate Path to the tooltip template
+ * @property {!string} ROLL.infosTemplate   Path to the infos template
+ * @property {Object}   DICE   Options for the YearZeroDie class
+ * @property {boolean} [DICE.localizeDieTypes=true]
+ *   Whether to localize the type of the die
+ * @property {Object.<DieTypeString, class>}  DICE.DIE_TYPES
+ *   An enumeration of YearZeroDie classes
+ * @property {Object.<string, DieTypeString>} DICE.DIE_TYPES_BY_CLASS
+ *   An enumeration of YearZeroDie types sorted by their class names
+ * @property {Object}    DICE.ICONS    Options for the icons and what's on the die faces
+ * @property {function} [DICE.ICONS.getLabel=getLabel( type: DieTypeString, result: number )] 
+ *   A customizable helper function for creating the labels of the die.
+ *   Note: You must return a string or DsN will throw an error.
+ * @property {Object.<DieTypeString, (Object.<string, string|number)>>} DICE.ICONS.yzGame
+ *   Defines the labels for your dice. Change `yzGame` with the 
+ */
 const YZUR = {
   game: '',
   CHAT: {
@@ -48,7 +74,7 @@ const YZUR = {
        * @param {number} result
        * @returns {string}
        */
-      getLabel: function(type, result) {
+      getLabel: function (type, result) {
         const arto = ['d8', 'd10', 'd12'];
         if (arto.includes(type)) type = 'arto';
         return String(this[CONFIG.YZUR.game][type][result]);

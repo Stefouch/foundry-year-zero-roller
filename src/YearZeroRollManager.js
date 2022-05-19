@@ -205,7 +205,6 @@ export default class YearZeroRollManager {
 /**
  * Die Types mapped with Games.
  * Used by the register method to choose which dice to activate.
- * @type {Object.<GameTypeString, DieTypeString[]>}
  * @enum {DieTypeString[]}
  * @constant
  */
@@ -228,5 +227,9 @@ YearZeroRollManager.DIE_TYPES_MAP = {
   'br': ['brD12', 'brD10', 'brD8', 'brD6'],
 };
 
-/** @type {GameTypeString[]} @enum {GameTypeString} */
+/**
+ * List of identifiers for the games.
+ * @enum {GameTypeString}
+ * @constant
+ */
 YearZeroRollManager.GAMES = Object.keys(YearZeroRollManager.DIE_TYPES_MAP);

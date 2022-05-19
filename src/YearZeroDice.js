@@ -2,6 +2,11 @@
 /*  Custom Dice classes                         */
 /* -------------------------------------------- */
 
+/**
+ * Custom Die class for Year Zero games.
+ * @extends {Die} The Foundry Die class
+ * @category MAIN
+ */
 export class YearZeroDie extends Die {
   constructor(termData = {}) {
     termData.faces = termData.faces || 6;
@@ -313,6 +318,7 @@ YearZeroDie.MODIFIERS = foundry.utils.mergeObject(
 /**
  * Base Die: 1 & 6 cannot be re-rolled.
  * @extends {YearZeroDie}
+ * @category OTHER DICE
  */
 export class BaseDie extends YearZeroDie {}
 BaseDie.TYPE = 'base';
@@ -322,6 +328,7 @@ BaseDie.LOCKED_VALUES = [1, 6];
 /**
  * Skill Die: 6 cannot be re-rolled.
  * @extends {YearZeroDie}
+ * @category OTHER DICE
  */
 export class SkillDie extends YearZeroDie {}
 SkillDie.TYPE = 'skill';
@@ -330,6 +337,7 @@ SkillDie.DENOMINATION = 's';
 /**
  * Gear Die: 1 & 6 cannot be re-rolled.
  * @extends {YearZeroDie}
+ * @category OTHER DICE
  */
 export class GearDie extends YearZeroDie {}
 GearDie.TYPE = 'gear';
@@ -339,6 +347,7 @@ GearDie.LOCKED_VALUES = [1, 6];
 /**
  * Negative Die: 6 cannot be re-rolled.
  * @extends {SkillDie}
+ * @category OTHER DICE
  */
 export class NegativeDie extends SkillDie {}
 NegativeDie.TYPE = 'neg';
@@ -349,6 +358,7 @@ NegativeDie.DENOMINATION = 'n';
 /**
  * Stress Die: 1 & 6 cannot be re-rolled.
  * @extends {YearZeroDie}
+ * @category OTHER DICE
  */
 export class StressDie extends YearZeroDie {}
 StressDie.TYPE = 'stress';
@@ -360,6 +370,7 @@ StressDie.LOCKED_VALUES = [1, 6];
 /**
  * Artifact Die: 6+ cannot be re-rolled.
  * @extends {SkillDie}
+ * @category OTHER DICE
  */
 export class ArtifactDie extends SkillDie {
   /** @override */
@@ -403,6 +414,7 @@ D12ArtifactDie.DENOMINATION = '12';
 /**
  * Twilight Die: 1 & 6+ cannot be re-rolled.
  * @extends {ArtifactDie} But LOCKED_VALUES are not the same
+ * @category OTHER DICE
  */
 export class TwilightDie extends ArtifactDie {
   /** @override */
@@ -485,6 +497,7 @@ LocationDie.LOCKED_VALUES = [1, 2, 3, 4, 5, 6];
 /**
  * BladeRunner Die: 1 cannot be re-rolled.
  * @extends {ArtifactDie} But LOCKED_VALUES are not the same
+ * @category OTHER DICE
  */
 export class BladeRunnerDie extends ArtifactDie {
   /** @override */
