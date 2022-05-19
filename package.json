@@ -2,13 +2,14 @@
   "name": "foundry-year-zero-roller",
   "version": "4.0.0",
   "description": "",
-  "main": "foundry-year-zero-roller.js",
+  "main": "dist/yzur.js",
   "scripts": {
-    "build": "gulp build",
+    "build": "gulp build && npm run docs",
     "bump": "gulp bump --release",
     "release": "gulp release",
     "update": "npm outdated && npm update",
-    "watch": "gulp watch"
+    "watch": "gulp watch",
+    "docs": "jsdoc -c jsdoc.jsonc"
   },
   "keywords": [
     "Foundry",
@@ -19,12 +20,14 @@
   "devDependencies": {
     "@league-of-foundry-developers/foundry-vtt-types": "^9.268.2",
     "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
+    "better-docs": "^2.7.2",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
     "execa": "^5.1.1",
     "fs-extra": "^10.0.0",
     "gulp": "^4.0.2",
+    "jsdoc": "^3.6.10",
     "moment": "^2.29.2",
     "rollup": "^2.56.2",
     "rollup-plugin-license": "^2.7.0",
