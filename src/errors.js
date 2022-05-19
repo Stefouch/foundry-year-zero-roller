@@ -11,10 +11,10 @@ export class GameTypeError extends TypeError {
   }
 }
 
-export class DieTypeError extends TypeError {
+export class DieTermError extends TypeError {
   constructor(msg) {
-    super(`Unknown die type: "${msg}". Allowed types are: ${Object.keys(CONFIG.YZUR.Dice.DIE_TYPES).join(', ')}.`);
-    this.name = 'YZUR | DieType Error';
+    super(`Unknown die term: "${msg}". Allowed terms are: ${Object.keys(CONFIG.YZUR.Dice.DIE_TERMS).join(', ')}.`);
+    this.name = 'YZUR | DieTerm Error';
   }
 }
 

@@ -1,46 +1,6 @@
 import YearZeroRoll from './YearZeroRoll.js';
 import YZUR from './constants.js';
-import { DieTypeError, GameTypeError } from './errors.js';
-
-/* -------------------------------------------- */
-/*  Definitions                                 */
-/* -------------------------------------------- */
-
-/**
- * Defines a Year Zero game.
- * - `myz`: Mutant Year Zero
- * - `fbl`: Forbidden Lands
- * - `alien`: Alien RPG
- * - `cor`: Coriolis The Third Horizon
- * - `tales`: Tales From the Loop & Things From the Flood
- * - `vae`: Vaesen
- * - `t2k`: Twilight 2000
- * - `br`: Blade Runner RPG
- * @typedef {string} GameTypeString
- */
-
-/**
- * Defines a type of a YZ die.
- * - `base`: Base Die (locked on 1 and 6, trauma on 1)
- * - `skill`: Skill Die (locked on 6)
- * - `gear`: Gear Die (locked on 1 and 6, gear damage on 1)
- * - `neg`: Negative Die (locked on 6, negative success)
- * - `stress`: Stress Die (locked on 1 and 6, stress, panic)
- * - `artoD8`: D8 Artifact Die (locked on 6+, multiple successes)
- * - `artoD10`: D10 Artifact Die (locked on 6+, multiple successes)
- * - `artoD12`: D12 Artifact Die (locked on 6+, multiple successes)
- * - `a`: Twilight 2000's D12 Die (locked on 1 and 6+, multiple successes)
- * - `b`: Twilight 2000's D10 Die (locked on 1 and 6+, multiple successes)
- * - `c`: Twilight 2000's D8 Die (locked on 1 and 6+)
- * - `d`: Twilight 2000's D6 Die (locked on 1 and 6+)
- * - `ammo`: Twilight 2000's Ammo Die (locked on 1 and 6, not success but hit)
- * - `loc`: Twilight 2000's Location Die
- * - `brD12`: Blade Runner's D12 Die (locked on 1 and 10+)
- * - `brD10`: Blade Runner's D10 Die (locked on 1 and 10)
- * - `brD8`: Blade Runner's D8 Die (locked on 1 and 6+)
- * - `brD6`: Blade Runner's D6 Die (locked on 1 and 6)
- * @typedef {string} DieTypeString
- */
+import { DieTermError, GameTypeError } from './errors.js';
 
 /* -------------------------------------------- */
 /*  Custom Dice Registration                    */
@@ -112,7 +72,7 @@ export default class YearZeroRollManager {
     if (!YearZeroRollManager.GAMES.includes(yzGame)) throw new GameTypeError(yzGame);
 
     // Registers the game's dice.
-    const diceTypes = YearZeroRollManager.DIE_TYPES_MAP[yzGame];
+    const diceTypes = YearZeroRollManager.DIE_TERMS_MAP[yzGame];
     for (const type of diceTypes) YearZeroRollManager.registerDie(type);
 
     // Finally, registers our custom Roll class for Year Zero games.
@@ -135,12 +95,12 @@ export default class YearZeroRollManager {
 
   /**
    * Registers a die in Foundry.
-   * @param {DieTypeString} type Type of die to register
+   * @param {DieTermString} term Type of die to register
    * @static
    */
-  static registerDie(type) {
-    const cls = CONFIG.YZUR.Dice.DIE_TYPES[type];
-    if (!cls) throw new DieTypeError(type);
+  static registerDie(term) {
+    const cls = CONFIG.YZUR.Dice.DIE_TERMS[term];
+    if (!cls) throw new DieTermError(term);
 
     const deno = cls.DENOMINATION;
     if (!deno) {
@@ -205,10 +165,10 @@ export default class YearZeroRollManager {
 /**
  * Die Types mapped with Games.
  * Used by the register method to choose which dice to activate.
- * @enum {DieTypeString[]}
+ * @enum {DieTermString[]}
  * @constant
  */
-YearZeroRollManager.DIE_TYPES_MAP = {
+YearZeroRollManager.DIE_TERMS_MAP = {
   // Mutant Year Zero
   'myz': ['base', 'skill', 'gear', 'neg'],
   // Forbidden Lands
@@ -232,4 +192,4 @@ YearZeroRollManager.DIE_TYPES_MAP = {
  * @enum {GameTypeString}
  * @constant
  */
-YearZeroRollManager.GAMES = Object.keys(YearZeroRollManager.DIE_TYPES_MAP);
+YearZeroRollManager.GAMES = Object.keys(YearZeroRollManager.DIE_TERMS_MAP);

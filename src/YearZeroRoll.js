@@ -280,16 +280,16 @@ export default class YearZeroRoll extends Roll {
     if (!YearZeroRollManager.GAMES.includes(yzGame)) throw new GameTypeError(yzGame);
 
     // Converts old format DiceQuantities.
-    // ? Was: {Object.<DieTypeString, number>}
+    // ? Was: {Object.<DieTermString, number>}
     // ! This is temporary support. @deprecated
     const isOldFormat = !Array.isArray(dice) && typeof dice === 'object' && !Object.keys().includes('term');
     if (isOldFormat) {
       // eslint-disable-next-line max-len
       console.warn(`${YearZeroRoll.name} | You are using an old "DiceQuanties" format which is deprecated and could be removed in a future release. Please refer to ".forge()" for the newer format.`);
       const _dice = [];
-      for (const [type, n] of Object.entries(dice)) {
+      for (const [term, n] of Object.entries(dice)) {
         if (n <= 0) continue;
-        let deno = CONFIG.YZUR.Dice.DIE_TYPES[type].DENOMINATION;
+        let deno = CONFIG.YZUR.Dice.DIE_TERMS[term].DENOMINATION;
         const cls = CONFIG.Dice.terms[deno];
         deno = cls.DENOMINATION;
         _dice.push({ term: deno, number: n });
@@ -305,15 +305,6 @@ export default class YearZeroRoll extends Roll {
     for (const d of dice) {
       out.push(YearZeroRoll._getTermFormulaFromBlok(d));
     }
-    // TODO clean
-    // for (const [type, n] of Object.entries(dice)) {
-    //   if (n <= 0) continue;
-    //   let deno = CONFIG.YZUR.Dice.DIE_TYPES[type].DENOMINATION;
-    //   const cls = CONFIG.Dice.terms[deno];
-    //   deno = cls.DENOMINATION;
-    //   const str = `${n}d${deno}${push ? 'p' : ''}`;
-    //   out.push(str);
-    // }
     let formula = out.join(' + ');
 
     if (!YearZeroRoll.validate(formula)) {
@@ -360,7 +351,7 @@ export default class YearZeroRoll extends Roll {
    * @param {number}  number   The quantity of those dice
    * @param {DieDeno} term     The denomination of the dice to create
    * @param {string} [flavor]  (optional) Any flavor tied to those dice
-   * @param {number} [maxPush] (optional) Special maxPush modifier but only for the those dice
+   * @param {number} [maxPush] (optional) Special maxPush modifier but only for those dice
    * @returns {string}
    * @static
    */
@@ -466,7 +457,7 @@ export default class YearZeroRoll extends Roll {
    * Adds a number of dice to the roll.
    * Note: If a negative quantity is passed, instead it removes that many dice.
    * @param {number}        qty      The quantity to add
-   * @param {DieTypeString} type     The type of dice to add
+   * @param {DieTermString} type     The type of dice to add
    * @param {number}       [range=6] The number of faces of the die
    * @param {number}       [value]   The predefined value for the new dice
    * @param {Object}       [options] Additional options that modify the term
@@ -494,7 +485,7 @@ export default class YearZeroRoll extends Roll {
     }
     // If the DieTerm doesn't exist, creates it.
     else {
-      const cls = CONFIG.YZUR.Dice.DIE_TYPES[type];
+      const cls = CONFIG.YZUR.Dice.DIE_TERMS[type];
       term = new cls({
         number: qty,
         faces: range,
@@ -567,27 +558,6 @@ export default class YearZeroRoll extends Roll {
     }
 
     return this;
-  }
-
-  /* -------------------------------------------- */
-
-  /**
-   * Gets the quantities of each die type.
-   * @returns {DiceQuantities}
-   * @deprecated Useless now
-   */
-  // TODO Why did I put a todo tag here?
-  // TODO remove in version 5.0
-  getDiceQuantities() {
-    console.warn('YZUR | getDiceQuantities() is deprecated and will be removed in a future release.');
-    return this.terms.reduce((dice, t) => {
-      if (t instanceof YearZeroDie) {
-        const clsName = t.constructor.name;
-        const type = CONFIG.YZUR.Dice.DIE_TYPES_BY_CLASS[clsName];
-        if (type) dice[type] = t.number;
-      }
-      return dice;
-    }, {});
   }
 
   /* -------------------------------------------- */
@@ -755,7 +725,12 @@ export default class YearZeroRoll extends Roll {
   /*  Templating                                  */
   /* -------------------------------------------- */
 
-  /** @override */
+  /** 
+   * Renders the tooltip HTML for a Roll instance.
+   * @returns {Promise.<string>} The rendered HTML tooltip as a string
+   * @async
+   * @override
+   */
   async getTooltip() {
     const parts = this.dice.map(d => d.getTooltipData())
     // ==>
@@ -824,12 +799,13 @@ export default class YearZeroRoll extends Roll {
    * @param {string}  [chatOptions.flavor]        The flavor of the message
    * @param {string}  [chatOptions.template]      The path to the template
    *   that renders the roll
-   * @param {string}  [chatOptions.infosTemplate] The path to the template
+   * @param {string}  [chatOptions.infosTemplate] ✨ The path to the template
    *   that renders the infos box under the roll tooltip
    * @param {boolean} [chatOptions.blind]         Whether this is a blind roll
    * @param {boolean} [chatOptions.isPrivate]     Whether this roll is private
    *   (displays sensitive infos with `???` instead)
    * @returns {Promise.<string>}
+   * @see ✨ Extra features added by the override.
    * @async
    * @override
    */
@@ -874,7 +850,7 @@ export default class YearZeroRoll extends Roll {
    * This function can either create the ChatMessage directly, or return the data object that will be used to create.
    * @param {Object}  [messageData]         The data object to use when creating the message
    * @param {string}  [messageData.user]    The ID of the user that sends the message
-   * @param {Object}  [messageData.speaker] The identified speaker data
+   * @param {Object}  [messageData.speaker] ✨ The identified speaker data
    * @param {string}  [messageData.content] The HTML content of the message,
    *   overriden by the `roll.render()`'s returned content if left unchanged
    * @param {number}  [messageData.type=5]    The type to use for the message from `CONST.CHAT_MESSAGE_TYPES`
@@ -886,6 +862,7 @@ export default class YearZeroRoll extends Roll {
    * @return {Promise.<ChatMessage|ChatMessageData>} A promise which resolves to the created ChatMessage entity
    *   if create is true
    *   or the Object of prepared chatData otherwise.
+   * @see ✨ Extra features added by the override.
    * @async
    * @override
    */
@@ -916,21 +893,3 @@ export default class YearZeroRoll extends Roll {
     return this.constructor.fromData(this.toJSON());
   }
 }
-
-/* -------------------------------------------- */
-/*  Definitions                                 */
-/* -------------------------------------------- */
-
-/**
- * Defines a YZ die's denomination.
- * @typedef {string} DieDeno
- */
-
-/**
- * An object that is used to define a YearZero DieTerm.
- * @typedef  {Object}  TermBlok
- * @property {DieDeno} term     The denomination of the dice to create
- * @property {number}  number   The quantity of those dice
- * @property {string} [flavor]  (optional) Any flavor tied to those dice
- * @property {number} [maxPush] (optional) Special maxPush modifier but only for the those dice
- */

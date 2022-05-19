@@ -302,8 +302,8 @@ export class YearZeroDie extends Die {
       //* Adds a default flavor for the die.
       // flavor: this.flavor,
       flavor: this.options.flavor ?? (
-        CONFIG.YZUR?.Dice?.localizeDieTypes
-          ? game.i18n.localize(`YZUR.DIETYPES.${this.constructor.name}`)
+        CONFIG.YZUR?.Dice?.localizeDieTerms
+          ? game.i18n.localize(`YZUR.DIETERMS.${this.constructor.name}`)
           : null
       ),
       //* <==
@@ -507,6 +507,7 @@ D12TwilightDie.DENOMINATION = '12';
 /**
  * Ammunition Die for Twilight 2000.
  * @extends {YearZeroDie}
+ * @category OTHER DICE
  */
 export class AmmoDie extends YearZeroDie {
   constructor(termData = {}) {
@@ -523,6 +524,7 @@ AmmoDie.LOCKED_VALUES = [1, 6];
 /**
  * Location/Hit Die for Twilight 2000.
  * @extends {YearZeroDie}
+ * @category OTHER DICE
  */
 export class LocationDie extends YearZeroDie {
   constructor(termData = {}) {
@@ -596,28 +598,3 @@ export class D12BladeRunnerDie extends BladeRunnerDie {
 }
 D12BladeRunnerDie.DENOMINATION = '12';
 D12BladeRunnerDie.LOCKED_VALUES = [1, 10, 11, 12];
-
-/* -------------------------------------------- */
-/*  Definitions                                 */
-/* -------------------------------------------- */
-
-/**
- * Result of a rolled YearZero DieTerm.
- * @typedef {Object} YearZeroDieTermResult
- * @property {!number} result      The numeric result
- * @property {boolean} active      Is this result active, contributing to the total?
- * @property {number}  count       A value that the result counts as, otherwise the result is not used directly as
- * @property {boolean} success     Does this result denote a success?
- * @property {boolean} failure     Does this result denote a failure?
- * @property {boolean} discarded   Was this result discarded?
- * @property {boolean} rerolled    Was this result rerolled?
- * @property {boolean} exploded    Was this result exploded?
- * @property {boolean} pushed      ✨ Was this result pushed?
- * @property {boolean} hidden      ✨ Hides the die for DsN
- * @property {number}  indexResult ✨ Index of the result, and column position in the chat tooltip
- * @property {number}  indexPush   ✨ Index of the push, and row position in the chat tooltip
- */
-
-/**
- * 
- */
