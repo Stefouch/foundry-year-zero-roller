@@ -5,7 +5,7 @@ import * as YZUR from './dist/yzur.js';
 /*  Foundry VTT Initialization                  */
 /* -------------------------------------------- */
 
-Hooks.once('init', function() {
+Hooks.once('init', function () {
   // CONFIG.debug.hooks = true;
 
   // Copy this in your Hooks.once('init')
@@ -19,13 +19,13 @@ Hooks.once('init', function() {
   game.yzur = YZUR;
 });
 
-Hooks.once('ready', function() {
+Hooks.once('ready', function () {
   CONFIG.debug.dice = true;
   // CONFIG.debug.hook = true;
   console.warn('YZ Roller Tester | READY!');
 });
 
-Hooks.on('renderChatLog', (app, html, data) => {
+Hooks.on('renderChatLog', (app, html, _data) => {
   html.on('click', '.dice-button.push', _onPush);
 });
 
