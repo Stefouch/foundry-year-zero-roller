@@ -311,7 +311,7 @@ export default YZUR;
  */
 
 /**
- * Defines a term of a YZ die.
+ * Defines a term of a YZ die. It's a shortcut to its class.
  * - `base`: Base Die (locked on 1 and 6, trauma on 1)
  * - `skill`: Skill Die (locked on 6)
  * - `gear`: Gear Die (locked on 1 and 6, gear damage on 1)
@@ -334,7 +334,7 @@ export default YZUR;
  */
 
 /**
- * Defines a type of a YZ die.
+ * Defines a type of a YZ die, its generic role and function.
  * - `base`: Base Die
  * - `skill`: Skill Die
  * - `gear`: Gear Die
@@ -349,6 +349,15 @@ export default YZUR;
 /**
  * Defines a YZ die's denomination.
  * @typedef {string} DieDeno
+ */
+
+/**
+ * An object that is used to build a new class that extends the YearZeroDie class.
+ * @typedef {Object} DieClassData
+ * @property {!string}        name          The name of the new Die class
+ * @property {!DieDeno}       denomination  The denomination of the new Die class
+ * @property {DieTypeString} [type]         The type of the new Die class
+ * @property {number[]}      [lockedValues] An array of values that disallow the die to be pushed
  */
 
 /**
@@ -376,4 +385,5 @@ export default YZUR;
  * @property {number}  indexResult ✨ Index of the result, and column position in the chat tooltip
  * @property {number}  indexPush   ✨ Index of the push, and row position in the chat tooltip
  * @see ✨ Extra features added by the override.
+ * @see (FoundryVTT) {@link https://foundryvtt.com/api/global.html#DiceTermResult|DieTermResult} 
  */
