@@ -4,22 +4,64 @@ All notable changes to this project will be documented in this file.
 <br/>The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 <br/>and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [4.1.0] - Unreleased
+## [5.0.0] - 2022-05-20
+
+> :warning: **BREAKING CHANGES**
+> Although V4 was released recently (with a minor breaking change), this version brings many more refactoring to the global and constants names.
+> This change was much needed as there were ambiguities between YearZeroDie.TYPE and DieTypeString.
+> Also, the YearZeroRoll.forge method has been super-boosted.
+
+The main changes are:
+
+- Learn the API easily with the new JS documentation.
+- Create and register new custom dice on the fly.
+- More powerful `YearZeroRoll.forge()` method.
+- (Breaking) Renamed properties in the YZUR global constant.
 
 ### Added
 
-- `YearZeroRoll#generateTermFormula(number, term, flavor, maxPush)`: Creates a roll formula based on number of dice.
+- **Comprehensive JS documentation** in `docs/`.
+- `YearZeroRollManager.registerCustomDie(term, data)`: Registers a custom die in Foundry.
+- `YearZeroRollManager.createDieClass(data)`: Creates a new custom Die class that extends the YearZeroDie class.
+- `YearZeroRoll.generateTermFormula(number, term, flavor, maxPush)`: Creates a roll formula based on number of dice.
+- New optional parameter `options.yzur` in `YearZeroRoll` constructor to force the roll of a YearZeroRoll in Foundry.
+- New global: `YZUR.Dice.DIE_TYPES` (DieTypeString[]).
+- New type definitions (see documentation):
+  - `DieTypeString`: Defines a type of a YZ die, its generic role and function.
+  - `DieTermString`: Defines a term of a YZ die. It's a shortcut to its class.
+  - `TermBlok`: An object that is used to define a YearZero DieTerm
+  - `YearZeroDieTermResult`: Result of a rolled YearZero DieTerm
+  - `DieClassData`: An object that is used to build a new class that extends the YearZeroDie class
 
 ### Changed
 
-- `YearZeroRoll#forge()` has been refactored (see documentation), with the following:
-  - Revamped `dice` parameter. Was: _DiceQuantities_ `Object.<DieTypeString, number>`. Now: `TermBlok` (can be an array), which is an object `{ term: string, number: number, flavor?: string, maxPush?: number }`.
+- `YearZeroRoll.forge()` has been refactored (see documentation), with the following:
+  - Revamped `dice` parameter. Was: _DiceQuantities_ `Object.<DieTermString, number>`. Now: `TermBlok` (can be an array), which is an object `{ term: string, number: number, flavor?: string, maxPush?: number }`.
     - It is now possible to directly pass a flavor to a die term.
-    - Note: The function **still** accept an old _DiceQuantities_ format in the `dice` parameter for compatibility purposes. But it will log a deprecation warning in the console.
+    - Note: The function **still** accepts an old _DiceQuantities_ format in the `dice` parameter for compatibility purposes. But it will log a deprecation warning in the console.
   - Added `options` parameter, which are passed in the roll object and saved in the Foundry database.
+- **YZUR** globals have been renamed in order to follow good practices:
+  - Note: For compatibility purposes, old paths can still be read with a deprecation warning until the next major update.
+  - `YZUR.CHAT` becomes `YZUR.Chat`
+  - `YZUR.ROLL` becomes `YZUR.Roll`
+  - `YZUR.DICE` becomes `YZUR.Dice`
+    - `YZUR.DICE.localizeDieTypes` becomes `YZUR.Dice.localizeDieTerms`
+    - `YZUR.DICE.DIE_TYPES` becomes `YZUR.Dice.DIE_TERMS`
+    - `YZUR.DICE.ICONS` becomes `YZUR.Icons`
+- `YearZeroRollManager` member's `DIE_TYPES_MAP` becomes `DIE_TERMS_MAP`.
+- `YearZeroRollManager` member's `GAMES` is now read-only (getter).
+- `DieTypeError` becomes `DieTermError`.
+- Refactored `YearZeroRollManager._overrideRollCreate()` for better checks.
+- Refactored other methods for support of the new shiny things.
+
+### Deprecated
+
+- DOCUMENTATION.md is deprecated in favor of JSDocs-generated documentation.
 
 ### Removed
 
+- `YearZeroRoll.getDiceQuantities()` was deprecated and has been removed. Use `count()` instead.
+- `YZUR.DICE.DIE_TYPES_BY_CLASS` was deprecated and has been removed.
 - `DiceQuantities` type definition is deprecated and removed.
 
 ## [4.0.0] - 2022-05-14
@@ -39,12 +81,12 @@ after: import * as YZUR from './dist/yzur.js';
 
 ### Changed
 
-- `YearZeroRoll#createFromDiceQuantities()` renamed to `forge()`. _(That function name was really too long.)_
+- `YearZeroRoll.createFromDiceQuantities()` renamed to `forge()`. _(That function name was really too long.)_
 
 ### Removed
 
 - YzurErrors removed from main export.
-- `push` property in `YearZeroRoll#createFromDiceQuantities()`. _(Was useless.)_
+- `push` property in `YearZeroRoll.createFromDiceQuantities()`. _(Was useless.)_
 
 ### Fixed
 
