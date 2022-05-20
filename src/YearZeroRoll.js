@@ -7,12 +7,18 @@ import { YearZeroDie } from './YearZeroDice.js';
 import YZUR from './constants.js';
 import { GameTypeError } from './errors.js';
 
+/** @typedef {import('./constants').GameTypeString} GameTypeString */
+/** @typedef {import('./constants').DieTermString} DieTermString */
+/** @typedef {import('./constants').DieTypeString} DieTypeString */
+/** @typedef {import('./constants').TermBlok} TermBlok */
+/** @typedef {import('./constants').DieDeno} DieDeno */
+
 /**
  * Custom Roll class for Year Zero games.
  * @extends {Roll} The Foundry Roll class
- * @category MAIN
  */
 export default class YearZeroRoll extends Roll {
+
   /**
    * @param {string} formula The string formula to parse
    * @param {Object}         [data]         The data object against which to parse attributes within the formula
@@ -23,7 +29,7 @@ export default class YearZeroRoll extends Roll {
    * @param {GameTypeString} [options.game]    The game used
    * @param {string}         [options.name]    The name of the roll
    * @param {number}         [options.maxPush] The maximum number of times the roll can be pushed
-   * @param {boolean}        [options.yzur]    Specify this one if you have issues to recognize a YearZeroRoll
+   * @param {boolean}        [options.yzur]    Forces the roll of a YearZeroRoll in Foundry
    */
   constructor(formula, data = {}, options = {}) {
     if (options.name == undefined) options.name = data.name;
@@ -257,7 +263,15 @@ export default class YearZeroRoll extends Roll {
   /*  Static Class Methods                        */
   /* -------------------------------------------- */
 
-  /** @override */
+  /**
+   * A factory method which constructs a Roll instance using the default configured Roll class.
+   * @param {string}  formula     The formula used to create the Roll instance
+   * @param {Object} [data={}]    The data object which provides component data for the formula
+   * @param {Object} [options={}] Additional options which modify or describe this Roll
+   * @returns {YearZeroRoll} The constructed Roll instance
+   * @see (FoundryVTT) {@link https://foundryvtt.com/api/Roll.html#.create|Roll.create}
+   * @override
+   */
   static create(formula, data = {}, options = {}) {
     return new YearZeroRoll(formula, data, options);
   }
@@ -266,11 +280,12 @@ export default class YearZeroRoll extends Roll {
 
   /**
    * Generates a roll based on the number of dice.
-   * @param {TermBlok|TermBlok[]}  dice       An array of objects that define the dice
-   * @param {string}              [title]     The name of the roll
-   * @param {GameTypeString}      [yzGame]    The game used
-   * @param {number}              [maxPush=1] The maximum number of pushes
-   * @param {Object}              [options]   Additional data which is preserved in the database
+   * @param {TermBlok|TermBlok[]} dice An array of objects that define the dice
+   * @param {Object}         [data={}]        Additional data to forge the dice
+   * @param {string}         [data.title]     The name of the roll
+   * @param {GameTypeString} [data.yzGame]    The game used
+   * @param {number}         [data.maxPush=1] The maximum number of pushes
+   * @param {Object}         [options]        Additional data which is preserved in the database
    * @returns {YearZeroRoll}
    * @static
    */
@@ -728,6 +743,7 @@ export default class YearZeroRoll extends Roll {
   /** 
    * Renders the tooltip HTML for a Roll instance.
    * @returns {Promise.<string>} The rendered HTML tooltip as a string
+   * @see (FoundryVTT) {@link https://foundryvtt.com/api/Roll.html#getTooltip|Roll.getTooltip}
    * @async
    * @override
    */
@@ -806,6 +822,7 @@ export default class YearZeroRoll extends Roll {
    *   (displays sensitive infos with `???` instead)
    * @returns {Promise.<string>}
    * @see ✨ Extra features added by the override.
+   * @see (FoundryVTT) {@link https://foundryvtt.com/api/Roll.html#render|Roll.render}
    * @async
    * @override
    */
@@ -863,6 +880,7 @@ export default class YearZeroRoll extends Roll {
    *   if create is true
    *   or the Object of prepared chatData otherwise.
    * @see ✨ Extra features added by the override.
+   * @see (FoundryVTT) {@link https://foundryvtt.com/api/Roll.html#toMessage|Roll.toMessage}
    * @async
    * @override
    */

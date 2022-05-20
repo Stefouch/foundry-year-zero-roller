@@ -2,10 +2,12 @@
 /*  Custom Dice classes                         */
 /* -------------------------------------------- */
 
+/** @typedef {import('./constants').DieTypeString} DieTypeString */
+/** @typedef {import('./constants').YearZeroDieTermResult} YearZeroDieTermResult */
+
 /**
  * Custom Die class for Year Zero games.
  * @extends {Die} The Foundry Die class
- * @category MAIN
  */
 export class YearZeroDie extends Die {
   constructor(termData = {}) {
@@ -109,6 +111,7 @@ export class YearZeroDie extends Die {
    * @param {boolean} [options.minimize=false] Minimize the result, obtaining the smallest possible value
    * @param {boolean} [options.maximize=false] Maximize the result, obtaining the smallest possible value
    * @returns {YearZeroDieTermResult} The produced result
+   * @see (Foundry) {@link https://foundryvtt.com/api/DiceTerm.html#roll|DiceTerm.roll}
    * @override
    */
   roll(options = {}) {
@@ -215,6 +218,7 @@ export class YearZeroDie extends Die {
    * Returns a string used as the label for each rolled result.
    * @param {YearZeroDieTermResult} result The rolled result
    * @returns {string} The result label
+   * @see (FoundryVTT) {@link https://foundryvtt.com/api/DiceTerm.html#getResultLabel|DiceTerm.getResultLabel}
    * @override
    */
   getResultLabel(result) {
@@ -230,6 +234,7 @@ export class YearZeroDie extends Die {
    * Gets the CSS classes that should be used to display each rolled result.
    * @param {YearZeroDieTermResult} result The rolled result
    * @returns {string[]} The desired classes
+   * @see (FoundryVTT) {@link https://foundryvtt.com/api/DiceTerm.html#getResultCSS|DiceTerm.getResultCSS}
    * @override
    */
   getResultCSS(result) {
@@ -279,6 +284,7 @@ export class YearZeroDie extends Die {
   /** 
    * Renders the tooltip HTML for a Roll instance.
    * @returns {Object} The data object used to render the default tooltip template for this DiceTerm
+   * @see (FoundryVTT) {@link https://foundryvtt.com/api/DiceTerm.html#getTooltipData|DiceTerm.getTooltipData}
    * @override
    */
   getTooltipData() {
