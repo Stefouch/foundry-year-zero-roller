@@ -1,6 +1,11 @@
 import YearZeroRoll from './YearZeroRoll.js';
 import YZUR from './constants.js';
+import { YearZeroDie } from './YearZeroDice.js';
 import { DieTermError, GameTypeError } from './errors.js';
+
+/** @typedef {import('./constants').GameTypeString} GameTypeString */
+/** @typedef {import('./constants').DieTermString} DieTermString */
+/** @typedef {import('./constants').DieClassData} DieClassData */
 
 /* -------------------------------------------- */
 /*  Custom Dice Registration                    */
@@ -14,7 +19,8 @@ import { DieTermError, GameTypeError } from './errors.js';
  * at the start of the `init` Hooks.
  * 
  * @abstract
- * @interface
+ * 
+ * @throws {SyntaxError} When instanciated
  * 
  * @example
  * import { YearZeroRollManager } from './lib/yzur.js';
@@ -25,6 +31,10 @@ import { DieTermError, GameTypeError } from './errors.js';
  * 
  */
 export default class YearZeroRollManager {
+  constructor() {
+    throw new SyntaxError(`YZUR | ${this.constructor.name} cannot be instanciated!`);
+  }
+
   /**
    * Registers the Year Zero dice for the specified game.
    * 
@@ -34,6 +44,9 @@ export default class YearZeroRollManager {
    * @param {Object}        [config] Custom config to merge with the initial config
    * @param {Object} [options]       Additional options
    * @param {number} [options.index] Index of the registration
+   * @see YearZeroRollManager.registerConfig
+   * @see YearZeroRollManager.registerDice
+   * @see YearZeroRollManager.registerDie
    * @static
    */
   static register(yzGame, config, options = {}) {
@@ -46,6 +59,8 @@ export default class YearZeroRollManager {
     console.log('YZUR | Registration complete!');
   }
 
+  /* -------------------------------------------- */
+
   /**
    * Registers the Year Zero Universal Roller config.
    * *(See the config details at the very bottom of this file.)*
@@ -56,20 +71,28 @@ export default class YearZeroRollManager {
     CONFIG.YZUR = foundry.utils.mergeObject(YZUR, config);
   }
 
+  /* -------------------------------------------- */
+
   /**
-   * Registers all the Year Zero Dice.
+   * Registers all the Year Zero Dice of the chosen game.
    * @param {GameTypeString} [yzGame] The game used (for the choice of die types to register)
    * @param {number}         [i=0]    Index of the registration
+   * @see YearZeroRollManager.registerDie
    * @static
    */
   static registerDice(yzGame, i) {
-    // Registers all the dice if `game` is omitted.
-    if (!yzGame) {
+    // Exists early if `game` is omitted.
+    if (!yzGame || typeof yzGame !== 'string') {
       throw new SyntaxError('YZUR | A game must be specified for the registration.');
     }
 
     // Checks the game validity.
-    if (!YearZeroRollManager.GAMES.includes(yzGame)) throw new GameTypeError(yzGame);
+    if (!YearZeroRollManager.GAMES.includes(yzGame)) {
+      console.warn(`YZUR | Unsupported game identifier "${yzGame}"`);
+      if (!YearZeroRollManager.DIE_TERMS_MAP[yzGame]) {
+        YearZeroRollManager.DIE_TERMS_MAP[yzGame] = [];
+      }
+    }
 
     // Registers the game's dice.
     const diceTypes = YearZeroRollManager.DIE_TERMS_MAP[yzGame];
@@ -78,6 +101,8 @@ export default class YearZeroRollManager {
     // Finally, registers our custom Roll class for Year Zero games.
     YearZeroRollManager.registerRoll(undefined, i);
   }
+
+  /* -------------------------------------------- */
 
   /**
    * Registers the roll.
@@ -93,9 +118,11 @@ export default class YearZeroRollManager {
     if (i > 0) YearZeroRollManager._overrideRollCreate(i);
   }
 
+  /* -------------------------------------------- */
+
   /**
    * Registers a die in Foundry.
-   * @param {DieTermString} term Type of die to register
+   * @param {DieTermString} term Class identifier of the die to register
    * @static
    */
   static registerDie(term) {
@@ -120,6 +147,32 @@ export default class YearZeroRollManager {
     CONFIG.Dice.terms[deno] = cls;
   }
 
+  /* -------------------------------------------- */
+
+  /**
+   * Registers a custom die in Foundry.
+   * @param {DieTermString} term Class identifier of the die to register
+   * @param {DieClassData}  data Data for creating the custom die class
+   * @see YearZeroRollManager.createDieClass
+   * @see YearZeroRollManager.registerDie
+   */
+  static registerCustomDie(term, data) {
+    if (!YearZeroRollManager.GAMES.includes(CONFIG.YZUR.game)) {
+      throw new GameTypeError('YZUR | Unregistered game. Please register a game before registering a custom die.');
+    }
+
+    const cls = YearZeroRollManager.createDieClass(data);
+
+    if (CONFIG.YZUR.Dice.DIE_TERMS[term]) {
+      console.warn(`YZUR | Overwriting an existing die "${CONFIG.YZUR.Dice.DIE_TERMS[term]}" with: "${term}"`);
+    }
+    CONFIG.YZUR.Dice.DIE_TERMS[term] = cls;
+
+    YearZeroRollManager.DIE_TERMS_MAP[CONFIG.YZUR.game].push(term);
+    YearZeroRollManager.registerDie(term);
+  }
+  /* -------------------------------------------- */
+
   /**
    * @param {GameTypeString} yzGame The game used (for the choice of die types to register)
    * @private
@@ -129,12 +182,14 @@ export default class YearZeroRollManager {
     if (!CONFIG.YZUR) throw new ReferenceError('YZUR | CONFIG.YZUR does not exists!');
     if (CONFIG.YZUR.game) {
       console.warn(
-        `YZUR | Overwritting the default Year Zero game "${CONFIG.YZUR.game}" with: "${yzGame}"`,
+        `YZUR | Overwriting the default Year Zero game "${CONFIG.YZUR.game}" with: "${yzGame}"`,
       );
     }
     CONFIG.YZUR.game = yzGame;
     console.log(`YZUR | The name of the Year Zero game is: "${yzGame}".`);
   }
+
+  /* -------------------------------------------- */
 
   /**
    * Overrides the default Foundry Roll prototype to inject our own create() function. 
@@ -147,19 +202,78 @@ export default class YearZeroRollManager {
    */
   static _overrideRollCreate(index = 1) {
     Roll.prototype.constructor.create = function (formula, data = {}, options = {}) {
-      const isYZURFormula = data.game
-        ?? data.maxPush
-        ?? options.yzur
-        ?? options.game
-        ?? options.maxPush
-        ?? formula.match(/\d*d(:?[bsngzml]|6|8|10|12)/i);
+      const isYZURFormula = options.yzur ?? (
+        'game' in data ||
+        'maxPush' in data ||
+        'game' in options ||
+        'maxPush' in options ||
+        formula.match(/\d*d(:?[bsngzml]|6|8|10|12)/i)
+      );
       const n = isYZURFormula ? index : 0;
       const cls = CONFIG.Dice.rolls[n];
       return new cls(formula, data, options);
     };
   }
+
+  /* -------------------------------------------- */
+
+  /**
+   * Creates a new custom Die class that extends the {@link YearZeroDie} class.
+   * @param {DieClassData} data An object with
+   * @returns {class}
+   * @see YearZeroDie
+   * @static
+   */
+  static createDieClass(data) {
+    if (!data || typeof data !== 'object') {
+      throw new SyntaxError('YZUR | To create a Die class, you must pass a DieClassData object!');
+    }
+
+    const YearZeroCustomDie = class extends YearZeroDie {};
+    // eslint-disable-next-line no-shadow
+    const { name, denomination: deno, type, lockedValues } = data;
+
+    // Defines the name of the new die class.
+    if (!name | typeof name !== 'string') {
+      throw new DieTermError(`YZUR | Invalid die class name "${name}"`);
+    }
+    Object.defineProperty(YearZeroCustomDie, 'name', { value: name });
+
+    // Defines the denomination of the new die class.
+    if (!deno || typeof deno !== 'string') {
+      throw new DieTermError(`YZUR | Invalid die class denomination "${deno}"`);
+    }
+    YearZeroCustomDie.DENOMINATION = deno;
+
+    // Defines the type of the new die class, if any.
+    if (type != undefined) {
+      if (typeof type !== 'string') {
+        throw new DieTermError(`YZUR | Invalid die class type "${type}"`);
+      }
+      if (!CONFIG.YZUR.Dice.DIE_TYPES.includes(type)) {
+        console.warn(`YZUR | Unsupported DieTypeString: "${type}"`);
+      }
+      YearZeroCustomDie.TYPE = type;
+    }
+
+    // Defines the locked values of the new die class, if any.
+    if (lockedValues != undefined) {
+      if (!Array.isArray(lockedValues)) {
+        throw new DieTermError(`YZUR | Invalid die class locked values "${lockedValues}" (not an Array)`);
+      }
+      for (const [i, v] of lockedValues.entries()) {
+        if (typeof v !== 'number') {
+          throw new DieTermError(`YZUR | Invalid die class locked value "${v}" at [${i}] (not a Number)`);
+        }
+      }
+      YearZeroCustomDie.LOCKED_VALUES = lockedValues;
+    }
+    return YearZeroCustomDie;
+  }
 }
 
+/* -------------------------------------------- */
+/*  Members                                     */
 /* -------------------------------------------- */
 
 /**
@@ -191,5 +305,10 @@ YearZeroRollManager.DIE_TERMS_MAP = {
  * List of identifiers for the games.
  * @enum {GameTypeString}
  * @constant
+ * @readonly
  */
-YearZeroRollManager.GAMES = Object.keys(YearZeroRollManager.DIE_TERMS_MAP);
+YearZeroRollManager.GAMES;
+Object.defineProperty(YearZeroRollManager, 'GAMES', {
+  get: () => Object.keys(YearZeroRollManager.DIE_TERMS_MAP),
+});
+// YearZeroRollManager.GAMES = Object.keys(YearZeroRollManager.DIE_TERMS_MAP);
