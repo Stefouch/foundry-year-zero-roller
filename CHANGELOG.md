@@ -22,7 +22,7 @@ _See this [pull request](https://github.com/Stefouch/t2k4e/pull/99) for an examp
 
 ### Added
 
-- **Comprehensive JS documentation** in `docs/`.
+- **[Comprehensive JS documentation](https://stefouch.github.io/foundry-year-zero-roller/)** in `docs/`.
 - `YearZeroRollManager.registerCustomDie(term, data)`: Registers a custom die in Foundry.
 - `YearZeroRollManager.createDieClass(data)`: Creates a new custom Die class that extends the YearZeroDie class.
 - `YearZeroRoll.generateTermFormula(number, term, flavor, maxPush)`: Creates a roll formula based on number of dice.

@@ -78,6 +78,8 @@ Hooks.once('init', function () {
 
 4. The settings are stored in the Foundry's `CONFIG.YZUR` global variable. For more details and how to customize them, see the constant `"YZUR"` in the `yzur.js` library.
 
+5. Read the [documentation](https://stefouch.github.io/foundry-year-zero-roller/).
+
 # How to Use
 
 ## Roll
@@ -218,7 +220,7 @@ await roll.toMessage(messageData, { rollMode });
 
 # Read More
 
-Read The Fucking Manual!
+Read The Fucking Manual [here!](https://stefouch.github.io/foundry-year-zero-roller/)
 
 # Supported Games
 
