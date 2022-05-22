@@ -1,12 +1,9 @@
 ===============================================================================
-
-# YZUR:
-
-# YEAR ZERO UNIVERSAL DICE ROLLER FOR THE FOUNDRY VTT
-
+YZUR:
+  YEAR ZERO UNIVERSAL DICE ROLLER FOR THE FOUNDRY VTT
 ===============================================================================
 Author: @Stefouch
-Version: <%= pkg.version %> for: Foundry VTT V<%= data.foundryVersion %>
+Version: <%= pkg.version %>          for: Foundry VTT V<%= data.foundryVersion %>
 Date: <%= moment().format('YYYY-MM-DD') %>
 License: MIT
 ===============================================================================
