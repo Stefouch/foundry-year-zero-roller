@@ -1,42 +1,36 @@
 /**
  * ===============================================================================
- * 
- * # YZUR:
- * 
- * # YEAR ZERO UNIVERSAL DICE ROLLER FOR THE FOUNDRY VTT
- * 
+ * YZUR:
+ * YEAR ZERO UNIVERSAL DICE ROLLER FOR THE FOUNDRY VTT
  * ===============================================================================
  * Author: @Stefouch
- * Version: 5.0.0 for: Foundry VTT V9
- * Date: 2022-05-20
+ * Version: 5.0.0          for: Foundry VTT V9
+ * Date: 2022-05-22
  * License: MIT
  * ===============================================================================
  * Content:
- * 
+ *
  * - YearZeroRollManager: Interface for registering dice.
- * 
+ *
  * - YearZeroRoll: Custom implementation of the default Foundry Roll class,
  * with many extra getters and utility functions.
- * 
+ *
  * - YearZeroDie: Custom implementation of the default Foundry DieTerm class,
  * also with many extra getters.
- * 
+ *
  * - (Base/Skill/Gear/etc..)Die: Extends of the YearZeroDie class with specific
  * DENOMINATION and LOCKED_VALUE constants.
- * 
+ *
  * - CONFIG.YZUR.game: The name of the game stored in the Foundry config.
- * 
+ *
  * - CONFIG.YZUR.Icons.{..}: The dice labels stored in the Foundry config.
- * 
+ *
  * ===============================================================================
  */
 
 /* -------------------------------------------- */
 /*  Custom Dice classes                         */
 /* -------------------------------------------- */
-
-/** @typedef {import('./constants').DieTypeString} DieTypeString */
-/** @typedef {import('./constants').YearZeroDieTermResult} YearZeroDieTermResult */
 
 /**
  * Custom Die class for Year Zero games.
@@ -922,34 +916,6 @@ const YZUR = {
   },
 };
 
-// TODO clean
-// YZUR.Dice.DIE_TYPES_BY_CLASS = Object.entries(YZUR.Dice.DIE_TERMS).reduce((dieTypes, [type, cls]) => {
-//   dieTypes[cls.name] = type;
-//   return dieTypes;
-// }, {});
-
-// For compatibility with version 4.0.0
-// TODO remove at version 6.0
-Object.defineProperties(YZUR, 'CHAT', { get: () => depreYZUR('Chat') });
-Object.defineProperties(YZUR, 'ROLL', { get: () => depreYZUR('Roll') });
-Object.defineProperties(YZUR, 'DICE', {
-  get: () => {
-    depreYZUR('Dice');
-    return {
-      get localizeDieTypes() { return YZUR.Dice.localizeDieTerms; },
-      get DIE_TYPES() { return YZUR.Dice.DIE_TERMS; },
-      // get DIE_TYPES_BY_CLASS() { return YZUR.Dice.DIE_TYPES_BY_CLASS; },
-      get ICONS() { return depreYZUR('Icons', 'DICE.ICONS'); },
-    };
-  },
-});
-
-const depreYZUR = (key, text) => {
-  console.error(`YZUR | "YZUR.${text ?? key.toUpperCase()}" is deprecated. Use "YZUR.${key}" instead.`);
-  if (key in YZUR) return YZUR[key];
-  return null;
-};
-
 /* -------------------------------------------- */
 /*  Definitions                                 */
 /* -------------------------------------------- */
@@ -1013,6 +979,7 @@ const depreYZUR = (key, text) => {
  * @typedef {Object} DieClassData
  * @property {!string}        name          The name of the new Die class
  * @property {!DieDeno}       denomination  The denomination of the new Die class
+ * @property {!faces}         faces         The number of faces of the new Die class
  * @property {DieTypeString} [type]         The type of the new Die class
  * @property {number[]}      [lockedValues] An array of values that disallow the die to be pushed
  */
@@ -1070,12 +1037,6 @@ class DieTermError extends TypeError {
 // }
 
 /* -------------------------------------------- */
-
-/** @typedef {import('./constants').GameTypeString} GameTypeString */
-/** @typedef {import('./constants').DieTermString} DieTermString */
-/** @typedef {import('./constants').DieTypeString} DieTypeString */
-/** @typedef {import('./constants').TermBlok} TermBlok */
-/** @typedef {import('./constants').DieDeno} DieDeno */
 
 /**
  * Custom Roll class for Year Zero games.
@@ -1250,7 +1211,7 @@ class YearZeroRoll extends Roll {
   get mishap() {
     // if (this.game !== 't2k') return false;
     // return this.baneCount >= 2 || this.baneCount >= this.size;
-    console.warn('YZRoll | YearZeroRoll#mishap is deprecated.');
+    console.warn('YZUR | YearZeroRoll#mishap is deprecated.');
     return false;
   }
 
@@ -1361,10 +1322,10 @@ class YearZeroRoll extends Roll {
     // Converts old format DiceQuantities.
     // ? Was: {Object.<DieTermString, number>}
     // ! This is temporary support. @deprecated
-    const isOldFormat = !Array.isArray(dice) && typeof dice === 'object' && !Object.keys().includes('term');
+    const isOldFormat = !Array.isArray(dice) && typeof dice === 'object' && !Object.keys(dice).includes('term');
     if (isOldFormat) {
       // eslint-disable-next-line max-len
-      console.warn(`${YearZeroRoll.name} | You are using an old "DiceQuanties" format which is deprecated and could be removed in a future release. Please refer to ".forge()" for the newer format.`);
+      console.warn(`YZUR | ${YearZeroRoll.name} | You are using an old "DiceQuanties" format which is deprecated and could be removed in a future release. Please refer to ".forge()" for the newer format.`);
       const _dice = [];
       for (const [term, n] of Object.entries(dice)) {
         if (n <= 0) continue;
@@ -1387,7 +1348,7 @@ class YearZeroRoll extends Roll {
     let formula = out.join(' + ');
 
     if (!YearZeroRoll.validate(formula)) {
-      console.warn(`${YearZeroRoll.name} | Invalid roll formula: "${formula}"`);
+      console.warn(`YZUR | ${YearZeroRoll.name} | Invalid roll formula: "${formula}"`);
       formula = yzGame === 't2k' ? '1d6' : '1ds';
     }
 
@@ -1422,7 +1383,7 @@ class YearZeroRoll extends Roll {
    */
   static _getTermFormulaFromBlok(termBlok) {
     const { term, number, flavor, maxPush } = termBlok;
-    return YearZeroRoll.generateTermFormula(term, number, flavor, maxPush);
+    return YearZeroRoll.generateTermFormula(number, term, flavor, maxPush);
   }
 
   /**
@@ -1976,10 +1937,6 @@ class YearZeroRoll extends Roll {
   }
 }
 
-/** @typedef {import('./constants').GameTypeString} GameTypeString */
-/** @typedef {import('./constants').DieTermString} DieTermString */
-/** @typedef {import('./constants').DieClassData} DieClassData */
-
 /* -------------------------------------------- */
 /*  Custom Dice Registration                    */
 /* -------------------------------------------- */
@@ -2196,15 +2153,34 @@ class YearZeroRollManager {
    * @returns {class}
    * @see YearZeroDie
    * @static
+   * 
+   * @example
+   * YZUR.YearZeroRollManager.createDieClass({
+   *   name: 'D6SpecialDie',
+   *   denomination: 's',
+   *   faces: 6,
+   *   type: 'gear',
+   *   lockedValues: [4, 5, 6],
+   * });
    */
   static createDieClass(data) {
     if (!data || typeof data !== 'object') {
       throw new SyntaxError('YZUR | To create a Die class, you must pass a DieClassData object!');
     }
 
-    const YearZeroCustomDie = class extends YearZeroDie {};
     // eslint-disable-next-line no-shadow
-    const { name, denomination: deno, type, lockedValues } = data;
+    const { name, denomination: deno, faces, type, lockedValues } = data;
+
+    if (typeof faces !== 'number' || faces <= 0) {
+      throw new DieTermError(`YZUR | Invalid die class faces "${faces}"`);
+    }
+
+    const YearZeroCustomDie = class extends YearZeroDie {
+      constructor(termData = {}) {
+        termData.faces = faces;
+        super(termData);
+      }
+    };
 
     // Defines the name of the new die class.
     if (!name | typeof name !== 'string') {
@@ -2226,17 +2202,20 @@ class YearZeroRollManager {
       if (!CONFIG.YZUR.Dice.DIE_TYPES.includes(type)) {
         console.warn(`YZUR | Unsupported DieTypeString: "${type}"`);
       }
+      if (!CONFIG.YZUR.Icons[CONFIG.YZUR.game][type]) {
+        console.warn(`YZUR | No icons defined for type "${type}"`);
+      }
       YearZeroCustomDie.TYPE = type;
     }
 
     // Defines the locked values of the new die class, if any.
     if (lockedValues != undefined) {
       if (!Array.isArray(lockedValues)) {
-        throw new DieTermError(`YZUR | Invalid die class locked values "${lockedValues}" (not an Array)`);
+        throw new DieTermError(`YZUR | Invalid die class locked values "${lockedValues}" (Not an Array)`);
       }
       for (const [i, v] of lockedValues.entries()) {
         if (typeof v !== 'number') {
-          throw new DieTermError(`YZUR | Invalid die class locked value "${v}" at [${i}] (not a Number)`);
+          throw new DieTermError(`YZUR | Invalid die class locked value "${v}" at [${i}] (Not a Number)`);
         }
       }
       YearZeroCustomDie.LOCKED_VALUES = lockedValues;

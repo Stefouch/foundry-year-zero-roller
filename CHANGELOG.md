@@ -9,7 +9,7 @@ All notable changes to this project will be documented in this file.
 > :warning: **BREAKING CHANGES**
 > Although V4 was released recently (with a minor breaking change), this version brings many more refactoring to the global and constants names.
 > This change was much needed as there were ambiguities between YearZeroDie.TYPE and DieTypeString.
-> Also, the YearZeroRoll.forge method has been super-boosted.
+> Also, the YearZeroRoll.forge method has been super-charged.
 
 The main changes are:
 
@@ -17,6 +17,8 @@ The main changes are:
 - Create and register new custom dice on the fly.
 - More powerful `YearZeroRoll.forge()` method.
 - (Breaking) Renamed properties in the YZUR global constant.
+
+_See this [pull request](https://github.com/Stefouch/t2k4e/pull/99) for an example of what was needed to change for a game system._
 
 ### Added
 
@@ -36,12 +38,11 @@ The main changes are:
 ### Changed
 
 - `YearZeroRoll.forge()` has been refactored (see documentation), with the following:
-  - Revamped `dice` parameter. Was: _DiceQuantities_ `Object.<DieTermString, number>`. Now: `TermBlok` (can be an array), which is an object `{ term: string, number: number, flavor?: string, maxPush?: number }`.
+  - Revamped `dice` parameter. Was: _DiceQuantities_ `Object.<DieTermString, number>`. Now: `TermBlok` (can be an array), which is an object `{ term: DieDeno, number: number, flavor?: string, maxPush?: number }`.
     - It is now possible to directly pass a flavor to a die term.
     - Note: The function **still** accepts an old _DiceQuantities_ format in the `dice` parameter for compatibility purposes. But it will log a deprecation warning in the console.
   - Added `options` parameter, which are passed in the roll object and saved in the Foundry database.
 - **YZUR** globals have been renamed in order to follow good practices:
-  - Note: For compatibility purposes, old paths can still be read with a deprecation warning until the next major update.
   - `YZUR.CHAT` becomes `YZUR.Chat`
   - `YZUR.ROLL` becomes `YZUR.Roll`
   - `YZUR.DICE` becomes `YZUR.Dice`
