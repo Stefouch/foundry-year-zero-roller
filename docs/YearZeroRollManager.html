@@ -1,0 +1,2118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YZUR Docs YearZeroRollManager</title>
+
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="./build/entry.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700|Inconsolata,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+  <link type="text/css" rel="stylesheet" href="">
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+  
+</head>
+
+
+
+<body class="layout small-header">
+    <div id="stickyNavbarOverlay"></div>
+    
+
+<div class="top-nav">
+    <div class="inner">
+        <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+        <div class="logo">
+            
+             
+                <a href="index.html">
+                    <h1 class="navbar-item">YZUR – Year Zero Universal Roller</h1>
+                </a>
+            
+        </div>
+        <div class="menu">
+            
+            <div class="navigation">
+                <a
+                    href="index.html"
+                    class="link"
+                >
+                    Documentation
+                </a>
+                
+                 
+                    
+                        <a
+                            class="link user-link "
+                            href="https://github.com/Stefouch/foundry-year-zero-roller"
+                        >
+                            Github
+                        </a>
+                    
+                        <a
+                            class="link user-link "
+                            href="https://stefouch.be"
+                        >
+                            Stefouch
+                        </a>
+                    
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+    <div id="main">
+        <div
+            class="sidebar "
+            id="sidebarNav"
+        >
+            
+                <div class="search-wrapper">
+                    <input id="search" type="text" placeholder="Search docs..." class="input">
+                </div>
+            
+            <nav>
+                
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Classes</h3><ul><li><a href="YearZeroDie.html">YearZeroDie</a></li><li><a href="YearZeroRoll.html">YearZeroRoll</a></li><li><a href="YearZeroRollManager.html">YearZeroRollManager</a></li></ul><h3>Global</h3><ul><li><a href="global.html#YZUR">YZUR</a></li></ul></div><div class="category"><h2>OTHER DICE</h2><h3>Classes</h3><ul><li><a href="AmmoDie.html">AmmoDie</a></li><li><a href="ArtifactDie.html">ArtifactDie</a></li><li><a href="BaseDie.html">BaseDie</a></li><li><a href="BladeRunnerDie.html">BladeRunnerDie</a></li><li><a href="GearDie.html">GearDie</a></li><li><a href="LocationDie.html">LocationDie</a></li><li><a href="NegativeDie.html">NegativeDie</a></li><li><a href="SkillDie.html">SkillDie</a></li><li><a href="StressDie.html">StressDie</a></li><li><a href="TwilightDie.html">TwilightDie</a></li></ul></div>
+                
+            </nav>
+        </div>
+        <div class="core" id="main-content-wrapper">
+            <div class="content">
+                <header class="page-title">
+                    <p>Class</p>
+                    <h1>YearZeroRollManager</h1>
+                </header>
+                
+
+
+
+
+<section>
+
+<header>
+    
+        <h2><span class="attribs"><span class="type-signature">(abstract) </span></span>YearZeroRollManager<span class="signature">()</span><span class="type-signature"></span></h2>
+        
+            <div class="class-description"><p>Interface for registering Year Zero dice.</p>
+<p>To register the game and its dice,
+call the static <code>YearZeroRollManager.register()</code> method
+at the start of the <code>init</code> Hooks.</p></div>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class='vertical-section'>
+                <div class="members">
+                    <div class="member">
+                        <div class=name>
+                            <span class="tag">Constructor</span>
+                        </div>
+                        
+
+
+    
+    <h4 class="name" id="YearZeroRollManager">
+        <a class="href-link" href="#YearZeroRollManager">#</a>
+        
+            
+                <span class='tag'>abstract</span>
+            
+        
+        <span class="code-name">
+            
+                new YearZeroRollManager<span class="signature">()</span><span class="type-signature"></span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="yzur.js.html" class="button">View Source</a>
+            <span>
+                <a href="yzur.js.html">yzur.js</a>, <a href="yzur.js.html#line1963">line 1963</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class='columns method-parameter'>
+        <div class="column is-2"><label>Throws:</label></div>
+        <div class="column is-10">
+            
+                    
+<div class="columns">
+    
+    <div class='param-desc column is-7'><p>When instanciated</p></div>
+    <div class='column is-5 has-text-left'>
+        <label>Type: </label>
+<code class="param-type">SyntaxError</code>
+
+
+    </div>
+    
+</div>
+
+                
+        </div>
+    </div>
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    
+        <pre class="prettyprint"><code>import { YearZeroRollManager } from './lib/yzur.js';
+Hooks.once('init', function() {
+  YearZeroRollManager.register('yourgame', config, options);
+  ...
+});</code></pre>
+    
+
+
+
+                    </div>
+                </div>
+            </div>
+        
+    
+    </div>
+    
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <div class='vertical-section'>
+            <h1>Members</h1>
+            <div class="members">
+            
+                <div class="member">
+
+    <span class="method-parameter is-pulled-right">
+        <label>Type:</label>
+        
+<code class="param-type">Array.&lt;<a href="global.html#DieTermString">DieTermString</a>></code>
+
+
+    </span>
+
+<h4 class="name" id=".DIE_TERMS_MAP">
+    <a class="href-link" href="#.DIE_TERMS_MAP">#</a>
+    
+        
+            <span class='tag'>static</span>
+        
+            <span class='tag'>constant</span>
+        
+    
+    <span class="code-name">
+        DIE_TERMS_MAP
+    </span>
+    
+</h4>
+
+
+
+
+<div class="description">
+    <p>Die Types mapped with Games.
+Used by the register method to choose which dice to activate.</p>
+</div>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+<div class="table-container">
+    <table class="props table">
+        <thead>
+        <tr>
+            
+            <th>Name</th>
+            
+
+            <th>Type</th>
+
+            
+
+            
+
+            <th class="last">Description</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        
+            
+<tr class="deep-level-0">
+    
+        <td class="name"><code>myz</code></td>
+    
+
+    <td class="type">
+    
+        
+<code class="param-type">Array.&lt;<a href="global.html#DieTermString">DieTermString</a>></code>
+
+
+    
+    </td>
+
+    
+
+    
+
+    <td class="description last"></td>
+</tr>
+
+        
+            
+<tr class="deep-level-0">
+    
+        <td class="name"><code>fbl</code></td>
+    
+
+    <td class="type">
+    
+        
+<code class="param-type">Array.&lt;<a href="global.html#DieTermString">DieTermString</a>></code>
+
+
+    
+    </td>
+
+    
+
+    
+
+    <td class="description last"></td>
+</tr>
+
+        
+            
+<tr class="deep-level-0">
+    
+        <td class="name"><code>alien</code></td>
+    
+
+    <td class="type">
+    
+        
+<code class="param-type">Array.&lt;<a href="global.html#DieTermString">DieTermString</a>></code>
+
+
+    
+    </td>
+
+    
+
+    
+
+    <td class="description last"></td>
+</tr>
+
+        
+            
+<tr class="deep-level-0">
+    
+        <td class="name"><code>tales</code></td>
+    
+
+    <td class="type">
+    
+        
+<code class="param-type">Array.&lt;<a href="global.html#DieTermString">DieTermString</a>></code>
+
+
+    
+    </td>
+
+    
+
+    
+
+    <td class="description last"></td>
+</tr>
+
+        
+            
+<tr class="deep-level-0">
+    
+        <td class="name"><code>cor</code></td>
+    
+
+    <td class="type">
+    
+        
+<code class="param-type">Array.&lt;<a href="global.html#DieTermString">DieTermString</a>></code>
+
+
+    
+    </td>
+
+    
+
+    
+
+    <td class="description last"></td>
+</tr>
+
+        
+            
+<tr class="deep-level-0">
+    
+        <td class="name"><code>vae</code></td>
+    
+
+    <td class="type">
+    
+        
+<code class="param-type">Array.&lt;<a href="global.html#DieTermString">DieTermString</a>></code>
+
+
+    
+    </td>
+
+    
+
+    
+
+    <td class="description last"></td>
+</tr>
+
+        
+            
+<tr class="deep-level-0">
+    
+        <td class="name"><code>t2k</code></td>
+    
+
+    <td class="type">
+    
+        
+<code class="param-type">Array.&lt;<a href="global.html#DieTermString">DieTermString</a>></code>
+
+
+    
+    </td>
+
+    
+
+    
+
+    <td class="description last"></td>
+</tr>
+
+        
+            
+<tr class="deep-level-0">
+    
+        <td class="name"><code>br</code></td>
+    
+
+    <td class="type">
+    
+        
+<code class="param-type">Array.&lt;<a href="global.html#DieTermString">DieTermString</a>></code>
+
+
+    
+    </td>
+
+    
+
+    
+
+    <td class="description last"></td>
+</tr>
+
+        
+        </tbody>
+    </table>
+</div>
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="yzur.js.html" class="button">View Source</a>
+            <span>
+                <a href="yzur.js.html">yzur.js</a>, <a href="yzur.js.html#line2237">line 2237</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+</div>
+            
+                <div class="member">
+
+    <span class="method-parameter is-pulled-right">
+        <label>Type:</label>
+        
+<code class="param-type"><a href="global.html#GameTypeString">GameTypeString</a></code>
+
+
+    </span>
+
+<h4 class="name" id=".GAMES">
+    <a class="href-link" href="#.GAMES">#</a>
+    
+        
+            <span class='tag'>static</span>
+        
+            <span class='tag'>constant</span>
+        
+    
+    <span class="code-name">
+        GAMES
+    </span>
+    
+</h4>
+
+
+
+
+<div class="description">
+    <p>List of identifiers for the games.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="yzur.js.html" class="button">View Source</a>
+            <span>
+                <a href="yzur.js.html">yzur.js</a>, <a href="yzur.js.html#line2262">line 2262</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+</div>
+            
+            </div>
+        </div>
+    
+
+    
+        <div class='vertical-section'>
+            <h1>Methods</h1>
+            <div class="members">
+            
+                <div class="member">
+
+
+    
+    <h4 class="name" id=".createDieClass">
+        <a class="href-link" href="#.createDieClass">#</a>
+        
+            
+                <span class='tag'>static</span>
+            
+        
+        <span class="code-name">
+            
+                createDieClass<span class="signature">(data)</span><span class="type-signature"> &rarr; {class}</span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+    <div class="description">
+        <p>Creates a new custom Die class that extends the <a href="YearZeroDie.html"><code>YearZeroDie</code></a> class.</p>
+    </div>
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+<div class="table-container">
+    <table class="params table">
+        <thead>
+        <tr>
+            
+            <th>Name</th>
+            
+
+            <th>Type</th>
+
+            
+
+            
+
+            <th class="last">Description</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        
+
+            
+<tr class="deep-level-0">
+  
+      <td class="name"><code>data</code></td>
+  
+
+  <td class="type">
+  
+      
+<code class="param-type"><a href="global.html#DieClassData">DieClassData</a></code>
+
+
+  
+  </td>
+
+  
+
+  
+
+  <td class="description last"><p>An object with</p></td>
+</tr>
+
+
+        
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="YearZeroDie.html">YearZeroDie</a></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="yzur.js.html" class="button">View Source</a>
+            <span>
+                <a href="yzur.js.html">yzur.js</a>, <a href="yzur.js.html#line2166">line 2166</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class='columns method-parameter'>
+        <div class="column is-2"><label>Returns:</label></div>
+        <div class="column is-10">
+            
+                    
+
+<div class="columns">
+    
+    
+    <div class='column is-5 has-text-left'>
+        <label>Type: </label>
+        
+<code class="param-type">class</code>
+
+
+    </div>
+    
+</div>
+
+                
+        </div>
+    </div>
+
+
+
+
+    <h5>Example</h5>
+    
+    
+        <pre class="prettyprint"><code>YZUR.YearZeroRollManager.createDieClass({
+  name: 'D6SpecialDie',
+  denomination: 's',
+  faces: 6,
+  type: 'gear',
+  lockedValues: [4, 5, 6],
+});</code></pre>
+    
+
+
+</div>
+            
+                <div class="member">
+
+
+    
+    <h4 class="name" id=".register">
+        <a class="href-link" href="#.register">#</a>
+        
+            
+                <span class='tag'>static</span>
+            
+        
+        <span class="code-name">
+            
+                register<span class="signature">(yzGame, config<span class="signature-attributes">opt</span>, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+    <div class="description">
+        <p>Registers the Year Zero dice for the specified game.</p>
+<p>You must call this method in <code>Hooks.once('init')</code>.</p>
+    </div>
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+<div class="table-container">
+    <table class="params table">
+        <thead>
+        <tr>
+            
+            <th>Name</th>
+            
+
+            <th>Type</th>
+
+            
+            <th>Attributes</th>
+            
+
+            
+
+            <th class="last">Description</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        
+
+            
+<tr class="deep-level-0">
+  
+      <td class="name"><code>yzGame</code></td>
+  
+
+  <td class="type">
+  
+      
+<code class="param-type"><a href="global.html#GameTypeString">GameTypeString</a></code>
+
+
+  
+  </td>
+
+  
+      <td class="attributes">
+      
+
+      
+
+      
+      </td>
+  
+
+  
+
+  <td class="description last"><p>The game used (for the choice of die types to register)</p></td>
+</tr>
+
+
+        
+
+            
+<tr class="deep-level-0">
+  
+      <td class="name"><code>config</code></td>
+  
+
+  <td class="type">
+  
+      
+<code class="param-type">Object</code>
+
+
+  
+  </td>
+
+  
+      <td class="attributes">
+      
+          &lt;optional><br>
+      
+
+      
+
+      
+      </td>
+  
+
+  
+
+  <td class="description last"><p>Custom config to merge with the initial config</p></td>
+</tr>
+
+
+        
+
+            
+<tr class="deep-level-0">
+  
+      <td class="name"><code>options</code></td>
+  
+
+  <td class="type">
+  
+      
+<code class="param-type">Object</code>
+
+
+  
+  </td>
+
+  
+      <td class="attributes">
+      
+          &lt;optional><br>
+      
+
+      
+
+      
+      </td>
+  
+
+  
+
+  <td class="description last"><p>Additional options</p></td>
+</tr>
+
+  
+  
+    
+<tr class="deep-level-1">
+  
+      <td class="name"><code>index</code></td>
+  
+
+  <td class="type">
+  
+      
+<code class="param-type">number</code>
+
+
+  
+  </td>
+
+  
+      <td class="attributes">
+      
+          &lt;optional><br>
+      
+
+      
+
+      
+      </td>
+  
+
+  
+
+  <td class="description last"><p>Index of the registration</p></td>
+</tr>
+
+  
+
+
+        
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="YearZeroRollManager.html#.registerConfig">YearZeroRollManager.registerConfig</a></li>
+        
+            <li><a href="YearZeroRollManager.html#.registerDice">YearZeroRollManager.registerDice</a></li>
+        
+            <li><a href="YearZeroRollManager.html#.registerDie">YearZeroRollManager.registerDie</a></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="yzur.js.html" class="button">View Source</a>
+            <span>
+                <a href="yzur.js.html">yzur.js</a>, <a href="yzur.js.html#line1982">line 1982</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+            
+                <div class="member">
+
+
+    
+    <h4 class="name" id=".registerConfig">
+        <a class="href-link" href="#.registerConfig">#</a>
+        
+            
+                <span class='tag'>static</span>
+            
+        
+        <span class="code-name">
+            
+                registerConfig<span class="signature">(config<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+    <div class="description">
+        <p>Registers the Year Zero Universal Roller config.
+<em>(See the config details at the very bottom of this file.)</em></p>
+    </div>
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+<div class="table-container">
+    <table class="params table">
+        <thead>
+        <tr>
+            
+            <th>Name</th>
+            
+
+            <th>Type</th>
+
+            
+            <th>Attributes</th>
+            
+
+            
+
+            <th class="last">Description</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        
+
+            
+<tr class="deep-level-0">
+  
+      <td class="name"><code>config</code></td>
+  
+
+  <td class="type">
+  
+      
+<code class="param-type">string</code>
+
+
+  
+  </td>
+
+  
+      <td class="attributes">
+      
+          &lt;optional><br>
+      
+
+      
+
+      
+      </td>
+  
+
+  
+
+  <td class="description last"><p>Custom config to merge with the initial config</p></td>
+</tr>
+
+
+        
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="yzur.js.html" class="button">View Source</a>
+            <span>
+                <a href="yzur.js.html">yzur.js</a>, <a href="yzur.js.html#line2000">line 2000</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+            
+                <div class="member">
+
+
+    
+    <h4 class="name" id=".registerCustomDie">
+        <a class="href-link" href="#.registerCustomDie">#</a>
+        
+            
+                <span class='tag'>static</span>
+            
+        
+        <span class="code-name">
+            
+                registerCustomDie<span class="signature">(term, data)</span><span class="type-signature"></span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+    <div class="description">
+        <p>Registers a custom die in Foundry.</p>
+    </div>
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+<div class="table-container">
+    <table class="params table">
+        <thead>
+        <tr>
+            
+            <th>Name</th>
+            
+
+            <th>Type</th>
+
+            
+
+            
+
+            <th class="last">Description</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        
+
+            
+<tr class="deep-level-0">
+  
+      <td class="name"><code>term</code></td>
+  
+
+  <td class="type">
+  
+      
+<code class="param-type"><a href="global.html#DieTermString">DieTermString</a></code>
+
+
+  
+  </td>
+
+  
+
+  
+
+  <td class="description last"><p>Class identifier of the die to register</p></td>
+</tr>
+
+
+        
+
+            
+<tr class="deep-level-0">
+  
+      <td class="name"><code>data</code></td>
+  
+
+  <td class="type">
+  
+      
+<code class="param-type"><a href="global.html#DieClassData">DieClassData</a></code>
+
+
+  
+  </td>
+
+  
+
+  
+
+  <td class="description last"><p>Data for creating the custom die class</p></td>
+</tr>
+
+
+        
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="YearZeroRollManager.html#.createDieClass">YearZeroRollManager.createDieClass</a></li>
+        
+            <li><a href="YearZeroRollManager.html#.registerDie">YearZeroRollManager.registerDie</a></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="yzur.js.html" class="button">View Source</a>
+            <span>
+                <a href="yzur.js.html">yzur.js</a>, <a href="yzur.js.html#line2089">line 2089</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+            
+                <div class="member">
+
+
+    
+    <h4 class="name" id=".registerDice">
+        <a class="href-link" href="#.registerDice">#</a>
+        
+            
+                <span class='tag'>static</span>
+            
+        
+        <span class="code-name">
+            
+                registerDice<span class="signature">(yzGame<span class="signature-attributes">opt</span>, i<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+    <div class="description">
+        <p>Registers all the Year Zero Dice of the chosen game.</p>
+    </div>
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+<div class="table-container">
+    <table class="params table">
+        <thead>
+        <tr>
+            
+            <th>Name</th>
+            
+
+            <th>Type</th>
+
+            
+            <th>Attributes</th>
+            
+
+            
+            <th>Default</th>
+            
+
+            <th class="last">Description</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        
+
+            
+<tr class="deep-level-0">
+  
+      <td class="name"><code>yzGame</code></td>
+  
+
+  <td class="type">
+  
+      
+<code class="param-type"><a href="global.html#GameTypeString">GameTypeString</a></code>
+
+
+  
+  </td>
+
+  
+      <td class="attributes">
+      
+          &lt;optional><br>
+      
+
+      
+
+      
+      </td>
+  
+
+  
+      <td class="default">
+      
+      </td>
+  
+
+  <td class="description last"><p>The game used (for the choice of die types to register)</p></td>
+</tr>
+
+
+        
+
+            
+<tr class="deep-level-0">
+  
+      <td class="name"><code>i</code></td>
+  
+
+  <td class="type">
+  
+      
+<code class="param-type">number</code>
+
+
+  
+  </td>
+
+  
+      <td class="attributes">
+      
+          &lt;optional><br>
+      
+
+      
+
+      
+      </td>
+  
+
+  
+      <td class="default">
+      
+          0
+      
+      </td>
+  
+
+  <td class="description last"><p>Index of the registration</p></td>
+</tr>
+
+
+        
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="YearZeroRollManager.html#.registerDie">YearZeroRollManager.registerDie</a></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="yzur.js.html" class="button">View Source</a>
+            <span>
+                <a href="yzur.js.html">yzur.js</a>, <a href="yzur.js.html#line2013">line 2013</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+            
+                <div class="member">
+
+
+    
+    <h4 class="name" id=".registerDie">
+        <a class="href-link" href="#.registerDie">#</a>
+        
+            
+                <span class='tag'>static</span>
+            
+        
+        <span class="code-name">
+            
+                registerDie<span class="signature">(term)</span><span class="type-signature"></span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+    <div class="description">
+        <p>Registers a die in Foundry.</p>
+    </div>
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+<div class="table-container">
+    <table class="params table">
+        <thead>
+        <tr>
+            
+            <th>Name</th>
+            
+
+            <th>Type</th>
+
+            
+
+            
+
+            <th class="last">Description</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        
+
+            
+<tr class="deep-level-0">
+  
+      <td class="name"><code>term</code></td>
+  
+
+  <td class="type">
+  
+      
+<code class="param-type"><a href="global.html#DieTermString">DieTermString</a></code>
+
+
+  
+  </td>
+
+  
+
+  
+
+  <td class="description last"><p>Class identifier of the die to register</p></td>
+</tr>
+
+
+        
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="yzur.js.html" class="button">View Source</a>
+            <span>
+                <a href="yzur.js.html">yzur.js</a>, <a href="yzur.js.html#line2058">line 2058</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+            
+                <div class="member">
+
+
+    
+    <h4 class="name" id=".registerRoll">
+        <a class="href-link" href="#.registerRoll">#</a>
+        
+            
+                <span class='tag'>static</span>
+            
+        
+        <span class="code-name">
+            
+                registerRoll<span class="signature">(cls<span class="signature-attributes">opt</span>, i<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+    <div class="description">
+        <p>Registers the roll.</p>
+    </div>
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+<div class="table-container">
+    <table class="params table">
+        <thead>
+        <tr>
+            
+            <th>Name</th>
+            
+
+            <th>Type</th>
+
+            
+            <th>Attributes</th>
+            
+
+            
+            <th>Default</th>
+            
+
+            <th class="last">Description</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        
+
+            
+<tr class="deep-level-0">
+  
+      <td class="name"><code>cls</code></td>
+  
+
+  <td class="type">
+  
+      
+<code class="param-type">class</code>
+
+
+  
+  </td>
+
+  
+      <td class="attributes">
+      
+          &lt;optional><br>
+      
+
+      
+
+      
+      </td>
+  
+
+  
+      <td class="default">
+      
+      </td>
+  
+
+  <td class="description last"><p>The roll class to register</p></td>
+</tr>
+
+
+        
+
+            
+<tr class="deep-level-0">
+  
+      <td class="name"><code>i</code></td>
+  
+
+  <td class="type">
+  
+      
+<code class="param-type">number</code>
+
+
+  
+  </td>
+
+  
+      <td class="attributes">
+      
+          &lt;optional><br>
+      
+
+      
+
+      
+      </td>
+  
+
+  
+      <td class="default">
+      
+          0
+      
+      </td>
+  
+
+  <td class="description last"><p>Index of the registration</p></td>
+</tr>
+
+
+        
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="yzur.js.html" class="button">View Source</a>
+            <span>
+                <a href="yzur.js.html">yzur.js</a>, <a href="yzur.js.html#line2043">line 2043</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+            
+            </div>
+        </div>
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+            </div>
+            
+            <footer class="footer">
+                <div class="content has-text-centered">
+                    <p>Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.10</a></p>
+                    <p class="sidebar-created-by">
+                        <a href="https://github.com/SoftwareBrothers/better-docs" target="_blank">BetterDocs theme</a> provided with <i class="fas fa-heart"></i> by
+                        <a href="http://softwarebrothers.co" target="_blank">SoftwareBrothers - JavaScript Development Agency</a>
+                    </p>
+                </div>
+            </footer>
+            
+        </div>
+        <div id="side-nav" class="side-nav">
+        </div>
+    </div>
+<script src="scripts/app.min.js"></script>
+<script>PR.prettyPrint();</script>
+<script src="scripts/linenumber.js"> </script>
+
+<script src="scripts/search.js"> </script>
+
+
+</body>
+</html>

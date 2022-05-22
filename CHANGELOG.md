@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 <br/>The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 <br/>and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [5.0.0] - 2022-05-20
+## [5.0.0] - 2022-05-22
 
 > :warning: **BREAKING CHANGES**
 > Although V4 was released recently (with a minor breaking change), this version brings many more refactoring to the global and constants names.
@@ -18,7 +18,7 @@ The main changes are:
 - More powerful `YearZeroRoll.forge()` method.
 - (Breaking) Renamed properties in the YZUR global constant.
 
-_See this [pull request](https://github.com/Stefouch/t2k4e/pull/99) for an example of what was needed to change for a game system._
+_See this [pull request](https://github.com/Stefouch/t2k4e/pull/99) for an example of what changes were needed for a game system._
 
 ### Added
 
