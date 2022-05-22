@@ -2,7 +2,7 @@
 /*  Custom Config                               */
 /*                                              */
 /*  To change dice labels, you just need to     */
-/*  edit CONFIG.YZUR.Icons.<your game>     */
+/*  edit CONFIG.YZUR.Icons.<your game>          */
 /* -------------------------------------------- */
 
 import * as YearZeroDice from './YearZeroDice.js';
@@ -269,28 +269,6 @@ const YZUR = {
 //   return dieTypes;
 // }, {});
 
-// For compatibility with version 4.0.0
-// TODO remove at version 6.0
-Object.defineProperties(YZUR, 'CHAT', { get: () => depreYZUR('Chat') });
-Object.defineProperties(YZUR, 'ROLL', { get: () => depreYZUR('Roll') });
-Object.defineProperties(YZUR, 'DICE', {
-  get: () => {
-    depreYZUR('Dice');
-    return {
-      get localizeDieTypes() { return YZUR.Dice.localizeDieTerms; },
-      get DIE_TYPES() { return YZUR.Dice.DIE_TERMS; },
-      // get DIE_TYPES_BY_CLASS() { return YZUR.Dice.DIE_TYPES_BY_CLASS; },
-      get ICONS() { return depreYZUR('Icons', 'DICE.ICONS'); },
-    };
-  },
-});
-
-const depreYZUR = (key, text) => {
-  console.error(`YZUR | "YZUR.${text ?? key.toUpperCase()}" is deprecated. Use "YZUR.${key}" instead.`);
-  if (key in YZUR) return YZUR[key];
-  return null;
-};
-
 export default YZUR;
 
 /* -------------------------------------------- */
@@ -356,6 +334,7 @@ export default YZUR;
  * @typedef {Object} DieClassData
  * @property {!string}        name          The name of the new Die class
  * @property {!DieDeno}       denomination  The denomination of the new Die class
+ * @property {!faces}         faces         The number of faces of the new Die class
  * @property {DieTypeString} [type]         The type of the new Die class
  * @property {number[]}      [lockedValues] An array of values that disallow the die to be pushed
  */
