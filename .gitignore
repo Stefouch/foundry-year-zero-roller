@@ -18,3 +18,4 @@ build/
 # Foundry VTT files
 /foundry.js
 /*.lock
+/docs
