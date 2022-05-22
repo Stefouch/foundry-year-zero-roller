@@ -186,7 +186,7 @@ export default class YearZeroRoll extends Roll {
   get mishap() {
     // if (this.game !== 't2k') return false;
     // return this.baneCount >= 2 || this.baneCount >= this.size;
-    console.warn('YZRoll | YearZeroRoll#mishap is deprecated.');
+    console.warn('YZUR | YearZeroRoll#mishap is deprecated.');
     return false;
   }
 
@@ -297,10 +297,10 @@ export default class YearZeroRoll extends Roll {
     // Converts old format DiceQuantities.
     // ? Was: {Object.<DieTermString, number>}
     // ! This is temporary support. @deprecated
-    const isOldFormat = !Array.isArray(dice) && typeof dice === 'object' && !Object.keys().includes('term');
+    const isOldFormat = !Array.isArray(dice) && typeof dice === 'object' && !Object.keys(dice).includes('term');
     if (isOldFormat) {
       // eslint-disable-next-line max-len
-      console.warn(`${YearZeroRoll.name} | You are using an old "DiceQuanties" format which is deprecated and could be removed in a future release. Please refer to ".forge()" for the newer format.`);
+      console.warn(`YZUR | ${YearZeroRoll.name} | You are using an old "DiceQuanties" format which is deprecated and could be removed in a future release. Please refer to ".forge()" for the newer format.`);
       const _dice = [];
       for (const [term, n] of Object.entries(dice)) {
         if (n <= 0) continue;
@@ -323,7 +323,7 @@ export default class YearZeroRoll extends Roll {
     let formula = out.join(' + ');
 
     if (!YearZeroRoll.validate(formula)) {
-      console.warn(`${YearZeroRoll.name} | Invalid roll formula: "${formula}"`);
+      console.warn(`YZUR | ${YearZeroRoll.name} | Invalid roll formula: "${formula}"`);
       formula = yzGame === 't2k' ? '1d6' : '1ds';
     }
 
@@ -358,7 +358,7 @@ export default class YearZeroRoll extends Roll {
    */
   static _getTermFormulaFromBlok(termBlok) {
     const { term, number, flavor, maxPush } = termBlok;
-    return YearZeroRoll.generateTermFormula(term, number, flavor, maxPush);
+    return YearZeroRoll.generateTermFormula(number, term, flavor, maxPush);
   }
 
   /**
