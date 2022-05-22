@@ -63,18 +63,16 @@ import { YearZeroRollManager } from './lib/yzur.js';
 ```
 
 3. In your init hook, initialize the dice with the `.register()` method.<br/>
-• Replace `'<your_game>'` with the code of the game to be used.<br/>
-• The second argument is an object of options. Add there the paths to the three templates and your own custom settings.
+   • Replace `'<your_game>'` with the code of the game to be used.<br/>
+   • The second argument is an object of options. Add there the paths to the three templates and your own custom settings.
 
 ```js
-Hooks.once('init', function() {
-
+Hooks.once('init', function () {
   YearZeroRollManager.register('<your_game>', {
     'ROLL.chatTemplate': 'systems/your_system/templates/dice/roll.hbs',
     'ROLL.tooltipTemplate': 'systems/your_system/templates/dice/tooltip.hbs',
     'ROLL.infosTemplate': 'systems/your_system/templates/dice/infos.hbs',
   });
-
 });
 ```
 
@@ -92,11 +90,21 @@ Either create your own formula with it, or use the `.forge()` static method.
 import { YearZeroRoll } from './lib/yzur.js';
 
 // Set the dice quantities.
-let dice = {
-  base: 5,
-  skill: 3,
-  gear: 2,
-};
+let dice = [
+  {
+    term: 'b', // Base dice
+    number: 5,
+  },
+  {
+    term: 's', // Skill dice
+    number: 3,
+  },
+  {
+    term: 'g' // Gear dice
+    number: 2
+    flavor: 'Sword'
+  }
+];
 
 // Set options for the roll.
 let options = {
@@ -109,7 +117,7 @@ let roll;
 roll = Roll.create('<my_formula>', { yzur: true });
 roll = YearZeroRoll.create('<my_formula>');
 roll = new YearZeroRoll('<my_formula>', data, options);
-roll = YearZeroRoll.forge(dice);
+roll = YearZeroRoll.forge(dice, data, options);
 
 // Roll the roll, same methods as usual
 await roll.roll({ async: true });
@@ -210,20 +218,20 @@ await roll.toMessage(messageData, { rollMode });
 
 # Read More
 
-Read The Fucking Manual here: [DOCUMENTATION](./DOCUMENTATION.md).
+Read The Fucking Manual!
 
 # Supported Games
 
-| Game | Code | Dice & Denominations |
-| :-- | :-- | :-- |
-| Alien RPG | `alien` | `skill: s`<br/>`stress: z` |
-| Blade Runner RPG | `br` | `brD12: 12`<br/>`brD10: 10`<br/>`brD8: 8`<br/>`brD6: 6` |
-| Coriolis: The Third Horizon | `cor` | `skill: s` |
-| Forbidden Lands | `fbl` | `base: b`<br/>`skill: s`<br/>`gear: g`<br/>`neg: n`<br/>`artoD8: 8`<br/>`artoD10: 10`<br/>`artoD12: 12` |
-| Mutant: Year Zero | `myz` | `base: b`<br/>`skill: s`<br/>`gear: g`<br/>`neg: n` |
-| Tales From the Loop | `tales` | `skill: s` |
-| Twilight 2000 (4th Edition) | `t2k` | `a: 12`<br/>`b: 10`<br/>`c: 8`<br/>`d: 6`<br/>`ammo: m`<br/>`loc: l` |
-| Vaesen | `vae` | `skill: s` |
+| Game                        | Code    | Dice & Denominations                                                                                    |
+| :-------------------------- | :------ | :------------------------------------------------------------------------------------------------------ |
+| Alien RPG                   | `alien` | `skill: s`<br/>`stress: z`                                                                              |
+| Blade Runner RPG            | `br`    | `brD12: 12`<br/>`brD10: 10`<br/>`brD8: 8`<br/>`brD6: 6`                                                 |
+| Coriolis: The Third Horizon | `cor`   | `skill: s`                                                                                              |
+| Forbidden Lands             | `fbl`   | `base: b`<br/>`skill: s`<br/>`gear: g`<br/>`neg: n`<br/>`artoD8: 8`<br/>`artoD10: 10`<br/>`artoD12: 12` |
+| Mutant: Year Zero           | `myz`   | `base: b`<br/>`skill: s`<br/>`gear: g`<br/>`neg: n`                                                     |
+| Tales From the Loop         | `tales` | `skill: s`                                                                                              |
+| Twilight 2000 (4th Edition) | `t2k`   | `a: 12`<br/>`b: 10`<br/>`c: 8`<br/>`d: 6`<br/>`ammo: m`<br/>`loc: l`                                    |
+| Vaesen                      | `vae`   | `skill: s`                                                                                              |
 
 ### Examples of commands in the chat
 
@@ -260,7 +268,7 @@ Read The Fucking Manual here: [DOCUMENTATION](./DOCUMENTATION.md).
 /roll 3dbp3 + 3dsp2 + 3dgnp   (can be combined)
 ```
 
-<small><i>Note: For full-auto fire, you can add the modifier <code>p100</code>.</i></small>
+<small><i>Note: For full-auto fire, you can add the modifier <code>p1000</code>.</i></small>
 
 # Dice So Nice
 
@@ -278,11 +286,11 @@ DsN is supported but not configured. See the [API](https://gitlab.com/riccisi/fo
 
 ### 👤 Stefouch
 
-* **Twitter:** [@stefouch](https://twitter.com/stefouch)
-* **Github:** [@Stefouch](https://github.com/Stefouch)
-* **Discord:** Stefouch#5202
-  * [Year Zero Worlds](https://discord.gg/RnaydHR)
-  * [The Foundry](https://discord.gg/8yAKUHZZKE)
+- **Twitter:** [@stefouch](https://twitter.com/stefouch)
+- **Github:** [@Stefouch](https://github.com/Stefouch)
+- **Discord:** Stefouch#5202
+  - [Year Zero Worlds](https://discord.gg/RnaydHR)
+  - [The Foundry](https://discord.gg/8yAKUHZZKE)
 
 # 🙏 Show Your Support
 

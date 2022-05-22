@@ -1,0 +1,58 @@
+{
+  "tags": {
+    "allowUnknownTags": ["category"]
+  },
+  "source": {
+    "include": ["./dist"],
+    "includePattern": ".js$",
+    "excludePattern": "(node_modules/|docs)"
+  },
+  "plugins": [
+    "plugins/markdown",
+    "node_modules/better-docs/category",
+    "node_modules/better-docs/typedef-import"
+  ],
+  "opts": {
+    "encoding": "utf8",
+    "destination": "docs/",
+    "readme": "./readme.md",
+    "recurse": true,
+    "verbose": true,
+  // "tutorials": "./docs-src/tutorials",
+    "template": "node_modules/better-docs"
+  },
+  "templates": {
+    "cleverLinks": true,
+    "monospaceLinks": false,
+    "search": true,
+    // "default": {
+    //   "staticFiles": {
+    //     "include": [
+    //         "./docs-src/statics"
+    //     ]
+    //   }
+    // },
+    "better-docs": {
+      "name": "YZUR – Year Zero Universal Roller",
+      // "logo": "https://github.com/Stefouch/t2k4e/raw/master/assets/stefouch-banner.png",
+      "title": "YZUR Docs", // HTML title
+      // "css": "style.css",
+      // "trackingCode": "tracking-code-which-will-go-to-the-HEAD",
+      "hideGenerator": false,
+      "navLinks": [
+        // {
+        //   "label": "Foundry",
+        //   "href": "https://www.foundryvtt.com"
+        // },
+        {
+            "label": "Github",
+            "href": "https://github.com/Stefouch/foundry-year-zero-roller"
+        },
+        {
+            "label": "Stefouch",
+            "href": "https://stefouch.be"
+        }
+      ]
+    }
+  }
+}

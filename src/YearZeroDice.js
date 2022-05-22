@@ -2,6 +2,13 @@
 /*  Custom Dice classes                         */
 /* -------------------------------------------- */
 
+/** @typedef {import('./constants').DieTypeString} DieTypeString */
+/** @typedef {import('./constants').YearZeroDieTermResult} YearZeroDieTermResult */
+
+/**
+ * Custom Die class for Year Zero games.
+ * @extends {Die} The Foundry Die class
+ */
 export class YearZeroDie extends Die {
   constructor(termData = {}) {
     termData.faces = termData.faces || 6;
@@ -98,7 +105,15 @@ export class YearZeroDie extends Die {
 
   /* -------------------------------------------- */
 
-  /** @override */
+  /** 
+   * Rolls the DiceTerm by mapping a random uniform draw against the faces of the dice term.
+   * @param {Object}  [options={}]             Options which modify how a random result is produced
+   * @param {boolean} [options.minimize=false] Minimize the result, obtaining the smallest possible value
+   * @param {boolean} [options.maximize=false] Maximize the result, obtaining the smallest possible value
+   * @returns {YearZeroDieTermResult} The produced result
+   * @see (Foundry) {@link https://foundryvtt.com/api/DiceTerm.html#roll|DiceTerm.roll}
+   * @override
+   */
   roll(options = {}) {
     // Modifies the result.
     const roll = super.roll(options);
@@ -199,17 +214,29 @@ export class YearZeroDie extends Die {
   /*  Dice Term Methods                           */
   /* -------------------------------------------- */
 
-  /** @override */
+  /** 
+   * Returns a string used as the label for each rolled result.
+   * @param {YearZeroDieTermResult} result The rolled result
+   * @returns {string} The result label
+   * @see (FoundryVTT) {@link https://foundryvtt.com/api/DiceTerm.html#getResultLabel|DiceTerm.getResultLabel}
+   * @override
+   */
   getResultLabel(result) {
     // Do not forget to stringify the label because
     // numbers return an error with DiceSoNice!
-    return CONFIG.YZUR.DICE.ICONS.getLabel(
+    return CONFIG.YZUR.Icons.getLabel(
       this.constructor.TYPE,
       result.result,
     );
   }
 
-  /** @override */
+  /**
+   * Gets the CSS classes that should be used to display each rolled result.
+   * @param {YearZeroDieTermResult} result The rolled result
+   * @returns {string[]} The desired classes
+   * @see (FoundryVTT) {@link https://foundryvtt.com/api/DiceTerm.html#getResultCSS|DiceTerm.getResultCSS}
+   * @override
+   */
   getResultCSS(result) {
     // This is copy-pasted from the source code,
     // with modified parts between ==> arrows <==.
@@ -254,7 +281,12 @@ export class YearZeroDie extends Die {
     ];
   }
 
-  /** @override */
+  /** 
+   * Renders the tooltip HTML for a Roll instance.
+   * @returns {Object} The data object used to render the default tooltip template for this DiceTerm
+   * @see (FoundryVTT) {@link https://foundryvtt.com/api/DiceTerm.html#getTooltipData|DiceTerm.getTooltipData}
+   * @override
+   */
   getTooltipData() {
     // This is copy-pasted from the source code,
     // with modified parts between ==> arrows <==.
@@ -276,8 +308,8 @@ export class YearZeroDie extends Die {
       //* Adds a default flavor for the die.
       // flavor: this.flavor,
       flavor: this.options.flavor ?? (
-        CONFIG.YZUR?.DICE?.localizeDieTypes
-          ? game.i18n.localize(`YZUR.DIETYPES.${this.constructor.name}`)
+        CONFIG.YZUR?.Dice?.localizeDieTerms
+          ? game.i18n.localize(`YZUR.DIETERMS.${this.constructor.name}`)
           : null
       ),
       //* <==
@@ -295,8 +327,31 @@ export class YearZeroDie extends Die {
     };
   }
 }
+
+/**
+ * The type of the die.
+ * @type {string}
+ * @constant
+ * @static
+ */
 YearZeroDie.TYPE = 'blank';
+
+/**
+ * An array of values that disallow the die to be pushed.
+ * @type {number[]}
+ * @constant
+ * @static
+ */
 YearZeroDie.LOCKED_VALUES = [6];
+
+/**
+ * An array of additional attributes which should be retained when the term is serialized.
+ * Addition: **maxPush**
+ * @type {string[]}
+ * @constant
+ * @static
+ * @inheritdoc
+ */
 YearZeroDie.SERIALIZE_ATTRIBUTES.push('maxPush');
 
 /** @inheritdoc */
@@ -313,6 +368,7 @@ YearZeroDie.MODIFIERS = foundry.utils.mergeObject(
 /**
  * Base Die: 1 & 6 cannot be re-rolled.
  * @extends {YearZeroDie}
+ * @category OTHER DICE
  */
 export class BaseDie extends YearZeroDie {}
 BaseDie.TYPE = 'base';
@@ -322,6 +378,7 @@ BaseDie.LOCKED_VALUES = [1, 6];
 /**
  * Skill Die: 6 cannot be re-rolled.
  * @extends {YearZeroDie}
+ * @category OTHER DICE
  */
 export class SkillDie extends YearZeroDie {}
 SkillDie.TYPE = 'skill';
@@ -330,6 +387,7 @@ SkillDie.DENOMINATION = 's';
 /**
  * Gear Die: 1 & 6 cannot be re-rolled.
  * @extends {YearZeroDie}
+ * @category OTHER DICE
  */
 export class GearDie extends YearZeroDie {}
 GearDie.TYPE = 'gear';
@@ -339,6 +397,7 @@ GearDie.LOCKED_VALUES = [1, 6];
 /**
  * Negative Die: 6 cannot be re-rolled.
  * @extends {SkillDie}
+ * @category OTHER DICE
  */
 export class NegativeDie extends SkillDie {}
 NegativeDie.TYPE = 'neg';
@@ -349,6 +408,7 @@ NegativeDie.DENOMINATION = 'n';
 /**
  * Stress Die: 1 & 6 cannot be re-rolled.
  * @extends {YearZeroDie}
+ * @category OTHER DICE
  */
 export class StressDie extends YearZeroDie {}
 StressDie.TYPE = 'stress';
@@ -360,11 +420,12 @@ StressDie.LOCKED_VALUES = [1, 6];
 /**
  * Artifact Die: 6+ cannot be re-rolled.
  * @extends {SkillDie}
+ * @category OTHER DICE
  */
 export class ArtifactDie extends SkillDie {
   /** @override */
   getResultLabel(result) {
-    return CONFIG.YZUR.DICE.ICONS.getLabel(
+    return CONFIG.YZUR.Icons.getLabel(
       `d${this.constructor.DENOMINATION}`,
       result.result,
     );
@@ -403,11 +464,12 @@ D12ArtifactDie.DENOMINATION = '12';
 /**
  * Twilight Die: 1 & 6+ cannot be re-rolled.
  * @extends {ArtifactDie} But LOCKED_VALUES are not the same
+ * @category OTHER DICE
  */
 export class TwilightDie extends ArtifactDie {
   /** @override */
   getResultLabel(result) {
-    return CONFIG.YZUR.DICE.ICONS.getLabel('base', result.result);
+    return CONFIG.YZUR.Icons.getLabel('base', result.result);
   }
 }
 TwilightDie.TYPE = 'base';
@@ -448,6 +510,11 @@ D12TwilightDie.DENOMINATION = '12';
 
 /* -------------------------------------------- */
 
+/**
+ * Ammunition Die for Twilight 2000.
+ * @extends {YearZeroDie}
+ * @category OTHER DICE
+ */
 export class AmmoDie extends YearZeroDie {
   constructor(termData = {}) {
     termData.faces = 6;
@@ -460,6 +527,11 @@ AmmoDie.LOCKED_VALUES = [1, 6];
 
 /* -------------------------------------------- */
 
+/**
+ * Location/Hit Die for Twilight 2000.
+ * @extends {YearZeroDie}
+ * @category OTHER DICE
+ */
 export class LocationDie extends YearZeroDie {
   constructor(termData = {}) {
     termData.faces = 6;
@@ -485,11 +557,12 @@ LocationDie.LOCKED_VALUES = [1, 2, 3, 4, 5, 6];
 /**
  * BladeRunner Die: 1 cannot be re-rolled.
  * @extends {ArtifactDie} But LOCKED_VALUES are not the same
+ * @category OTHER DICE
  */
 export class BladeRunnerDie extends ArtifactDie {
   /** @override */
   getResultLabel(result) {
-    return CONFIG.YZUR.DICE.ICONS.getLabel('base', result.result);
+    return CONFIG.YZUR.Icons.getLabel('base', result.result);
   }
 }
 BladeRunnerDie.TYPE = 'base';

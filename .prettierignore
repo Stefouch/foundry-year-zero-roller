@@ -1,3 +1,5 @@
 dist
+docs
 .eslintrc
 package-lock.json
+LICENSE_BANNER

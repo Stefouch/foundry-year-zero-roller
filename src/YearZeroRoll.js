@@ -7,20 +7,29 @@ import { YearZeroDie } from './YearZeroDice.js';
 import YZUR from './constants.js';
 import { GameTypeError } from './errors.js';
 
+/** @typedef {import('./constants').GameTypeString} GameTypeString */
+/** @typedef {import('./constants').DieTermString} DieTermString */
+/** @typedef {import('./constants').DieTypeString} DieTypeString */
+/** @typedef {import('./constants').TermBlok} TermBlok */
+/** @typedef {import('./constants').DieDeno} DieDeno */
+
 /**
  * Custom Roll class for Year Zero games.
  * @extends {Roll} The Foundry Roll class
  */
 export default class YearZeroRoll extends Roll {
+
   /**
-   * @param {string} formula  The string formula to parse
-   * @param {Object} data     The data object against which to parse attributes within the formula
-   * @param {string} data.game     The game used
-   * @param {string} data.name     The name of the roll
-   * @param {number} data.maxPush  The maximum number of times the roll can be pushed
-   * @param {string} options.game     The game used
-   * @param {string} options.name     The name of the roll
-   * @param {number} options.maxPush  The maximum number of times the roll can be pushed
+   * @param {string} formula The string formula to parse
+   * @param {Object}         [data]         The data object against which to parse attributes within the formula
+   * @param {GameTypeString} [data.game]    The game used
+   * @param {string}         [data.name]    The name of the roll
+   * @param {number}         [data.maxPush] The maximum number of times the roll can be pushed
+   * @param {Object}         [options]         Additional data which is preserved in the database
+   * @param {GameTypeString} [options.game]    The game used
+   * @param {string}         [options.name]    The name of the roll
+   * @param {number}         [options.maxPush] The maximum number of times the roll can be pushed
+   * @param {boolean}        [options.yzur]    Forces the roll of a YearZeroRoll in Foundry
    */
   constructor(formula, data = {}, options = {}) {
     if (options.name == undefined) options.name = data.name;
@@ -177,7 +186,7 @@ export default class YearZeroRoll extends Roll {
   get mishap() {
     // if (this.game !== 't2k') return false;
     // return this.baneCount >= 2 || this.baneCount >= this.size;
-    console.warn('YZRoll | YearZeroRoll#mishap is deprecated.');
+    console.warn('YZUR | YearZeroRoll#mishap is deprecated.');
     return false;
   }
 
@@ -254,7 +263,15 @@ export default class YearZeroRoll extends Roll {
   /*  Static Class Methods                        */
   /* -------------------------------------------- */
 
-  /** @override */
+  /**
+   * A factory method which constructs a Roll instance using the default configured Roll class.
+   * @param {string}  formula     The formula used to create the Roll instance
+   * @param {Object} [data={}]    The data object which provides component data for the formula
+   * @param {Object} [options={}] Additional options which modify or describe this Roll
+   * @returns {YearZeroRoll} The constructed Roll instance
+   * @see (FoundryVTT) {@link https://foundryvtt.com/api/Roll.html#.create|Roll.create}
+   * @override
+   */
   static create(formula, data = {}, options = {}) {
     return new YearZeroRoll(formula, data, options);
   }
@@ -263,48 +280,101 @@ export default class YearZeroRoll extends Roll {
 
   /**
    * Generates a roll based on the number of dice.
-   * @param {DiceQuantities}  dice       An object with quantities of dice
-   * @param {string}         [title]     The name of the roll
-   * @param {GameTypeString} [yzGame]    The game used
-   * @param {number}         [maxPush=1] The maximum number of pushes
-   * @param {Object}         [options]   Additional data which is preserved in the database
+   * @param {TermBlok|TermBlok[]} dice An array of objects that define the dice
+   * @param {Object}         [data={}]        Additional data to forge the dice
+   * @param {string}         [data.title]     The name of the roll
+   * @param {GameTypeString} [data.yzGame]    The game used
+   * @param {number}         [data.maxPush=1] The maximum number of pushes
+   * @param {Object}         [options]        Additional data which is preserved in the database
    * @returns {YearZeroRoll}
    * @static
    */
-  static forge(dice = {}, { title, yzGame = null, maxPush = 1, push = false } = {}, options = {}) {
+  static forge(dice = [], { title, yzGame = null, maxPush = 1 } = {}, options = {}) {
     // Checks the game.
-    yzGame = yzGame ?? CONFIG.YZUR?.game;
+    yzGame = yzGame ?? options.game ?? CONFIG.YZUR?.game;
     if (!YearZeroRollManager.GAMES.includes(yzGame)) throw new GameTypeError(yzGame);
+
+    // Converts old format DiceQuantities.
+    // ? Was: {Object.<DieTermString, number>}
+    // ! This is temporary support. @deprecated
+    const isOldFormat = !Array.isArray(dice) && typeof dice === 'object' && !Object.keys(dice).includes('term');
+    if (isOldFormat) {
+      // eslint-disable-next-line max-len
+      console.warn(`YZUR | ${YearZeroRoll.name} | You are using an old "DiceQuanties" format which is deprecated and could be removed in a future release. Please refer to ".forge()" for the newer format.`);
+      const _dice = [];
+      for (const [term, n] of Object.entries(dice)) {
+        if (n <= 0) continue;
+        let deno = CONFIG.YZUR.Dice.DIE_TERMS[term].DENOMINATION;
+        const cls = CONFIG.Dice.terms[deno];
+        deno = cls.DENOMINATION;
+        _dice.push({ term: deno, number: n });
+      }
+      dice = _dice;
+    }
+
+    // Converts to an array.
+    if (!Array.isArray(dice)) dice = [dice];
 
     // Builds the formula.
     const out = [];
-    for (const [type, n] of Object.entries(dice)) {
-      if (n <= 0) continue;
-      let deno = CONFIG.YZUR.DICE.DIE_TYPES[type].DENOMINATION;
-      const cls = CONFIG.Dice.terms[deno];
-      deno = cls.DENOMINATION;
-      const str = `${n}d${deno}${push ? 'p' : ''}`;
-      out.push(str);
+    for (const d of dice) {
+      out.push(YearZeroRoll._getTermFormulaFromBlok(d));
     }
     let formula = out.join(' + ');
 
     if (!YearZeroRoll.validate(formula)) {
-      console.warn(`${YearZeroRoll.name} | Invalid roll formula: "${formula}"`);
+      console.warn(`YZUR | ${YearZeroRoll.name} | Invalid roll formula: "${formula}"`);
       formula = yzGame === 't2k' ? '1d6' : '1ds';
     }
 
     // Creates the roll.
-    const roll = new YearZeroRoll(formula, { name: title, game: yzGame, maxPush }, options);
+    if (options.name == undefined) options.name = title;
+    if (options.game == undefined) options.game = yzGame;
+    if (options.maxPush == undefined) options.maxPush = maxPush;
+    const roll = YearZeroRoll.create(formula, {}, options);
     if (CONFIG.debug.dice) console.log(roll);
     return roll;
   }
+
+  /* -------------------------------------------- */
 
   /** @deprecated */
   // eslint-disable-next-line no-unused-vars
   static createFromDiceQuantities(dice = {}, { title, yzGame = null, maxPush = 1, push = false } = {}) {
     // eslint-disable-next-line max-len
-    console.warn('YZUR | createFromDiceQuantities() is deprecated and will be removed in a future release. Use forge()instead.');
+    console.warn('YZUR | createFromDiceQuantities() is deprecated and will be removed in a future release. Use forge() instead.');
     return YearZeroRoll.forge(dice, { title, yzGame, maxPush });
+  }
+
+  /* -------------------------------------------- */
+
+  /**
+   * Creates a roll formula based on a TermBlok.
+   * @see YearZeroRoll.generateTermFormula
+   * @param {TermBlok} termBlok
+   * @returns {string}
+   * @private
+   * @static
+   */
+  static _getTermFormulaFromBlok(termBlok) {
+    const { term, number, flavor, maxPush } = termBlok;
+    return YearZeroRoll.generateTermFormula(number, term, flavor, maxPush);
+  }
+
+  /**
+   * Creates a roll formula based on number of dice.
+   * @param {number}  number   The quantity of those dice
+   * @param {DieDeno} term     The denomination of the dice to create
+   * @param {string} [flavor]  (optional) Any flavor tied to those dice
+   * @param {number} [maxPush] (optional) Special maxPush modifier but only for those dice
+   * @returns {string}
+   * @static
+   */
+  static generateTermFormula(number, term, flavor = '', maxPush = null) {
+    let f = `${number}d${term}`;
+    if (typeof maxPush === 'number') f += `p${maxPush}`;
+    if (flavor) f += `[${flavor}]`;
+    return f;
   }
 
   /* -------------------------------------------- */
@@ -315,6 +385,26 @@ export default class YearZeroRoll extends Roll {
    * Gets all the dice terms of a certain type or that match an object of values.
    * @param {DieTypeString|{}} search Die type to search or an object with comparison values
    * @returns {YearZeroDie[]|DiceTerm[]}
+   * 
+   * @example
+   * // Gets all terms with the type "skill".
+   * let terms = getTerms('skill');
+   * 
+   * // Gets all terms that have exactly these specifications (it follows the structure of a DiceTerm).
+   * let terms = getTerms({
+   *   type: 'skill',
+   *   number: 1,
+   *   faces: 6,
+   *   options: {
+   *     flavor: 'Attack',
+   *     // ...etc...
+   *   },
+   *   results: {
+   *     result: 3,
+   *     active: true,
+   *     // ...etc...
+   *   },
+   * });
    */
   getTerms(search) {
     if (typeof search === 'string') return this.terms.filter(t => t.type === search);
@@ -382,7 +472,7 @@ export default class YearZeroRoll extends Roll {
    * Adds a number of dice to the roll.
    * Note: If a negative quantity is passed, instead it removes that many dice.
    * @param {number}        qty      The quantity to add
-   * @param {DieTypeString} type     The type of dice to add
+   * @param {DieTermString} type     The type of dice to add
    * @param {number}       [range=6] The number of faces of the die
    * @param {number}       [value]   The predefined value for the new dice
    * @param {Object}       [options] Additional options that modify the term
@@ -410,7 +500,7 @@ export default class YearZeroRoll extends Roll {
     }
     // If the DieTerm doesn't exist, creates it.
     else {
-      const cls = CONFIG.YZUR.DICE.DIE_TYPES[type];
+      const cls = CONFIG.YZUR.Dice.DIE_TERMS[type];
       term = new cls({
         number: qty,
         faces: range,
@@ -486,33 +576,12 @@ export default class YearZeroRoll extends Roll {
   }
 
   /* -------------------------------------------- */
-
-  /**
-   * Gets the quantities of each die type.
-   * @returns {DiceQuantities}
-   * @deprecated Useless now
-   */
-  // TODO Why did I put a todo tag here?
-  // TODO remove
-  getDiceQuantities() {
-    console.warn('YZUR | getDiceQuantities() is deprecated and will be removed in a future release.');
-    return this.terms.reduce((dice, t) => {
-      if (t instanceof YearZeroDie) {
-        const clsName = t.constructor.name;
-        const type = CONFIG.YZUR.DICE.DIE_TYPES_BY_CLASS[clsName];
-        if (type) dice[type] = t.number;
-      }
-      return dice;
-    }, {});
-  }
-
-  /* -------------------------------------------- */
   /*  Push                                        */
   /* -------------------------------------------- */
 
   /**
    * Pushes the roll, following the YZ rules.
-   * @param {Object} [options={}] Options which inform how the Roll is evaluated
+   * @param {Object}  [options={}]          Options which inform how the Roll is evaluated
    * @param {boolean} [options.async=false] Evaluate the roll asynchronously, receiving a Promise as the returned value
    * @returns {Promise.<YearZeroRoll>} The roll instance, pushed
    * @async
@@ -552,7 +621,7 @@ export default class YearZeroRoll extends Roll {
       const diceMap = [null, 6, 8, 10, 12, Infinity];
       const typesMap = ['d', 'd', 'c', 'b', 'a', 'a'];
       const refactorRange = (range, n) => diceMap[diceMap.indexOf(range) + n];
-      const getTypeFromRange = (range) => typesMap[diceMap.indexOf(range)];
+      const getTypeFromRange = range => typesMap[diceMap.indexOf(range)];
 
       const _terms = this.getTerms('base');
       const dice = _terms.flatMap(t => new Array(t.number).fill(t.faces));
@@ -671,13 +740,19 @@ export default class YearZeroRoll extends Roll {
   /*  Templating                                  */
   /* -------------------------------------------- */
 
-  /** @override */
+  /** 
+   * Renders the tooltip HTML for a Roll instance.
+   * @returns {Promise.<string>} The rendered HTML tooltip as a string
+   * @see (FoundryVTT) {@link https://foundryvtt.com/api/Roll.html#getTooltip|Roll.getTooltip}
+   * @async
+   * @override
+   */
   async getTooltip() {
     const parts = this.dice.map(d => d.getTooltipData())
     // ==>
       .sort((a, b) => {
-        const sorts = CONFIG?.YZUR?.CHAT?.diceSorting
-          || YZUR.CHAT.diceSorting
+        const sorts = CONFIG?.YZUR?.Chat?.diceSorting
+          || YZUR.Chat.diceSorting
           || [];
         if (!sorts.length) return 0;
         const at = sorts.indexOf(a.type);
@@ -725,7 +800,7 @@ export default class YearZeroRoll extends Roll {
    * @async
    */
   async getRollInfos(template = null) {
-    template = template ?? CONFIG.YZUR?.ROLL?.infosTemplate;
+    template = template ?? CONFIG.YZUR?.Roll?.infosTemplate;
     const context = { roll: this };
     return renderTemplate(template, context);
   }
@@ -740,12 +815,14 @@ export default class YearZeroRoll extends Roll {
    * @param {string}  [chatOptions.flavor]        The flavor of the message
    * @param {string}  [chatOptions.template]      The path to the template
    *   that renders the roll
-   * @param {string}  [chatOptions.infosTemplate] The path to the template
+   * @param {string}  [chatOptions.infosTemplate] ✨ The path to the template
    *   that renders the infos box under the roll tooltip
    * @param {boolean} [chatOptions.blind]         Whether this is a blind roll
    * @param {boolean} [chatOptions.isPrivate]     Whether this roll is private
    *   (displays sensitive infos with `???` instead)
    * @returns {Promise.<string>}
+   * @see ✨ Extra features added by the override.
+   * @see (FoundryVTT) {@link https://foundryvtt.com/api/Roll.html#render|Roll.render}
    * @async
    * @override
    */
@@ -771,7 +848,7 @@ export default class YearZeroRoll extends Roll {
       tooltip: isPrivate ? '' : await this.getTooltip(),
       total: isPrivate ? '?' : Math.round(this.total * 100) / 100,
       success: isPrivate ? '?' : this.successCount,
-      showInfos: isPrivate ? false : CONFIG.YZUR?.CHAT?.showInfos,
+      showInfos: isPrivate ? false : CONFIG.YZUR?.Chat?.showInfos,
       infos: isPrivate ? null : await this.getRollInfos(chatOptions.infosTemplate),
       pushable: isPrivate ? false : this.pushable,
       options: chatOptions,
@@ -790,7 +867,7 @@ export default class YearZeroRoll extends Roll {
    * This function can either create the ChatMessage directly, or return the data object that will be used to create.
    * @param {Object}  [messageData]         The data object to use when creating the message
    * @param {string}  [messageData.user]    The ID of the user that sends the message
-   * @param {Object}  [messageData.speaker] The identified speaker data
+   * @param {Object}  [messageData.speaker] ✨ The identified speaker data
    * @param {string}  [messageData.content] The HTML content of the message,
    *   overriden by the `roll.render()`'s returned content if left unchanged
    * @param {number}  [messageData.type=5]    The type to use for the message from `CONST.CHAT_MESSAGE_TYPES`
@@ -802,6 +879,8 @@ export default class YearZeroRoll extends Roll {
    * @return {Promise.<ChatMessage|ChatMessageData>} A promise which resolves to the created ChatMessage entity
    *   if create is true
    *   or the Object of prepared chatData otherwise.
+   * @see ✨ Extra features added by the override.
+   * @see (FoundryVTT) {@link https://foundryvtt.com/api/Roll.html#toMessage|Roll.toMessage}
    * @async
    * @override
    */

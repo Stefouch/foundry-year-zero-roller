@@ -1,4 +1,115 @@
-/**
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YZUR Docs yzur.js</title>
+
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="./build/entry.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700|Inconsolata,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+  <link type="text/css" rel="stylesheet" href="">
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+  
+</head>
+
+
+
+<body class="layout small-header">
+    <div id="stickyNavbarOverlay"></div>
+    
+
+<div class="top-nav">
+    <div class="inner">
+        <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+        <div class="logo">
+            
+             
+                <a href="index.html">
+                    <h1 class="navbar-item">YZUR – Year Zero Universal Roller</h1>
+                </a>
+            
+        </div>
+        <div class="menu">
+            
+            <div class="navigation">
+                <a
+                    href="index.html"
+                    class="link"
+                >
+                    Documentation
+                </a>
+                
+                 
+                    
+                        <a
+                            class="link user-link "
+                            href="https://github.com/Stefouch/foundry-year-zero-roller"
+                        >
+                            Github
+                        </a>
+                    
+                        <a
+                            class="link user-link "
+                            href="https://stefouch.be"
+                        >
+                            Stefouch
+                        </a>
+                    
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+    <div id="main">
+        <div
+            class="sidebar "
+            id="sidebarNav"
+        >
+            
+                <div class="search-wrapper">
+                    <input id="search" type="text" placeholder="Search docs..." class="input">
+                </div>
+            
+            <nav>
+                
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Classes</h3><ul><li><a href="YearZeroDie.html">YearZeroDie</a></li><li><a href="YearZeroRoll.html">YearZeroRoll</a></li><li><a href="YearZeroRollManager.html">YearZeroRollManager</a></li></ul><h3>Global</h3><ul><li><a href="global.html#YZUR">YZUR</a></li></ul></div><div class="category"><h2>OTHER DICE</h2><h3>Classes</h3><ul><li><a href="AmmoDie.html">AmmoDie</a></li><li><a href="ArtifactDie.html">ArtifactDie</a></li><li><a href="BaseDie.html">BaseDie</a></li><li><a href="BladeRunnerDie.html">BladeRunnerDie</a></li><li><a href="GearDie.html">GearDie</a></li><li><a href="LocationDie.html">LocationDie</a></li><li><a href="NegativeDie.html">NegativeDie</a></li><li><a href="SkillDie.html">SkillDie</a></li><li><a href="StressDie.html">StressDie</a></li><li><a href="TwilightDie.html">TwilightDie</a></li></ul></div>
+                
+            </nav>
+        </div>
+        <div class="core" id="main-content-wrapper">
+            <div class="content">
+                <header class="page-title">
+                    <p>Source</p>
+                    <h1>yzur.js</h1>
+                </header>
+                
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
  * ===============================================================================
  * YZUR:
  * YEAR ZERO UNIVERSAL DICE ROLLER FOR THE FOUNDRY VTT
@@ -126,7 +237,7 @@ class YearZeroDie extends Die {
     if (!this._evaluated) return undefined;
     return this.results.reduce((tot, r) => {
       if (!r.active) return tot;
-      return tot + (r.result <= 1);
+      return tot + (r.result &lt;= 1);
     }, 0);
   }
 
@@ -204,7 +315,7 @@ class YearZeroDie extends Die {
 
     // Then, rolls a new die for each pushed die.
     // With the indexes as options.
-    for (let i = 0; i < indexesResult.length; i++) {
+    for (let i = 0; i &lt; indexesResult.length; i++) {
       this.roll({
         indexResult: indexesResult[i],
         indexPush,
@@ -266,10 +377,10 @@ class YearZeroDie extends Die {
    */
   getResultCSS(result) {
     // This is copy-pasted from the source code,
-    // with modified parts between ==> arrows <==.
+    // with modified parts between ==> arrows &lt;==.
     const hasSuccess = result.success !== undefined;
     const hasFailure = result.failure !== undefined;
-    //* Refactors the isMin & isMax for YZE dice.
+    //* Refactors the isMin &amp; isMax for YZE dice.
     // const isMax = result.result === this.faces;
     // const isMin = result.result === 1;
     let isMax = false, isMin = false;
@@ -280,13 +391,13 @@ class YearZeroDie extends Die {
     else if (this instanceof YearZeroDie) {
       const noMin = ['skill', 'arto', 'loc'];
       isMax = result.result === this.faces || result.result >= 6;
-      isMin = result.result === 1 && !noMin.includes(this.type);
+      isMin = result.result === 1 &amp;&amp; !noMin.includes(this.type);
     }
     else {
       isMax = result.result === this.faces;
       isMin = result.result === 1;
     }
-    //* <==
+    //* &lt;==
     return [
       this.constructor.name.toLowerCase(),
       'd' + this.faces,
@@ -295,16 +406,16 @@ class YearZeroDie extends Die {
       // result.failure ? 'failure' : null,
       hasSuccess ? 'success' : null,
       hasFailure ? 'failure' : null,
-      //* <==
+      //* &lt;==
       result.rerolled ? 'rerolled' : null,
       result.exploded ? 'exploded' : null,
       result.discarded ? 'discarded' : null,
       //* ==>
       //* Adds a CSS property for pushed dice.
       result.pushed ? 'pushed' : null,
-      //* <==
-      !(hasSuccess || hasFailure) && isMin ? 'min' : null,
-      !(hasSuccess || hasFailure) && isMax ? 'max' : null,
+      //* &lt;==
+      !(hasSuccess || hasFailure) &amp;&amp; isMin ? 'min' : null,
+      !(hasSuccess || hasFailure) &amp;&amp; isMax ? 'max' : null,
     ];
   }
 
@@ -316,14 +427,14 @@ class YearZeroDie extends Die {
    */
   getTooltipData() {
     // This is copy-pasted from the source code,
-    // with modified parts between ==> arrows <==.
+    // with modified parts between ==> arrows &lt;==.
     return {
       formula: this.expression,
       //* ==>
       // total: this.total,
       total: this.success,
       banes: this.failure,
-      //* <==
+      //* &lt;==
       faces: this.faces,
       //* ==>
       //* Adds the number of dice, used in the chat for the pushed dice matrix.
@@ -339,7 +450,7 @@ class YearZeroDie extends Die {
           ? game.i18n.localize(`YZUR.DIETERMS.${this.constructor.name}`)
           : null
       ),
-      //* <==
+      //* &lt;==
       rolls: this.results.map(r => {
         return {
           result: this.getResultLabel(r),
@@ -348,7 +459,7 @@ class YearZeroDie extends Die {
           //* Adds row and col indexes.
           row: r.indexPush,
           col: r.indexResult,
-          //* <==
+          //* &lt;==
         };
       }),
     };
@@ -393,7 +504,7 @@ YearZeroDie.MODIFIERS = foundry.utils.mergeObject(
 /* -------------------------------------------- */
 
 /**
- * Base Die: 1 & 6 cannot be re-rolled.
+ * Base Die: 1 &amp; 6 cannot be re-rolled.
  * @extends {YearZeroDie}
  * @category OTHER DICE
  */
@@ -412,7 +523,7 @@ SkillDie.TYPE = 'skill';
 SkillDie.DENOMINATION = 's';
 
 /**
- * Gear Die: 1 & 6 cannot be re-rolled.
+ * Gear Die: 1 &amp; 6 cannot be re-rolled.
  * @extends {YearZeroDie}
  * @category OTHER DICE
  */
@@ -433,7 +544,7 @@ NegativeDie.DENOMINATION = 'n';
 /* -------------------------------------------- */
 
 /**
- * Stress Die: 1 & 6 cannot be re-rolled.
+ * Stress Die: 1 &amp; 6 cannot be re-rolled.
  * @extends {YearZeroDie}
  * @category OTHER DICE
  */
@@ -489,7 +600,7 @@ D12ArtifactDie.DENOMINATION = '12';
 /* -------------------------------------------- */
 
 /**
- * Twilight Die: 1 & 6+ cannot be re-rolled.
+ * Twilight Die: 1 &amp; 6+ cannot be re-rolled.
  * @extends {ArtifactDie} But LOCKED_VALUES are not the same
  * @category OTHER DICE
  */
@@ -678,13 +789,13 @@ var YearZeroDice = /*#__PURE__*/Object.freeze({
  *   Whether to localize the type of the die
  * @property {DieTypeString[]} Dice.DIE_TYPES
  *   An array of YearZeroDie types
- * @property {Object.<DieTermString, class>}  Dice.DIE_TERMS
+ * @property {Object.&lt;DieTermString, class>}  Dice.DIE_TERMS
  *   An enumeration of YearZeroDie classes
  * @property {Object}    Icons    Options for the icons and what's on the die faces
  * @property {function} [Icons.getLabel=getLabel( type: DieTypeString, result: number )] 
  *   A customizable helper function for creating the labels of the die.
  *   Note: You must return a string or DsN will throw an error.
- * @property {Object.<DieTypeString, Object.<string, string|number>>} Icons.yzGame
+ * @property {Object.&lt;DieTypeString, Object.&lt;string, string|number>>} Icons.yzGame
  *   Defines the labels for your dice. Change `yzGame` with the game identifier
  */
 const YZUR = {
@@ -926,7 +1037,7 @@ const YZUR = {
  * - `fbl`: Forbidden Lands
  * - `alien`: Alien RPG
  * - `cor`: Coriolis The Third Horizon
- * - `tales`: Tales From the Loop & Things From the Flood
+ * - `tales`: Tales From the Loop &amp; Things From the Flood
  * - `vae`: Vaesen
  * - `t2k`: Twilight 2000
  * - `br`: Blade Runner RPG
@@ -1136,9 +1247,9 @@ class YearZeroRoll extends Roll {
    */
   get pushable() {
     return (
-      this.pushCount < this.maxPush
-      && this.terms.some(t => t.pushable)
-      // && !this.mishap
+      this.pushCount &lt; this.maxPush
+      &amp;&amp; this.terms.some(t => t.pushable)
+      // &amp;&amp; !this.mishap
     );
   }
 
@@ -1320,15 +1431,15 @@ class YearZeroRoll extends Roll {
     if (!YearZeroRollManager.GAMES.includes(yzGame)) throw new GameTypeError(yzGame);
 
     // Converts old format DiceQuantities.
-    // ? Was: {Object.<DieTermString, number>}
+    // ? Was: {Object.&lt;DieTermString, number>}
     // ! This is temporary support. @deprecated
-    const isOldFormat = !Array.isArray(dice) && typeof dice === 'object' && !Object.keys(dice).includes('term');
+    const isOldFormat = !Array.isArray(dice) &amp;&amp; typeof dice === 'object' &amp;&amp; !Object.keys(dice).includes('term');
     if (isOldFormat) {
       // eslint-disable-next-line max-len
       console.warn(`YZUR | ${YearZeroRoll.name} | You are using an old "DiceQuanties" format which is deprecated and could be removed in a future release. Please refer to ".forge()" for the newer format.`);
       const _dice = [];
       for (const [term, n] of Object.entries(dice)) {
-        if (n <= 0) continue;
+        if (n &lt;= 0) continue;
         let deno = CONFIG.YZUR.Dice.DIE_TERMS[term].DENOMINATION;
         const cls = CONFIG.Dice.terms[deno];
         deno = cls.DENOMINATION;
@@ -1435,17 +1546,17 @@ class YearZeroRoll extends Roll {
     if (typeof search === 'string') return this.terms.filter(t => t.type === search);
     return this.terms.filter(t => {
       let f = true;
-      if (search.type != undefined) f = f && search.type === t.type;
-      if (search.number != undefined) f = f && search.number === t.number;
-      if (search.faces != undefined) f = f && search.faces === t.faces;
+      if (search.type != undefined) f = f &amp;&amp; search.type === t.type;
+      if (search.number != undefined) f = f &amp;&amp; search.number === t.number;
+      if (search.faces != undefined) f = f &amp;&amp; search.faces === t.faces;
       if (search.options) {
         for (const key in search.options) {
-          f = f && search.options[key] === t.options[key];
+          f = f &amp;&amp; search.options[key] === t.options[key];
         }
       }
       if (search.results) {
         for (const key in search.results) {
-          f = f && t.results.some(r => r[key] === search.results[key]);
+          f = f &amp;&amp; t.results.some(r => r[key] === search.results[key]);
         }
       }
       return f;
@@ -1459,7 +1570,7 @@ class YearZeroRoll extends Roll {
    * If `seed` is omitted, counts all the dice of a certain type.
    * @param {DieTypeString} type  The type of the die
    * @param {number}       [seed] The value to search, if any
-   * @param {string}       [comparison='='] The comparison to use against the seed: `>`, `>=`, `<`, `<=` or `=`
+   * @param {string}       [comparison='='] The comparison to use against the seed: `>`, `>=`, `&lt;`, `&lt;=` or `=`
    * @returns {number} Total count
    */
   count(type, seed = null, comparison = '=') {
@@ -1471,8 +1582,8 @@ class YearZeroRoll extends Roll {
             if (seed != null) {
               if (comparison === '>') { if (r.result > seed) c++; }
               else if (comparison === '>=') { if (r.result >= seed) c++; }
-              else if (comparison === '<') { if (r.result < seed) c++; }
-              else if (comparison === '<=') { if (r.result <= seed) c++; }
+              else if (comparison === '&lt;') { if (r.result &lt; seed) c++; }
+              else if (comparison === '&lt;=') { if (r.result &lt;= seed) c++; }
               else if (r.result === seed) { c++; }
             }
             else {
@@ -1501,14 +1612,14 @@ class YearZeroRoll extends Roll {
    * @param {number}       [range=6] The number of faces of the die
    * @param {number}       [value]   The predefined value for the new dice
    * @param {Object}       [options] Additional options that modify the term
-   * @returns {Promise.<YearZeroRoll>} This roll
+   * @returns {Promise.&lt;YearZeroRoll>} This roll
    * @async
    */
   async addDice(qty, type, { range = 6, value = null, options } = {}) {
     if (!qty) return this;
     const search = { type, faces: range, options };
-    if (qty < 0) return this.removeDice(-qty, search);
-    if (value != undefined && !this._evaluated) await this.roll({ async: true });
+    if (qty &lt; 0) return this.removeDice(-qty, search);
+    if (value != undefined &amp;&amp; !this._evaluated) await this.roll({ async: true });
 
     let term = this.getTerms(search)[0];
     if (term) {
@@ -1568,9 +1679,9 @@ class YearZeroRoll extends Roll {
       const term = this.getTerms(search)[0];
       if (term) {
         term.number--;
-        if (term.number <= 0) {
+        if (term.number &lt;= 0) {
           const type = search.type ?? search;
-          const index = this.terms.findIndex(t => t.type === type && t.number === 0);
+          const index = this.terms.findIndex(t => t.type === type &amp;&amp; t.number === 0);
           this.terms.splice(index, 1);
           if (this.terms[index - 1]?.operator) {
             this.terms.splice(index - 1, 1);
@@ -1578,7 +1689,7 @@ class YearZeroRoll extends Roll {
         }
         else if (this._evaluated) {
           const index = term.results.findIndex(r => r.active);
-          if (index < 0) break;
+          if (index &lt; 0) break;
           if (discard || disable) {
             if (discard) term.results[index].discarded = discard;
             if (disable) term.results[index].active = !disable;
@@ -1608,7 +1719,7 @@ class YearZeroRoll extends Roll {
    * Pushes the roll, following the YZ rules.
    * @param {Object}  [options={}]          Options which inform how the Roll is evaluated
    * @param {boolean} [options.async=false] Evaluate the roll asynchronously, receiving a Promise as the returned value
-   * @returns {Promise.<YearZeroRoll>} The roll instance, pushed
+   * @returns {Promise.&lt;YearZeroRoll>} The roll instance, pushed
    * @async
    */
   async push({ async } = {}) {
@@ -1634,13 +1745,13 @@ class YearZeroRoll extends Roll {
   /**
    * Applies a difficulty modifier to the roll.
    * @param {number} mod Difficulty modifier (bonus or malus)
-   * @returns {Promise.<YearZeroRoll>} This roll, modified
+   * @returns {Promise.&lt;YearZeroRoll>} This roll, modified
    * @async
    */
   async modify(mod = 0) {
     if (!mod) return this;
 
-    // TWILIGHT 2000 & BLADE RUNNER
+    // TWILIGHT 2000 &amp; BLADE RUNNER
     // --------------------------------------------
     else if (this.game === 't2k' || this.game === 'br') {
       const diceMap = [null, 6, 8, 10, 12, Infinity];
@@ -1663,7 +1774,7 @@ class YearZeroRoll extends Roll {
         }
         // A negative modifier means disadvantage.
         // A disadvantage removes the lowest die.
-        else if (mod < 0) {
+        else if (mod &lt; 0) {
           const i = dice.indexOf(lowest);
           dice.splice(i, 1);
         }
@@ -1690,7 +1801,7 @@ class YearZeroRoll extends Roll {
           // 1.2 — Readjusts term faces.
           if (dice[i] === Infinity) {
             dice[i] = refactorRange(dice[i], -1);
-            if (dice.length < 2) {
+            if (dice.length &lt; 2) {
               dice.push(diceMap[1]);
             }
           }
@@ -1703,7 +1814,7 @@ class YearZeroRoll extends Roll {
             }
           }
           else if (dice[i] === undefined) {
-            throw new Error(`YZUR | YearZeroRoll#modify<T2K> | dice[${i}] is out of bounds (mod: ${mod})`);
+            throw new Error(`YZUR | YearZeroRoll#modify&lt;T2K> | dice[${i}] is out of bounds (mod: ${mod})`);
           }
         }
       }
@@ -1712,8 +1823,8 @@ class YearZeroRoll extends Roll {
       this.removeDice(100, 'base');
 
       // 3 — Reconstructs the base terms.
-      const skilled = _terms.length > 1 && dice.length > 1;
-      for (let index = 0; index < dice.length; index++) {
+      const skilled = _terms.length > 1 &amp;&amp; dice.length > 1;
+      for (let index = 0; index &lt; dice.length; index++) {
         const ti = Math.min(index, skilled ? 1 : 0);
         await this.addDice(1, getTypeFromRange(dice[index]), {
           range: dice[index],
@@ -1723,17 +1834,17 @@ class YearZeroRoll extends Roll {
       // Note: reconstructed terms are evaluated
       // at the end of this method.
     }
-    // MUTANT YEAR ZERO & FORBIDDEN LANDS
+    // MUTANT YEAR ZERO &amp; FORBIDDEN LANDS
     // --------------------------------------------
     else if (['myz', 'fbl'].includes(this.game)) {
-      // Modifies skill & neg dice.
+      // Modifies skill &amp; neg dice.
       const skill = this.count('skill');
       const neg = Math.max(0, -mod - skill);
       await this.addDice(mod, 'skill');
       if (neg > 0) await this.addDice(neg, 'neg');
 
-      // Balances skill & neg dice.
-      while (this.count('skill') > 0 && this.count('neg') > 0) {
+      // Balances skill &amp; neg dice.
+      while (this.count('skill') > 0 &amp;&amp; this.count('neg') > 0) {
         this.removeDice(1, 'skill');
         this.removeDice(1, 'neg');
       }
@@ -1742,7 +1853,7 @@ class YearZeroRoll extends Roll {
     // --------------------------------------------
     else {
       const skill = this.count('skill');
-      if (mod < 0) {
+      if (mod &lt; 0) {
         // Minimum of 1 skill die.
         mod = Math.max(-skill + 1, mod);
       }
@@ -1767,7 +1878,7 @@ class YearZeroRoll extends Roll {
 
   /** 
    * Renders the tooltip HTML for a Roll instance.
-   * @returns {Promise.<string>} The rendered HTML tooltip as a string
+   * @returns {Promise.&lt;string>} The rendered HTML tooltip as a string
    * @see (FoundryVTT) {@link https://foundryvtt.com/api/Roll.html#getTooltip|Roll.getTooltip}
    * @async
    * @override
@@ -1784,7 +1895,7 @@ class YearZeroRoll extends Roll {
         const bt = sorts.indexOf(b.type);
         return at - bt;
       });
-    // <==
+    // &lt;==
     // START MODIFIED PART ==>
     if (this.pushed) {
       // Converts "parts.rolls" into a matrix.
@@ -1813,7 +1924,7 @@ class YearZeroRoll extends Roll {
         : undefined,
       config: CONFIG.YZUR ?? {},
     });
-    // <== END MODIFIED PART
+    // &lt;== END MODIFIED PART
   }
 
   /* -------------------------------------------- */
@@ -1821,7 +1932,7 @@ class YearZeroRoll extends Roll {
   /**
    * Renders the infos of a Year Zero roll.
    * @param {string} [template] The path to the template
-   * @returns {Promise.<string>}
+   * @returns {Promise.&lt;string>}
    * @async
    */
   async getRollInfos(template = null) {
@@ -1845,7 +1956,7 @@ class YearZeroRoll extends Roll {
    * @param {boolean} [chatOptions.blind]         Whether this is a blind roll
    * @param {boolean} [chatOptions.isPrivate]     Whether this roll is private
    *   (displays sensitive infos with `???` instead)
-   * @returns {Promise.<string>}
+   * @returns {Promise.&lt;string>}
    * @see ✨ Extra features added by the override.
    * @see (FoundryVTT) {@link https://foundryvtt.com/api/Roll.html#render|Roll.render}
    * @async
@@ -1901,7 +2012,7 @@ class YearZeroRoll extends Roll {
    * @param {string}  [options.rollMode]    The template roll mode to use for the message from CONFIG.Dice.rollModes
    * @param {boolean} [options.create=true] Whether to automatically create the chat message,
    *   or only return the prepared chatData object.
-   * @return {Promise.<ChatMessage|ChatMessageData>} A promise which resolves to the created ChatMessage entity
+   * @return {Promise.&lt;ChatMessage|ChatMessageData>} A promise which resolves to the created ChatMessage entity
    *   if create is true
    *   or the Object of prepared chatData otherwise.
    * @see ✨ Extra features added by the override.
@@ -2171,7 +2282,7 @@ class YearZeroRollManager {
     // eslint-disable-next-line no-shadow
     const { name, denomination: deno, faces, type, lockedValues } = data;
 
-    if (typeof faces !== 'number' || faces <= 0) {
+    if (typeof faces !== 'number' || faces &lt;= 0) {
       throw new DieTermError(`YZUR | Invalid die class faces "${faces}"`);
     }
 
@@ -2266,3 +2377,35 @@ Object.defineProperty(YearZeroRollManager, 'GAMES', {
 // YearZeroRollManager.GAMES = Object.keys(YearZeroRollManager.DIE_TERMS_MAP);
 
 export { YZUR, YearZeroDice, YearZeroRoll, YearZeroRollManager };
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+            </div>
+            
+            <footer class="footer">
+                <div class="content has-text-centered">
+                    <p>Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.10</a></p>
+                    <p class="sidebar-created-by">
+                        <a href="https://github.com/SoftwareBrothers/better-docs" target="_blank">BetterDocs theme</a> provided with <i class="fas fa-heart"></i> by
+                        <a href="http://softwarebrothers.co" target="_blank">SoftwareBrothers - JavaScript Development Agency</a>
+                    </p>
+                </div>
+            </footer>
+            
+        </div>
+        <div id="side-nav" class="side-nav">
+        </div>
+    </div>
+<script src="scripts/app.min.js"></script>
+<script>PR.prettyPrint();</script>
+<script src="scripts/linenumber.js"> </script>
+
+<script src="scripts/search.js"> </script>
+
+
+</body>
+</html>
