@@ -223,15 +223,34 @@ export default class YearZeroRollManager {
    * @returns {class}
    * @see YearZeroDie
    * @static
+   * 
+   * @example
+   * YZUR.YearZeroRollManager.createDieClass({
+   *   name: 'D6SpecialDie',
+   *   denomination: 's',
+   *   faces: 6,
+   *   type: 'gear',
+   *   lockedValues: [4, 5, 6],
+   * });
    */
   static createDieClass(data) {
     if (!data || typeof data !== 'object') {
       throw new SyntaxError('YZUR | To create a Die class, you must pass a DieClassData object!');
     }
 
-    const YearZeroCustomDie = class extends YearZeroDie {};
     // eslint-disable-next-line no-shadow
-    const { name, denomination: deno, type, lockedValues } = data;
+    const { name, denomination: deno, faces, type, lockedValues } = data;
+
+    if (typeof faces !== 'number' || faces <= 0) {
+      throw new DieTermError(`YZUR | Invalid die class faces "${faces}"`);
+    }
+
+    const YearZeroCustomDie = class extends YearZeroDie {
+      constructor(termData = {}) {
+        termData.faces = faces;
+        super(termData);
+      }
+    };
 
     // Defines the name of the new die class.
     if (!name | typeof name !== 'string') {
@@ -253,17 +272,20 @@ export default class YearZeroRollManager {
       if (!CONFIG.YZUR.Dice.DIE_TYPES.includes(type)) {
         console.warn(`YZUR | Unsupported DieTypeString: "${type}"`);
       }
+      if (!CONFIG.YZUR.Icons[CONFIG.YZUR.game][type]) {
+        console.warn(`YZUR | No icons defined for type "${type}"`);
+      }
       YearZeroCustomDie.TYPE = type;
     }
 
     // Defines the locked values of the new die class, if any.
     if (lockedValues != undefined) {
       if (!Array.isArray(lockedValues)) {
-        throw new DieTermError(`YZUR | Invalid die class locked values "${lockedValues}" (not an Array)`);
+        throw new DieTermError(`YZUR | Invalid die class locked values "${lockedValues}" (Not an Array)`);
       }
       for (const [i, v] of lockedValues.entries()) {
         if (typeof v !== 'number') {
-          throw new DieTermError(`YZUR | Invalid die class locked value "${v}" at [${i}] (not a Number)`);
+          throw new DieTermError(`YZUR | Invalid die class locked value "${v}" at [${i}] (Not a Number)`);
         }
       }
       YearZeroCustomDie.LOCKED_VALUES = lockedValues;
