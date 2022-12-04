@@ -700,12 +700,19 @@ export default class YearZeroRoll extends Roll {
     }
     // MUTANT YEAR ZERO & FORBIDDEN LANDS
     // --------------------------------------------
-    else if (['myz', 'fbl'].includes(this.game)) {
+    else if (['myz', 'fbl', 'alien'].includes(this.game)) {
       // Modifies skill & neg dice.
       const skill = this.count('skill');
-      const neg = Math.max(0, -mod - skill);
+      const neg = Math.min(skill + mod, 0);
       await this.addDice(mod, 'skill');
-      if (neg > 0) await this.addDice(neg, 'neg');
+      if (neg < 0) {
+        if (this.game === 'alien') {
+          await this.addDice(neg, 'stress');
+        }
+        else {
+          await this.addDice(neg, 'neg');
+        }
+      }
 
       // Balances skill & neg dice.
       while (this.count('skill') > 0 && this.count('neg') > 0) {
@@ -713,7 +720,7 @@ export default class YearZeroRoll extends Roll {
         this.removeDice(1, 'neg');
       }
     }
-    // ALL OTHER GAMES (ALIEN RPG, CORIOLIS, VAESEN, TFTL, etc.)
+    // ALL OTHER GAMES (CORIOLIS, VAESEN, TFTL, etc.)
     // --------------------------------------------
     else {
       const skill = this.count('skill');
