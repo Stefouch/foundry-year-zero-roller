@@ -38,11 +38,11 @@ async function _onPush(event) {
   const message = game.messages.get(messageId);
 
   // Gets the roll.
-  const roll = message.roll.duplicate();
+  const roll = message.rolls[0].duplicate();
 
   // Pushes the roll.
   if (roll.pushable) {
     await roll.push({ async: true });
-    roll.toMessage();
+    await roll.toMessage();
   }
 }
