@@ -1,6 +1,4 @@
 const argv = require('yargs').argv;
-const chalk = require('chalk');
-const execa = require('execa');
 const fs = require('fs-extra');
 const gulp = require('gulp');
 const { rollup } = require('rollup');
@@ -78,6 +76,7 @@ function getTargetVersion(currentVersion, release) {
  * Commits and pushes release to Github.
  */
 async function commitTagPush() {
+  const execa = await import('execa');
   const { version } = fs.readJSONSync('package.json');
   const commitMsg = `chore: release v${version}`;
   await execa('git', ['add', '-A'], { stdio });
@@ -92,6 +91,7 @@ async function commitTagPush() {
  * Updates version.
  */
 async function bumpVersion(cb) {
+  const chalk = await import('chalk');
   const packageJson = fs.readJSONSync('package.json');
   const packageLockJson = fs.existsSync('package-lock.json') ? fs.readJSONSync('package-lock.json') : undefined;
   const manifest = getManifest();
