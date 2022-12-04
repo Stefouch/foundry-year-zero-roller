@@ -22,7 +22,7 @@
     "@rollup/plugin-eslint": "^9.0.1",
     "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
     "better-docs": "^2.7.2",
-    "chalk": "^5.1.2",
+    "chalk": "^4.1.2",
     "eslint": "^8.29.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",

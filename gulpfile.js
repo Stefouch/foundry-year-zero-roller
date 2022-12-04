@@ -1,5 +1,6 @@
 const argv = require('yargs').argv;
 const fs = require('fs-extra');
+const chalk = require('chalk');
 const gulp = require('gulp');
 const { rollup } = require('rollup');
 const rollupConfig = require('./rollup.config.js');
@@ -91,7 +92,6 @@ async function commitTagPush() {
  * Updates version.
  */
 async function bumpVersion(cb) {
-  const chalk = await import('chalk');
   const packageJson = fs.readJSONSync('package.json');
   const packageLockJson = fs.existsSync('package-lock.json') ? fs.readJSONSync('package-lock.json') : undefined;
   const manifest = getManifest();
