@@ -156,7 +156,7 @@ export class YearZeroDie extends Die {
     const indexPush = this.pushCount + 1;
     const indexesResult = [];
     for (const r of this.results) {
-      if (!r.active) continue;
+      if (!r.active || r.locked) continue;
       if (!this.constructor.LOCKED_VALUES.includes(r.result)) {
         // Removes the die from the total score.
         r.active = false;

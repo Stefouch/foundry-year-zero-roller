@@ -1,7 +1,7 @@
 const eslint = require('@rollup/plugin-eslint');
 const license = require('rollup-plugin-license');
 const { readFileSync, writeFileSync } = require('fs');
-const { compatibleCoreVersion } = require('./system.json');
+const { compatibility } = require('./system.json');
 
 module.exports = {
   input: './src/main.js',
@@ -40,7 +40,7 @@ module.exports = {
           },
           data() {
             return {
-              foundryVersion: compatibleCoreVersion,
+              foundryVersion: compatibility.minimum,
             };
           },
         },

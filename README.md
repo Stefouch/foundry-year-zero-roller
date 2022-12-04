@@ -2,7 +2,7 @@
 <p align="center">
   <img alt="Version" src="https://img.shields.io/badge/dynamic/json?color=blue&label=version&query=version&url=https%3A%2F%2Fraw.githubusercontent.com%2FStefouch%2Ffoundry-year-zero-roller%2Fmaster%2Fsystem.json"/>
   <a href="https://foundryvtt.com" target="_blank">
-    <img alt="Foundry Version" src="https://img.shields.io/badge/dynamic/json?color=blue&label=Foundry&query=compatibleCoreVersion&url=https%3A%2F%2Fraw.githubusercontent.com%2FStefouch%2Ffoundry-year-zero-roller%2Fmaster%2Fsystem.json"/>
+    <img alt="Foundry Version" src="https://img.shields.io/badge/dynamic/json?color=blue&label=Foundry&query=compatibility.minimum&url=https%3A%2F%2Fraw.githubusercontent.com%2FStefouch%2Ffoundry-year-zero-roller%2Fmaster%2Fsystem.json"/>
   </a>
   <a href="https://github.com/Stefouch/foundry-year-zero-roller/releases">
     <img alt="Downloads" src="https://img.shields.io/github/downloads/Stefouch/foundry-year-zero-roller/latest/yzur.js"/>
@@ -135,7 +135,7 @@ let roll = YearZeroRoll.forge(dice);
 
 // Modify the roll.
 let modifier = -1;
-roll.modify(modifier);
+await roll.modify(modifier);
 
 // Roll and send.
 await roll.roll({ async: true });
@@ -179,7 +179,7 @@ async function _onPush(event) {
   let message = game.messages.get(messageId);
 
   // Copy the roll.
-  let roll = message.roll.duplicate();
+  let roll = message.rolls[0].duplicate();
 
   // Delete the previous message.
   await message.delete();
@@ -194,7 +194,7 @@ If you don't want to create a new message and instead edit the current message, 
 
 ```js
 // Update the message (it triggers its rendering).
-await message.update({ roll: JSON.stringify(pushedRoll) });
+await message.update({ rolls: [JSON.stringify(pushedRoll)] });
 ```
 
 ## Custom Template
