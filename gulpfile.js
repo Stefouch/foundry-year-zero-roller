@@ -77,7 +77,7 @@ function getTargetVersion(currentVersion, release) {
  * Commits and pushes release to Github.
  */
 async function commitTagPush() {
-  const execa = await import('execa');
+  const { execa } = await import('execa');
   const { version } = fs.readJSONSync('package.json');
   const commitMsg = `chore: release v${version}`;
   await execa('git', ['add', '-A'], { stdio });

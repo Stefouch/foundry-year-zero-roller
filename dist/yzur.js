@@ -4,8 +4,8 @@
  * YEAR ZERO UNIVERSAL DICE ROLLER FOR THE FOUNDRY VTT
  * ===============================================================================
  * Author: @Stefouch
- * Version: 5.0.0          for: Foundry VTT V9
- * Date: 2022-05-22
+ * Version: 5.0.0          for: Foundry VTT V10
+ * Date: 2022-12-04
  * License: MIT
  * ===============================================================================
  * Content:
@@ -183,7 +183,7 @@ class YearZeroDie extends Die {
     const indexPush = this.pushCount + 1;
     const indexesResult = [];
     for (const r of this.results) {
-      if (!r.active) continue;
+      if (!r.active || r.locked) continue;
       if (!this.constructor.LOCKED_VALUES.includes(r.result)) {
         // Removes the die from the total score.
         r.active = false;
@@ -1725,12 +1725,19 @@ class YearZeroRoll extends Roll {
     }
     // MUTANT YEAR ZERO & FORBIDDEN LANDS
     // --------------------------------------------
-    else if (['myz', 'fbl'].includes(this.game)) {
+    else if (['myz', 'fbl', 'alien'].includes(this.game)) {
       // Modifies skill & neg dice.
       const skill = this.count('skill');
-      const neg = Math.max(0, -mod - skill);
+      const neg = Math.min(skill + mod, 0);
       await this.addDice(mod, 'skill');
-      if (neg > 0) await this.addDice(neg, 'neg');
+      if (neg < 0) {
+        if (this.game === 'alien') {
+          await this.addDice(neg, 'stress');
+        }
+        else {
+          await this.addDice(neg, 'neg');
+        }
+      }
 
       // Balances skill & neg dice.
       while (this.count('skill') > 0 && this.count('neg') > 0) {
@@ -1738,7 +1745,7 @@ class YearZeroRoll extends Roll {
         this.removeDice(1, 'neg');
       }
     }
-    // ALL OTHER GAMES (ALIEN RPG, CORIOLIS, VAESEN, TFTL, etc.)
+    // ALL OTHER GAMES (CORIOLIS, VAESEN, TFTL, etc.)
     // --------------------------------------------
     else {
       const skill = this.count('skill');
