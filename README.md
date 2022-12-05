@@ -194,7 +194,7 @@ If you don't want to create a new message and instead edit the current message, 
 
 ```js
 // Update the message (it triggers its rendering).
-await message.update({ rolls: [JSON.stringify(pushedRoll)] });
+await message.update({ rolls: [roll.toJSON()] });
 ```
 
 ## Custom Template
