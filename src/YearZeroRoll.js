@@ -191,7 +191,7 @@ export default class YearZeroRoll extends Roll {
   }
 
   /**
-   * The quantity of ammo spent. Equal to the sum of the ammo dice.
+   * The sum of the ammo dice's values.
    * @type {number}
    * @readonly
    */
