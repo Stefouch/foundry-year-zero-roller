@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 <br/>The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 <br/>and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.1.1] - 2023-04-18
+
+### Fixed
+
+- A bug where the T2K rolls with 1 die where not modified correctly.
+
 ## [5.1.0] - 2022-12-04
 
 ### Added

@@ -299,7 +299,7 @@ async function _onPush(event) {
 </code></pre>
 <p>If you don't want to create a new message and instead edit the current message, you must call an update for the changes:</p>
 <pre class="prettyprint source lang-js"><code>// Update the message (it triggers its rendering).
-await message.update({ rolls: [JSON.stringify(pushedRoll)] });
+await message.update({ rolls: [roll.toJSON()] });
 </code></pre>
 <h2>Custom Template</h2>
 <p>To dynamically use another template for the roll message, you can use this trick:</p>

@@ -115,8 +115,8 @@
  * YEAR ZERO UNIVERSAL DICE ROLLER FOR THE FOUNDRY VTT
  * ===============================================================================
  * Author: @Stefouch
- * Version: 5.1.0          for: Foundry VTT V10
- * Date: 2022-12-04
+ * Version: 5.1.1          for: Foundry VTT V10
+ * Date: 2023-04-18
  * License: MIT
  * ===============================================================================
  * Content:
@@ -745,28 +745,28 @@ D12BladeRunnerDie.LOCKED_VALUES = [1, 10, 11, 12];
 
 var YearZeroDice = /*#__PURE__*/Object.freeze({
   __proto__: null,
-  YearZeroDie: YearZeroDie,
-  BaseDie: BaseDie,
-  SkillDie: SkillDie,
-  GearDie: GearDie,
-  NegativeDie: NegativeDie,
-  StressDie: StressDie,
-  ArtifactDie: ArtifactDie,
-  D8ArtifactDie: D8ArtifactDie,
-  D10ArtifactDie: D10ArtifactDie,
-  D12ArtifactDie: D12ArtifactDie,
-  TwilightDie: TwilightDie,
-  D6TwilightDie: D6TwilightDie,
-  D8TwilightDie: D8TwilightDie,
-  D10TwilightDie: D10TwilightDie,
-  D12TwilightDie: D12TwilightDie,
   AmmoDie: AmmoDie,
-  LocationDie: LocationDie,
+  ArtifactDie: ArtifactDie,
+  BaseDie: BaseDie,
   BladeRunnerDie: BladeRunnerDie,
-  D6BladeRunnerDie: D6BladeRunnerDie,
-  D8BladeRunnerDie: D8BladeRunnerDie,
+  D10ArtifactDie: D10ArtifactDie,
   D10BladeRunnerDie: D10BladeRunnerDie,
-  D12BladeRunnerDie: D12BladeRunnerDie
+  D10TwilightDie: D10TwilightDie,
+  D12ArtifactDie: D12ArtifactDie,
+  D12BladeRunnerDie: D12BladeRunnerDie,
+  D12TwilightDie: D12TwilightDie,
+  D6BladeRunnerDie: D6BladeRunnerDie,
+  D6TwilightDie: D6TwilightDie,
+  D8ArtifactDie: D8ArtifactDie,
+  D8BladeRunnerDie: D8BladeRunnerDie,
+  D8TwilightDie: D8TwilightDie,
+  GearDie: GearDie,
+  LocationDie: LocationDie,
+  NegativeDie: NegativeDie,
+  SkillDie: SkillDie,
+  StressDie: StressDie,
+  TwilightDie: TwilightDie,
+  YearZeroDie: YearZeroDie
 });
 
 /* -------------------------------------------- */
@@ -1327,7 +1327,7 @@ class YearZeroRoll extends Roll {
   }
 
   /**
-   * The quantity of ammo spent. Equal to the sum of the ammo dice.
+   * The sum of the ammo dice's values.
    * @type {number}
    * @readonly
    */
@@ -1788,8 +1788,15 @@ class YearZeroRoll extends Roll {
           let i;
           // 1.1.1 — A positive modifier increases the lowest term.
           if (mod > 0) {
-            i = dice.indexOf(Math.min(...dice));
-            dice[i] = refactorRange(dice[i], 1);
+            // Adds an extra die if there is only 1 die.
+            if (dice.length &lt; 2) {
+              i = 1;
+              dice.push(diceMap[1]);
+            }
+            else {
+              i = dice.indexOf(Math.min(...dice));
+              dice[i] = refactorRange(dice[i], 1);
+            }
             mod--;
           }
           // 1.1.2 — A negative modifier decreases the highest term.
@@ -1801,9 +1808,6 @@ class YearZeroRoll extends Roll {
           // 1.2 — Readjusts term faces.
           if (dice[i] === Infinity) {
             dice[i] = refactorRange(dice[i], -1);
-            if (dice.length &lt; 2) {
-              dice.push(diceMap[1]);
-            }
           }
           else if (dice[i] === null) {
             if (dice.length > 1) {

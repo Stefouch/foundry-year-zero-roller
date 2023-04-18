@@ -1,13 +1,13 @@
 {
   "name": "foundry-year-zero-roller",
-  "version": "5.1.0",
+  "version": "5.1.1",
   "description": "",
   "main": "dist/yzur.js",
   "scripts": {
     "build": "gulp build && npm run docs",
     "bump": "gulp bump --release",
     "release": "gulp release",
-    "update": "npm outdated && npm-check -u",
+    "upd": "npm outdated && npm-check -u",
     "watch": "gulp watch",
     "docs": "jsdoc -c jsdoc.jsonc"
   },
@@ -19,22 +19,22 @@
   "license": "MIT",
   "devDependencies": {
     "@league-of-foundry-developers/foundry-vtt-types": "^9.280.0",
-    "@rollup/plugin-eslint": "^9.0.1",
+    "@rollup/plugin-eslint": "^9.0.3",
     "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
     "better-docs": "^2.7.2",
     "chalk": "^4.1.2",
-    "eslint": "^8.29.0",
-    "eslint-config-prettier": "^8.5.0",
+    "eslint": "^8.38.0",
+    "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
     "execa": "^6.1.0",
-    "fs-extra": "^11.1.0",
+    "fs-extra": "^11.1.1",
     "gulp": "^4.0.2",
     "jsdoc": "^3.6.11",
     "moment": "^2.29.4",
-    "rollup": "^3.5.1",
+    "rollup": "^3.20.6",
     "rollup-plugin-license": "^3.0.1",
-    "semver": "^7.3.8",
-    "yargs": "^17.6.2"
+    "semver": "^7.5.0",
+    "yargs": "^17.7.1"
   },
   "repository": {
     "type": "git",
