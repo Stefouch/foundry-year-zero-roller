@@ -191,7 +191,7 @@ export default class YearZeroRoll extends Roll {
   }
 
   /**
-   * The quantity of ammo spent. Equal to the sum of the ammo dice.
+   * The sum of the ammo dice's values.
    * @type {number}
    * @readonly
    */
@@ -652,8 +652,15 @@ export default class YearZeroRoll extends Roll {
           let i;
           // 1.1.1 — A positive modifier increases the lowest term.
           if (mod > 0) {
-            i = dice.indexOf(Math.min(...dice));
-            dice[i] = refactorRange(dice[i], 1);
+            // Adds an extra die if there is only 1 die.
+            if (dice.length < 2) {
+              i = 1;
+              dice.push(diceMap[1]);
+            }
+            else {
+              i = dice.indexOf(Math.min(...dice));
+              dice[i] = refactorRange(dice[i], 1);
+            }
             mod--;
           }
           // 1.1.2 — A negative modifier decreases the highest term.
@@ -665,9 +672,6 @@ export default class YearZeroRoll extends Roll {
           // 1.2 — Readjusts term faces.
           if (dice[i] === Infinity) {
             dice[i] = refactorRange(dice[i], -1);
-            if (dice.length < 2) {
-              dice.push(diceMap[1]);
-            }
           }
           else if (dice[i] === null) {
             if (dice.length > 1) {
