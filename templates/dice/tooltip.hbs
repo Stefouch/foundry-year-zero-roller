@@ -29,4 +29,11 @@
     </div>
   </section>
   {{/each}}
+  {{if breakdown.length}}
+  <ul>
+    {{#each breakdown}}
+    <li>{{{this}}}</li>
+    {{/each}}
+  </ul>
+  {{/if}}
 </div>
