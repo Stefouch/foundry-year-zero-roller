@@ -29,9 +29,11 @@
     </div>
   </section>
   {{/each}}
+  {{if breakdown.length}}
   <ul>
-  {{#each breakdown}}
+    {{#each breakdown}}
     <li>{{{this}}}</li>
-  {{/each}}
+    {{/each}}
   </ul>
+  {{/if}}
 </div>

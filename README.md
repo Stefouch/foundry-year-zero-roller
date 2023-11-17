@@ -112,6 +112,11 @@ let dice = [
 let options = {
   name: 'My Super Year Zero Roll',
   maxPush: 1,
+  breakdown: [
+    "Base Dice: 5",
+    "Skill Dice: 3",
+    "Gear Dice (Sword): 2"
+  ],
 };
 
 // Create a roll. Use any of the following methods:
