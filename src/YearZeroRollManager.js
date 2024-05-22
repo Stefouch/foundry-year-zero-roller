@@ -50,6 +50,8 @@ export default class YearZeroRollManager {
    * @static
    */
   static register(yzGame, config, options = {}) {
+    // Override DiceTerm.fromData until we have a better solution.
+    YearZeroRollManager._overrideDiceTermFromData();
     // Registers the config.
     YearZeroRollManager.registerConfig(config);
     // Registers the YZ game.
@@ -188,6 +190,34 @@ export default class YearZeroRollManager {
     CONFIG.YZUR.game = yzGame;
     console.log(`YZUR | The name of the Year Zero game is: "${yzGame}".`);
   }
+
+  /* -------------------------------------------- */
+
+  /**
+   * Overrides the default Foundry DiceTerm prototype to inject our own fromData() function.
+   * When creating a dice term, the DiceTerm prototype will now check if the term has a YZE pattern.
+   * If so, it uses our method, otherwise it returns to the Foundry defaults.
+   * @private
+   * @static
+   * @see DiceTerm.fromData
+  */
+  static _overrideDiceTermFromData() {
+    DiceTerm.prototype.constructor.fromData = function (data) {
+      let cls = CONFIG.Dice.termTypes[data.class];
+      if (!cls) {
+        const termkeys = Object.keys(CONFIG.Dice.terms);
+        const stringifiedFaces = String(data.faces);
+        if (data.class === 'Die' && termkeys.includes(stringifiedFaces)) {
+          cls = CONFIG.Dice.terms[stringifiedFaces];
+          data.class = cls.name;
+        }
+        else
+          cls = Object.values(CONFIG.Dice.terms).find(c => c.name === data.class) || foundry.dice.terms.Die;
+      }
+
+      return cls._fromData(data);
+    }
+  };
 
   /* -------------------------------------------- */
 

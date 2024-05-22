@@ -5,7 +5,7 @@
  * ===============================================================================
  * Author: @Stefouch
  * Version: 5.1.1          for: Foundry VTT V10
- * Date: 2023-04-18
+ * Date: 2024-05-22
  * License: MIT
  * ===============================================================================
  * Content:
@@ -38,12 +38,21 @@
  */
 class YearZeroDie extends Die {
   constructor(termData = {}) {
-    termData.faces = termData.faces || 6;
+    termData.faces = Number.isInteger(termData.faces) ? termData.faces : 6;
     super(termData);
 
     if (this.maxPush == undefined) {
       this.maxPush = termData.maxPush ?? 1;
     }
+  }
+
+  /**
+   * The denomination of the die.
+   * @type {string}
+   * @readonly
+   */
+  get denomination() {
+    return this.constructor.DENOMINATION;
   }
 
   /**
@@ -137,13 +146,13 @@ class YearZeroDie extends Die {
    * @param {Object}  [options={}]             Options which modify how a random result is produced
    * @param {boolean} [options.minimize=false] Minimize the result, obtaining the smallest possible value
    * @param {boolean} [options.maximize=false] Maximize the result, obtaining the smallest possible value
-   * @returns {YearZeroDieTermResult} The produced result
+   * @returns {Promise<YearZeroDieTermResult>} The produced result
    * @see (Foundry) {@link https://foundryvtt.com/api/DiceTerm.html#roll|DiceTerm.roll}
    * @override
    */
-  roll(options = {}) {
+  async roll(options = {}) {
     // Modifies the result.
-    const roll = super.roll(options);
+    const roll = await super.roll(options);
 
     // Stores indexes
     roll.indexResult = options.indexResult;
@@ -1991,6 +2000,8 @@ class YearZeroRollManager {
    * @static
    */
   static register(yzGame, config, options = {}) {
+    // Override DiceTerm.fromData until we have a better solution.
+    YearZeroRollManager._overrideDiceTermFromData();
     // Registers the config.
     YearZeroRollManager.registerConfig(config);
     // Registers the YZ game.
@@ -2129,6 +2140,34 @@ class YearZeroRollManager {
     CONFIG.YZUR.game = yzGame;
     console.log(`YZUR | The name of the Year Zero game is: "${yzGame}".`);
   }
+
+  /* -------------------------------------------- */
+
+  /**
+   * Overrides the default Foundry DiceTerm prototype to inject our own fromData() function.
+   * When creating a dice term, the DiceTerm prototype will now check if the term has a YZE pattern.
+   * If so, it uses our method, otherwise it returns to the Foundry defaults.
+   * @private
+   * @static
+   * @see DiceTerm.fromData
+  */
+  static _overrideDiceTermFromData() {
+    DiceTerm.prototype.constructor.fromData = function (data) {
+      let cls = CONFIG.Dice.termTypes[data.class];
+      if (!cls) {
+        const termkeys = Object.keys(CONFIG.Dice.terms);
+        const stringifiedFaces = String(data.faces);
+        if (data.class === 'Die' && termkeys.includes(stringifiedFaces)) {
+          cls = CONFIG.Dice.terms[stringifiedFaces];
+          data.class = cls.name;
+        }
+        else
+          cls = Object.values(CONFIG.Dice.terms).find(c => c.name === data.class) || foundry.dice.terms.Die;
+      }
+
+      return cls._fromData(data);
+    };
+  };
 
   /* -------------------------------------------- */
 
