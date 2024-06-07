@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 <br/>The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 <br/>and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.2.0] - 2024-06-07
+
+### Added
+
+- Options added to create a YearZeroRoll can now be retrieved in the tooltip template: see `YearZeroRoll#getTooltip()`. This can be used to pass extra informations from your roll directly into your own custom tooltip template. See also `YearZeroRoll#getRollInfos()` which renders the infos template (a section below the tooltip) and where the whole `roll` property was already accessible for your custom template.
+
+### Fixed
+
+- Compatibility with Foundry V12.
+
 ## [5.1.1] - 2023-04-18
 
 ### Fixed

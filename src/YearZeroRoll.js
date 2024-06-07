@@ -798,6 +798,7 @@ export default class YearZeroRoll extends Roll {
         ? [...Array(this.pushCount + 1).keys()].sort((a, b) => b - a)
         : undefined,
       config: CONFIG.YZUR ?? {},
+      options: this.options,
     });
     // <== END MODIFIED PART
   }

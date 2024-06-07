@@ -4,8 +4,8 @@
  * YEAR ZERO UNIVERSAL DICE ROLLER FOR THE FOUNDRY VTT
  * ===============================================================================
  * Author: @Stefouch
- * Version: 5.1.1          for: Foundry VTT V10
- * Date: 2024-05-22
+ * Version: 5.2.0          for: Foundry VTT V10
+ * Date: 2024-06-07
  * License: MIT
  * ===============================================================================
  * Content:
@@ -1832,6 +1832,7 @@ class YearZeroRoll extends Roll {
         ? [...Array(this.pushCount + 1).keys()].sort((a, b) => b - a)
         : undefined,
       config: CONFIG.YZUR ?? {},
+      options: this.options,
     });
     // <== END MODIFIED PART
   }
