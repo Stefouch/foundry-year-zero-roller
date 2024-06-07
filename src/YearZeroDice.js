@@ -11,12 +11,21 @@
  */
 export class YearZeroDie extends Die {
   constructor(termData = {}) {
-    termData.faces = termData.faces || 6;
+    termData.faces = Number.isInteger(termData.faces) ? termData.faces : 6;
     super(termData);
 
     if (this.maxPush == undefined) {
       this.maxPush = termData.maxPush ?? 1;
     }
+  }
+
+  /**
+   * The denomination of the die.
+   * @type {string}
+   * @readonly
+   */
+  get denomination() {
+    return this.constructor.DENOMINATION;
   }
 
   /**
@@ -110,13 +119,13 @@ export class YearZeroDie extends Die {
    * @param {Object}  [options={}]             Options which modify how a random result is produced
    * @param {boolean} [options.minimize=false] Minimize the result, obtaining the smallest possible value
    * @param {boolean} [options.maximize=false] Maximize the result, obtaining the smallest possible value
-   * @returns {YearZeroDieTermResult} The produced result
+   * @returns {Promise<YearZeroDieTermResult>} The produced result
    * @see (Foundry) {@link https://foundryvtt.com/api/DiceTerm.html#roll|DiceTerm.roll}
    * @override
    */
-  roll(options = {}) {
+  async roll(options = {}) {
     // Modifies the result.
-    const roll = super.roll(options);
+    const roll = await super.roll(options);
 
     // Stores indexes
     roll.indexResult = options.indexResult;
