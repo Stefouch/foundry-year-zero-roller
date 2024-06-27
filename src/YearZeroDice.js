@@ -559,6 +559,7 @@ export class LocationDie extends YearZeroDie {
 }
 LocationDie.TYPE = 'loc';
 LocationDie.DENOMINATION = 'l';
+LocationDie.SUCCESS_TABLE = [null, 0, 0, 0, 0, 0, 0];
 LocationDie.LOCKED_VALUES = [1, 2, 3, 4, 5, 6];
 
 /* -------------------------------------------- */
