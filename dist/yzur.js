@@ -5,7 +5,7 @@
  * ===============================================================================
  * Author: @Stefouch
  * Version: 5.2.0          for: Foundry VTT V10
- * Date: 2024-06-07
+ * Date: 2024-06-27
  * License: MIT
  * ===============================================================================
  * Content:
@@ -586,6 +586,7 @@ class LocationDie extends YearZeroDie {
 }
 LocationDie.TYPE = 'loc';
 LocationDie.DENOMINATION = 'l';
+LocationDie.SUCCESS_TABLE = [null, 0, 0, 0, 0, 0, 0];
 LocationDie.LOCKED_VALUES = [1, 2, 3, 4, 5, 6];
 
 /* -------------------------------------------- */
