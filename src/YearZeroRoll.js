@@ -696,12 +696,6 @@ export default class YearZeroRoll extends Roll {
       //       This way, it will also remove leading operator terms.
       this.removeDice(100, 'base');
 
-      // const terms = this.terms;
-      // // eslint-disable-next-line no-undef
-      // if (terms[0] instanceof OperatorTerm) {
-      //   terms.shift();
-      // }
-
       // 3 — Reconstructs the base terms.
       const skilled = _terms.length > 1 && dice.length > 1;
       for (let index = 0; index < dice.length; index++) {
