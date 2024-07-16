@@ -3,7 +3,7 @@
 /* -------------------------------------------- */
 
 import YearZeroRollManager from './YearZeroRollManager.js';
-import { YearZeroDie } from './YearZeroDice.js';
+import { YearZeroDie, OperatorTerm } from './YearZeroDice.js';
 import YZUR from './constants.js';
 import { GameTypeError } from './errors.js';
 
@@ -689,6 +689,11 @@ export default class YearZeroRoll extends Roll {
       // 2 — Filters out all the base terms.
       //       This way, it will also remove leading operator terms.
       this.removeDice(100, 'base');
+
+      const terms = this.terms;
+      if (terms[0] instanceof OperatorTerm) {
+        terms.shift();
+      }
 
       // 3 — Reconstructs the base terms.
       const skilled = _terms.length > 1 && dice.length > 1;

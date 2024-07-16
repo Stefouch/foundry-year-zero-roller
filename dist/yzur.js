@@ -4,8 +4,8 @@
  * YEAR ZERO UNIVERSAL DICE ROLLER FOR THE FOUNDRY VTT
  * ===============================================================================
  * Author: @Stefouch
- * Version: 5.2.0          for: Foundry VTT V10
- * Date: 2024-06-27
+ * Version: 5.2.1          for: Foundry VTT V10
+ * Date: 2024-07-15
  * License: MIT
  * ===============================================================================
  * Content:
