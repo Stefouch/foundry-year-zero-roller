@@ -5,7 +5,7 @@
  * ===============================================================================
  * Author: @Stefouch
  * Version: 5.2.1          for: Foundry VTT V10
- * Date: 2024-07-15
+ * Date: 2024-07-16
  * License: MIT
  * ===============================================================================
  * Content:
@@ -1607,6 +1607,12 @@ class YearZeroRoll extends Roll {
       else this._total = 0;
     }
 
+    const terms = this.terms;
+    // eslint-disable-next-line no-undef
+    if (terms[0] instanceof OperatorTerm) {
+      terms.shift();
+    }
+
     return this;
   }
 
@@ -1724,6 +1730,12 @@ class YearZeroRoll extends Roll {
       // 2 — Filters out all the base terms.
       //       This way, it will also remove leading operator terms.
       this.removeDice(100, 'base');
+
+      // const terms = this.terms;
+      // // eslint-disable-next-line no-undef
+      // if (terms[0] instanceof OperatorTerm) {
+      //   terms.shift();
+      // }
 
       // 3 — Reconstructs the base terms.
       const skilled = _terms.length > 1 && dice.length > 1;
