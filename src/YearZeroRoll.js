@@ -565,6 +565,12 @@ export default class YearZeroRoll extends Roll {
       }
       else { break; }
     }
+
+    const terms = this.terms;
+    // eslint-disable-next-line no-undef
+    if (terms[0] instanceof OperatorTerm) {
+      terms.shift();
+    }
     // Updates the cache of the Roll.
     this._formula = this.constructor.getFormula(this.terms);
     if (this._evaluated) {
