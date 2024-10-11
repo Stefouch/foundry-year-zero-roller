@@ -199,10 +199,10 @@ export default class YearZeroRollManager {
    * If so, it uses our method, otherwise it returns to the Foundry defaults.
    * @private
    * @static
-   * @see DiceTerm.fromData
+   * @see foundry.dice.terms.DiceTerm.fromData
   */
   static _overrideDiceTermFromData() {
-    DiceTerm.prototype.constructor.fromData = function (data) {
+    foundry.dice.terms.DiceTerm.prototype.constructor.fromData = function (data) {
       let cls = CONFIG.Dice.termTypes[data.class];
       if (!cls) {
         const termkeys = Object.keys(CONFIG.Dice.terms);
