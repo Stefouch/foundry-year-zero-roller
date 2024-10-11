@@ -910,7 +910,7 @@ export default class YearZeroRoll extends Roll {
       // with the HTML returned by roll.render(), but only if content is left unchanged.
       // So you can overwrite it here with a custom content in messageData.
       content: this.total,
-      type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+      type: this.rolls,
       // sound: CONFIG.sounds.dice, // Already added in super.
     }, messageData);
     // messageData.roll = this; // Already added in super.
