@@ -592,8 +592,8 @@ export default class YearZeroRoll extends Roll {
    * @returns {Promise.<YearZeroRoll>} The roll instance, pushed
    * @async
    */
-  async push({ async } = {}) {
-    if (!this._evaluated) await this.evaluate({ async });
+  async push() {
+    if (!this._evaluated) await this.evaluate();
     if (!this.pushable) return this;
 
     // Step 1 — Pushes the terms.
@@ -603,7 +603,7 @@ export default class YearZeroRoll extends Roll {
     //   The evaluate() method iterates each terms and runs only
     //   the term's own evaluate() method on new (pushed) dice.
     this._evaluated = false;
-    await this.evaluate({ async });
+    await this.evaluate();
 
     return this;
   }
