@@ -26,7 +26,7 @@ Hooks.once('ready', function () {
 });
 
 Hooks.on('renderChatLog', (app, html, _data) => {
-  html.on('click', '.dice-button.push', _onPush);
+  $(html).on('click', '.dice-button.push', _onPush);
 });
 
 async function _onPush(event) {

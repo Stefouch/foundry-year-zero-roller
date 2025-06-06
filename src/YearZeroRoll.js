@@ -483,7 +483,7 @@ export default class YearZeroRoll extends Roll {
     if (!qty) return this;
     const search = { type, faces: range, options };
     if (qty < 0) return this.removeDice(-qty, search);
-    if (value != undefined && !this._evaluated) await this.roll({ async: true });
+    if (value != undefined && !this._evaluated) await this.roll();
 
     let term = this.getTerms(search)[0];
     if (term) {
@@ -508,7 +508,7 @@ export default class YearZeroRoll extends Roll {
         options,
       });
       if (this._evaluated) {
-        await term.evaluate({ async: true });
+        await term.evaluate();
         if (value != undefined) {
           term.results.forEach(r => r.result = value);
         }
@@ -588,12 +588,11 @@ export default class YearZeroRoll extends Roll {
   /**
    * Pushes the roll, following the YZ rules.
    * @param {Object}  [options={}]          Options which inform how the Roll is evaluated
-   * @param {boolean} [options.async=false] Evaluate the roll asynchronously, receiving a Promise as the returned value
    * @returns {Promise.<YearZeroRoll>} The roll instance, pushed
    * @async
    */
-  async push({ async } = {}) {
-    if (!this._evaluated) await this.evaluate({ async });
+  async push() {
+    if (!this._evaluated) await this.evaluate();
     if (!this.pushable) return this;
 
     // Step 1 — Pushes the terms.
@@ -603,7 +602,7 @@ export default class YearZeroRoll extends Roll {
     //   The evaluate() method iterates each terms and runs only
     //   the term's own evaluate() method on new (pushed) dice.
     this._evaluated = false;
-    await this.evaluate({ async });
+    await this.evaluate();
 
     return this;
   }
@@ -797,7 +796,7 @@ export default class YearZeroRoll extends Roll {
       }
     }
     // // return renderTemplate(this.constructor.TOOLTIP_TEMPLATE, { parts });
-    return renderTemplate(this.constructor.TOOLTIP_TEMPLATE, {
+    return foundry.applications.handlebars.renderTemplate(this.constructor.TOOLTIP_TEMPLATE, {
       parts,
       pushed: this.pushed,
       pushCounts: this.pushed
@@ -820,7 +819,7 @@ export default class YearZeroRoll extends Roll {
   async getRollInfos(template = null) {
     template = template ?? CONFIG.YZUR?.Roll?.infosTemplate;
     const context = { roll: this };
-    return renderTemplate(template, context);
+    return foundry.applications.handlebars.renderTemplate(template, context);
   }
 
   /* -------------------------------------------- */
@@ -856,7 +855,7 @@ export default class YearZeroRoll extends Roll {
     const isPrivate = chatOptions.isPrivate;
 
     // Executes the roll, if needed.
-    if (!this._evaluated) await this.evaluate({ async: true });
+    if (!this._evaluated) await this.evaluate();
 
     // Defines chat data.
     const chatData = {
@@ -875,7 +874,7 @@ export default class YearZeroRoll extends Roll {
     };
 
     // Renders the roll display template.
-    return renderTemplate(chatOptions.template, chatData);
+    return foundry.applications.handlebars.renderTemplate(chatOptions.template, chatData);
   }
 
   /* -------------------------------------------- */
@@ -888,7 +887,7 @@ export default class YearZeroRoll extends Roll {
    * @param {Object}  [messageData.speaker] ✨ The identified speaker data
    * @param {string}  [messageData.content] The HTML content of the message,
    *   overriden by the `roll.render()`'s returned content if left unchanged
-   * @param {number}  [messageData.type=5]    The type to use for the message from `CONST.CHAT_MESSAGE_TYPES`
+   * @param {number}  [messageData.type=0]    The type to use for the message from `CONST.CHAT_MESSAGE_STYLES`
    * @param {string}  [messageData.sound]   The path to the sound played with the message (WAV format)
    * @param {options} [options]             Additional options which modify the created message.
    * @param {string}  [options.rollMode]    The template roll mode to use for the message from CONFIG.Dice.rollModes
@@ -910,7 +909,7 @@ export default class YearZeroRoll extends Roll {
       // with the HTML returned by roll.render(), but only if content is left unchanged.
       // So you can overwrite it here with a custom content in messageData.
       content: this.total,
-      type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+      // type: CONST.CHAT_MESSAGE_TYPES.ROLL,
       // sound: CONFIG.sounds.dice, // Already added in super.
     }, messageData);
     // messageData.roll = this; // Already added in super.

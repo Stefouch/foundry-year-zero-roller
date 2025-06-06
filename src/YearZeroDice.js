@@ -7,9 +7,9 @@
 
 /**
  * Custom Die class for Year Zero games.
- * @extends {Die} The Foundry Die class
+ * @extends {foundry.dice.terms.Die} The Foundry Die class
  */
-export class YearZeroDie extends Die {
+export class YearZeroDie extends foundry.dice.terms.Die {
   constructor(termData = {}) {
     termData.faces = Number.isInteger(termData.faces) ? termData.faces : 6;
     super(termData);
@@ -369,7 +369,7 @@ YearZeroDie.MODIFIERS = foundry.utils.mergeObject(
     'p' : 'setpush',
     'np': 'nopush',
   },
-  Die.MODIFIERS,
+  foundry.dice.terms.Die.MODIFIERS,
 );
 
 /* -------------------------------------------- */

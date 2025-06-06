@@ -4,8 +4,8 @@
  * YEAR ZERO UNIVERSAL DICE ROLLER FOR THE FOUNDRY VTT
  * ===============================================================================
  * Author: @Stefouch
- * Version: 5.2.2          for: Foundry VTT V13
- * Date: 2025-06-06
+ * Version: 5.2.2          for: Foundry VTT V10
+ * Date: 2024-07-29
  * License: MIT
  * ===============================================================================
  * Content:
@@ -34,9 +34,9 @@
 
 /**
  * Custom Die class for Year Zero games.
- * @extends {foundry.dice.terms.Die} The Foundry Die class
+ * @extends {Die} The Foundry Die class
  */
-class YearZeroDie extends foundry.dice.terms.Die {
+class YearZeroDie extends Die {
   constructor(termData = {}) {
     termData.faces = Number.isInteger(termData.faces) ? termData.faces : 6;
     super(termData);
@@ -396,7 +396,7 @@ YearZeroDie.MODIFIERS = foundry.utils.mergeObject(
     'p' : 'setpush',
     'np': 'nopush',
   },
-  foundry.dice.terms.Die.MODIFIERS,
+  Die.MODIFIERS,
 );
 
 /* -------------------------------------------- */
@@ -1518,7 +1518,7 @@ class YearZeroRoll extends Roll {
     if (!qty) return this;
     const search = { type, faces: range, options };
     if (qty < 0) return this.removeDice(-qty, search);
-    if (value != undefined && !this._evaluated) await this.roll();
+    if (value != undefined && !this._evaluated) await this.roll({ async: true });
 
     let term = this.getTerms(search)[0];
     if (term) {
@@ -1543,7 +1543,7 @@ class YearZeroRoll extends Roll {
         options,
       });
       if (this._evaluated) {
-        await term.evaluate();
+        await term.evaluate({ async: true });
         if (value != undefined) {
           term.results.forEach(r => r.result = value);
         }
@@ -1623,11 +1623,12 @@ class YearZeroRoll extends Roll {
   /**
    * Pushes the roll, following the YZ rules.
    * @param {Object}  [options={}]          Options which inform how the Roll is evaluated
+   * @param {boolean} [options.async=false] Evaluate the roll asynchronously, receiving a Promise as the returned value
    * @returns {Promise.<YearZeroRoll>} The roll instance, pushed
    * @async
    */
-  async push() {
-    if (!this._evaluated) await this.evaluate();
+  async push({ async } = {}) {
+    if (!this._evaluated) await this.evaluate({ async });
     if (!this.pushable) return this;
 
     // Step 1 — Pushes the terms.
@@ -1637,7 +1638,7 @@ class YearZeroRoll extends Roll {
     //   The evaluate() method iterates each terms and runs only
     //   the term's own evaluate() method on new (pushed) dice.
     this._evaluated = false;
-    await this.evaluate();
+    await this.evaluate({ async });
 
     return this;
   }
@@ -1831,7 +1832,7 @@ class YearZeroRoll extends Roll {
       }
     }
     // // return renderTemplate(this.constructor.TOOLTIP_TEMPLATE, { parts });
-    return foundry.applications.handlebars.renderTemplate(this.constructor.TOOLTIP_TEMPLATE, {
+    return renderTemplate(this.constructor.TOOLTIP_TEMPLATE, {
       parts,
       pushed: this.pushed,
       pushCounts: this.pushed
@@ -1854,7 +1855,7 @@ class YearZeroRoll extends Roll {
   async getRollInfos(template = null) {
     template = template ?? CONFIG.YZUR?.Roll?.infosTemplate;
     const context = { roll: this };
-    return foundry.applications.handlebars.renderTemplate(template, context);
+    return renderTemplate(template, context);
   }
 
   /* -------------------------------------------- */
@@ -1890,7 +1891,7 @@ class YearZeroRoll extends Roll {
     const isPrivate = chatOptions.isPrivate;
 
     // Executes the roll, if needed.
-    if (!this._evaluated) await this.evaluate();
+    if (!this._evaluated) await this.evaluate({ async: true });
 
     // Defines chat data.
     const chatData = {
@@ -1909,7 +1910,7 @@ class YearZeroRoll extends Roll {
     };
 
     // Renders the roll display template.
-    return foundry.applications.handlebars.renderTemplate(chatOptions.template, chatData);
+    return renderTemplate(chatOptions.template, chatData);
   }
 
   /* -------------------------------------------- */
@@ -1922,7 +1923,7 @@ class YearZeroRoll extends Roll {
    * @param {Object}  [messageData.speaker] ✨ The identified speaker data
    * @param {string}  [messageData.content] The HTML content of the message,
    *   overriden by the `roll.render()`'s returned content if left unchanged
-   * @param {number}  [messageData.type=0]    The type to use for the message from `CONST.CHAT_MESSAGE_STYLES`
+   * @param {number}  [messageData.type=5]    The type to use for the message from `CONST.CHAT_MESSAGE_TYPES`
    * @param {string}  [messageData.sound]   The path to the sound played with the message (WAV format)
    * @param {options} [options]             Additional options which modify the created message.
    * @param {string}  [options.rollMode]    The template roll mode to use for the message from CONFIG.Dice.rollModes
@@ -1944,7 +1945,7 @@ class YearZeroRoll extends Roll {
       // with the HTML returned by roll.render(), but only if content is left unchanged.
       // So you can overwrite it here with a custom content in messageData.
       content: this.total,
-      // type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+      type: CONST.CHAT_MESSAGE_TYPES.ROLL,
       // sound: CONFIG.sounds.dice, // Already added in super.
     }, messageData);
     // messageData.roll = this; // Already added in super.
@@ -2159,7 +2160,7 @@ class YearZeroRollManager {
    * @see DiceTerm.fromData
   */
   static _overrideDiceTermFromData() {
-    foundry.dice.terms.DiceTerm.prototype.constructor.fromData = function (data) {
+    DiceTerm.prototype.constructor.fromData = function (data) {
       let cls = CONFIG.Dice.termTypes[data.class];
       if (!cls) {
         const termkeys = Object.keys(CONFIG.Dice.terms);
