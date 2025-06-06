@@ -21,6 +21,7 @@
     "@league-of-foundry-developers/foundry-vtt-types": "^12.331.5",
     "@rollup/plugin-eslint": "^9.0.5",
     "@typhonjs-fvtt/eslint-config-foundry.js": "^0.8.0",
+    "@jsdoc/salty": "^0.2.9",
     "better-docs": "^2.7.3",
     "chalk": "^4.1.2",
     "eslint": "^9.28.0",
