@@ -263,12 +263,6 @@ const YZUR = {
   },
 };
 
-// TODO clean
-// YZUR.Dice.DIE_TYPES_BY_CLASS = Object.entries(YZUR.Dice.DIE_TERMS).reduce((dieTypes, [type, cls]) => {
-//   dieTypes[cls.name] = type;
-//   return dieTypes;
-// }, {});
-
 export default YZUR;
 
 /* -------------------------------------------- */
