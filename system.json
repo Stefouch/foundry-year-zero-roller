@@ -9,8 +9,12 @@
     "maximum": 13
   },
   "private": true,
-  "authors": ["Stefouch"],
-  "esmodules": ["foundry-year-zero-roller.js"],
+  "authors": [
+    "Stefouch"
+  ],
+  "esmodules": [
+    "foundry-year-zero-roller.js"
+  ],
   "scripts": [],
   "styles": [],
   "packs": [],

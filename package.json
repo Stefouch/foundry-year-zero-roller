@@ -1,6 +1,6 @@
 {
   "name": "foundry-year-zero-roller",
-  "version": "5.2.2",
+  "version": "6.0.0",
   "description": "",
   "main": "dist/yzur.js",
   "scripts": {
