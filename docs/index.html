@@ -274,7 +274,7 @@ await roll.push({ async: true });
 </code></pre>
 <h3>Push from the Chat</h3>
 <p>Add a listener to the button in the chat to get the roll and push it. See example below.</p>
-<pre class="prettyprint source lang-js"><code>Hooks.on('renderChatLog', (app, html, data) => {
+<pre class="prettyprint source lang-js"><code>Hooks.on('renderChatMessageHTML', (app, html, data) => {
   html.on('click', '.dice-button.push', _onPush);
 });
 

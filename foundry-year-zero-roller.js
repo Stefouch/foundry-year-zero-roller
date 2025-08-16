@@ -25,7 +25,7 @@ Hooks.once('ready', function () {
   console.warn('YZ Roller Tester | READY!');
 });
 
-Hooks.on('renderChatLog', (app, html, _data) => {
+Hooks.on('renderChatMessageHTML', (app, html, _data) => {
   $(html).on('click', '.dice-button.push', _onPush);
 });
 
