@@ -166,7 +166,7 @@ await roll.push({ async: true });
 Add a listener to the button in the chat to get the roll and push it. See example below.
 
 ```js
-Hooks.on('renderChatLog', (app, html, data) => {
+Hooks.on('renderChatMessageHTML', (app, html, data) => {
   html.on('click', '.dice-button.push', _onPush);
 });
 
