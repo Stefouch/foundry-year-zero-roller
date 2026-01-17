@@ -4,8 +4,8 @@
  * YEAR ZERO UNIVERSAL DICE ROLLER FOR THE FOUNDRY VTT
  * ===============================================================================
  * Author: @Stefouch
- * Version: 6.0.0          for: Foundry VTT V13
- * Date: 2025-06-06
+ * Version: 6.1.0          for: Foundry VTT V13
+ * Date: 2026-01-17
  * License: MIT
  * ===============================================================================
  * Content:
@@ -2104,6 +2104,7 @@ class YearZeroRollManager {
       console.log(`YZUR | Die Registration: "${deno}" with ${cls.name}.`);
     }
     CONFIG.Dice.terms[deno] = cls;
+    CONFIG.Dice.fulfillment.dice[deno] = {label: `d${deno}`, icon: "<i class=\"fa-solid fa-dice\"></i>"};
   }
 
   /* -------------------------------------------- */
