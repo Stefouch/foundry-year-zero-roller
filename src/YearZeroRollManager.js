@@ -147,6 +147,7 @@ export default class YearZeroRollManager {
       console.log(`YZUR | Die Registration: "${deno}" with ${cls.name}.`);
     }
     CONFIG.Dice.terms[deno] = cls;
+    CONFIG.Dice.fulfillment.dice[deno] = {label: `d${deno}`, icon: "<i class=\"fa-solid fa-dice\"></i>"};
   }
 
   /* -------------------------------------------- */
