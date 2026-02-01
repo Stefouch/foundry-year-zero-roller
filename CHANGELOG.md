@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 <br/>The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 <br/>and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.1.1] - 2026-02-01
+
+### Fixed
+
+- ✨ Remove parenthesis from formula when not necessary. See issue https://github.com/fvtt-fria-ligan/blade-runner-foundry-vtt/issues/65
+
 ## [6.1.0] - 2026-01-17
 
 ### Added
