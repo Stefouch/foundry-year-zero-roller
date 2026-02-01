@@ -276,6 +276,21 @@ export default class YearZeroRoll extends Roll {
     return new YearZeroRoll(formula, data, options);
   }
 
+  /**
+   * Replaces the `(digit)` patterns in a formula after data replacement.
+   * See https://github.com/fvtt-fria-ligan/blade-runner-foundry-vtt/issues/65 for more information.
+   * @override
+   */
+  static replaceFormulaData(formula, data, {missing, warn=false}={}) {
+    const replaced = super.replaceFormulaData(formula, data, {missing, warn});
+
+    const regex = new RegExp('\\((\\d*)\\)', 'gm')
+    const subst = `$1`;
+    const result = replaced.replace(regex, subst);
+
+    return result;
+  }
+
   /* -------------------------------------------- */
 
   /**
